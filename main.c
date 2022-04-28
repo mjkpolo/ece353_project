@@ -40,8 +40,9 @@ void Task_s2(void *pvParameters) {
     buttonState = buttonState << 1 | MKII_S2();
 
     if (buttonState == 0x7F) S2_P = true;
+		if (S2_P) printf("S2 true\r\n");
+		S2_P = false;
     ADC14->CTL0 |= ADC14_CTL0_SC | ADC14_CTL0_ENC;
-    TIMER32_1->INTCLR = BIT0;
 		vTaskDelay(pdMS_TO_TICKS(7));
 	}
 }
@@ -98,7 +99,7 @@ int main(void)
     xSemaphoreGive(Sem_LCD);
     xTaskCreate(Task_newFrame, "newFrame", configMINIMAL_STACK_SIZE, NULL, 1, &TaskH_newFrame);
     xTaskCreate(Task_joystick, "joystick", configMINIMAL_STACK_SIZE, NULL, 4, &TaskH_joystick);
-    xTaskCreate(Task_s2, "s2", configMINIMAL_STACK_SIZE, NULL, 4, &TaskH_s2);
+    xTaskCreate(Task_s2, "s2", configMINIMAL_STACK_SIZE, NULL, 1, &TaskH_s2);
 
     vTaskStartScheduler();
 
