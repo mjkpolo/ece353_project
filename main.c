@@ -49,67 +49,69 @@
 #include "crosshair.h"
 #include "ps2.h"
 #include "timer32.h"
+#include "task_blast.h"
 
-TaskHandle_t TaskH_updateBackground = NULL;
 TaskHandle_t TaskH_newFrame = NULL;
 SemaphoreHandle_t Sem_LCD;
 
 
 /* ****************************************************************************
  * This Function initializes the hardware required to blink LED1 on the
- * MSP432 Launchpad
+ * MSP432 Launchpad TODO
  * ***************************************************************************/
 static uint8_t x = 64, y = 64;
 
 inline void init(void)
 {
+    // TODO P3->DIR &= ~BIT5;
     P5->DIR &= ~BIT1;
     P5->DIR &= ~BIT5;
 
-	  Crystalfontz128x128_Init();
+	Crystalfontz128x128_Init();
 
     t32_init();
-    adc14_init();
-	  i2c_init();
-	  opt3001_init();
+    adc14_init(); // TODO Rename ps2.c/.h to adc14.c/.h
+	i2c_init();
+	opt3001_init();
 }
 
-// TODO Create header and move this to its own task_updateBackground.c file
+// TODO Create header and move this to its own task_updateBackground.c file with a corresponding task_updateBackground.h file
 void Task_updateBackground(void *pvParameters) {
 	while(true) {
-    enum light {DARK,MEDIUM,BRIGHT,foo};
-    static enum light l, pl = foo; // so pl != l
-	  float lux = opt3001_read_lux();
-		if (lux < 20) l=DARK;
-		else if (lux < 75) l=MEDIUM;
-		else l=BRIGHT;
-		if (pl != l) {
-			switch (l) {
-			  case BRIGHT :
-					draw_light_background();
-					break;
-			  case MEDIUM :
-					draw_medium_background();
-					break;
-			  case DARK :
-					draw_dark_background();
-					break;
-			}
-			// Draw crosshair so that it doesn't seem to disapear when the background color changes
-			draw_crosshair(x,y);
-		}
-		pl = l;
-    vTaskDelay(pdMS_TO_TICKS(10));
+	    ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
+        enum light {DARK,MEDIUM,BRIGHT,foo};
+        static enum light l, pl = foo; // so pl != l
+          float lux = opt3001_read_lux();
+            if (lux < 20) l=DARK;
+            else if (lux < 75) l=MEDIUM;
+            else l=BRIGHT;
+            if (pl != l) {
+                switch (l) {
+                  case BRIGHT :
+                        draw_light_background();
+                        break;
+                  case MEDIUM :
+                        draw_medium_background();
+                        break;
+                  case DARK :
+                        draw_dark_background();
+                        break;
+                }
+                // Draw crosshair so that it doesn't seem to disapear when the background color changes
+                draw_crosshair(x,y);
+            }
+            pl = l;
+        vTaskDelay(pdMS_TO_TICKS(10));
 	}
 }
 /******************************************************************************
 * Tasked used to blink LED1 on MSP432 Launchpad
-* TODO Update header and move this to its own task_newFrame.c file
+* TODO Update header and move this to its own task_newFrame.c file with a corresponding task_newFrame.h file
 ******************************************************************************/
 void Task_newFrame(void *pvParameters)
 {
 	while(true) {
-    vTaskDelay(pdMS_TO_TICKS(10));
+	    vTaskDelay(pdMS_TO_TICKS(10));
 		if (PS2_Y_VAL == PS2_DIR_UP) {
             // Move up unless the crosshair is already at the upper boundary. In which case, stay at the boundary
 		    if(y > (CROSSHAIR_HEIGHT / 2) + STEP_VAL) y -= STEP_VAL;
@@ -148,8 +150,9 @@ int main(void)
 
     Sem_LCD = xSemaphoreCreateBinary();
     xSemaphoreGive(Sem_LCD);
+    xTaskCreate(TaskBlast, "blast", configMINIMAL_STACK_SIZE, NULL, 2, &TaskH_TaskBlast);
     xTaskCreate(Task_newFrame, "newFrame", configMINIMAL_STACK_SIZE, NULL, 2, &TaskH_newFrame);
-    xTaskCreate(Task_updateBackground, "updateBackground", configMINIMAL_STACK_SIZE, NULL, 1, &TaskH_updateBackground);
+    xTaskCreate(Task_updateBackground, "updateBackground", configMINIMAL_STACK_SIZE, NULL, 2, &TaskH_updateBackground);
 
     vTaskStartScheduler();
 

@@ -11,7 +11,6 @@
 #include "main.h"
 
 extern volatile bool S2_P;
-extern volatile bool NEW_FRAME;
 void t32_init(void);
 bool MKII_S2(void);
 

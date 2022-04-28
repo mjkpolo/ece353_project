@@ -18,6 +18,8 @@
 #include "msp.h"
 
 extern SemaphoreHandle_t Sem_LCD;
+extern TaskHandle_t TaskH_TaskBlast;
+extern TaskHandle_t TaskH_updateBackground;
 
 
 #endif /* MAIN_H_ */

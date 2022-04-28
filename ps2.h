@@ -20,10 +20,14 @@ void adc14_init(void);
 #define PS2_DIR_LEFT 3
 #define PS2_DIR_RIGHT 4
 
+#define VOLT_TILT_L  1750
+#define VOLT_TILT_R  2250
+#define VOLT_TILT_F  2000
+#define VOLT_TILT_B  1500
+
+
 extern volatile uint32_t PS2_X_VAL;
 extern volatile uint32_t PS2_Y_VAL;
-
-void adc14_init(void);
 
 
 #endif /* PS2_H_ */
