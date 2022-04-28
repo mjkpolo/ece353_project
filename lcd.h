@@ -78,14 +78,29 @@ void Crystalfontz128x128_Init(void);
 
 void Crystalfontz128x128_SetDrawFrame(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1);
 
+typedef struct layer layer;
+struct layer{
+  short x0;
+  short x1;
+  short y0;
+  short y1;
+  const uint16_t color;
+  const uint8_t* bitmap;
+  layer* next;
+};
+
+extern short first_row_fg;
+extern short first_col_fg;
+extern short last_row_fg;
+extern short last_col_fg;
+extern layer* moving_layers;
+extern size_t num_moving_layers;
+
+void draw_moving_layers(void);
+
 void draw(
-  const short* x0,
-  const short* y0,
-  const short* x1,
-  const short* y1,
-  const uint8_t **image,
-  const uint16_t *fColor,
-  short numImages,
+  layer* layers,
+  short numLayers,
   short first_col,
   short first_row,
   short last_col,

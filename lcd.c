@@ -214,48 +214,44 @@ void Crystalfontz128x128_Init(void)
     HAL_LCD_writeData(CM_MADCTL_MX | CM_MADCTL_MY | CM_MADCTL_BGR);
 }
 
+void draw_moving_layers() {
+    draw(moving_layers,num_moving_layers,first_col_fg,first_row_fg,last_col_fg,last_row_fg,true);
+    free(moving_layers);
+    moving_layers = NULL;
+    num_moving_layers = 0;
+    first_col_fg = 132;
+    first_row_fg = 132;
+    last_col_fg = 0;
+    last_row_fg = 0;
+}
+
 void draw(
-  const short* x0,
-  const short* y0,
-  const short* x1,
-  const short* y1,
-  const uint8_t **image,
-  const uint16_t *fColor,
-  short numImages,
+  layer* layers,
+  short numLayers,
   short first_col,
   short first_row,
   short last_col,
   short last_row,
-  bool moving
-) {
+  bool moving) {
+
   short i,j,k;
 
   /*
   Previous Drawing
   */
-  static short* px0 = NULL;
-  static short* py0 = NULL;
-  static short* px1 = NULL;
-  static short* py1 = NULL;
-  static const uint8_t **pimage = NULL;
-  static const uint16_t *pfColor = NULL;
-  static short pnumImages = NULL;
+  static layer* players = NULL;
+  static short pnumLayers = NULL;
   static short pfirst_row = NULL;
   static short pfirst_col = NULL;
   static short plast_row = NULL;
   static short plast_col = NULL;
 
 
-  if (pnumImages != NULL && moving)
-    draw(px0,py0,px1,py1,pimage,pfColor,pnumImages,pfirst_col,pfirst_row,plast_col,plast_row,false);
+  if (pnumLayers != NULL && moving)
+    draw(players,pnumLayers,pfirst_col,pfirst_row,plast_col,plast_row,false);
 
-  px0 = moving ? px0 : x0;
-  py0 = moving ? py0 : y0;
-  px1 = moving ? px1 : x1;
-  py1 = moving ? py1 : y1;
-  pimage = moving ? pimage: image;
-  pfColor = moving ? pfColor : fColor;
-  pnumImages = moving ? pnumImages : numImages;
+  players = moving ? players : layers;
+  pnumLayers = moving ? pnumLayers : numLayers;
   pfirst_row = moving ? first_row : pfirst_row;
   pfirst_col = moving ? first_col : pfirst_col;
   plast_row = moving ? last_row : plast_row;
@@ -267,39 +263,39 @@ void draw(
 
   for (i=first_row; i<=last_row; i++) {
     for (j=first_col; j<=last_col; j++) {
-      for (k=0; k<numImages; k++) {
-        short image_width = x1[k]-x0[k]+1;
-        short image_height = y1[k]-y0[k]+1;
+      for (k=0; k<numLayers; k++) {
+        short image_width = layers[k].x1-layers[k].x0+1;
+        short image_height = layers[k].y1-layers[k].y0+1;
         short bytes_per_row = image_width / 8;
         bytes_per_row += image_width % 8 ? 1 : 0;
-        short relx = moving ? j-first_col : j-x0[k];
-        short rely = moving ? i-first_row : i-y0[k];
+        short relx = j-layers[k].x0;
+        short rely = i-layers[k].y0;
         short byte_index = (rely*bytes_per_row) + relx/8;
         bool inbounds = relx >= 0 ? (relx < image_width ? (rely >= 0 ? rely < image_height : false) : false) : false;
 
         if (inbounds) {
-          if (image[k][byte_index] & (1 << (7-(relx%8)))) {
-            HAL_LCD_writeData(fColor[k] >> 8);
-            HAL_LCD_writeData(fColor[k]);
+          if (layers[k].bitmap[byte_index] & (1 << (7-(relx%8)))) {
+            HAL_LCD_writeData(layers[k].color >> 8);
+            HAL_LCD_writeData(layers[k].color);
             break;
           }
         }
       }
-      if (k==numImages) {
-        for (k=0; k<pnumImages; k++) {
-          short image_width = px1[k]-px0[k]+1;
-          short image_height = py1[k]-py0[k]+1;
+      if (k==numLayers) {
+        for (k=0; k<pnumLayers; k++) {
+          short image_width = players[k].x1-players[k].x0+1;
+          short image_height = players[k].y1-players[k].y0+1;
           short bytes_per_row = image_width / 8;
           bytes_per_row += image_width % 8 ? 1 : 0;
-          short relx = j-px0[k];
-          short rely = i-py0[k];
+          short relx = j-players[k].x0;
+          short rely = i-players[k].y0;
           short byte_index = (rely*bytes_per_row) + relx/8;
           bool inbounds = relx >= 0 ? (relx < image_width ? (rely >= 0 ? rely < image_height : false) : false) : false;
 
           if (inbounds) {
-            if (pimage[k][byte_index] & (1 << (7-(relx%8)))) {
-              HAL_LCD_writeData(pfColor[k] >> 8);
-              HAL_LCD_writeData(pfColor[k]);
+            if (players[k].bitmap[byte_index] & (1 << (7-(relx%8)))) {
+              HAL_LCD_writeData(players[k].color >> 8);
+              HAL_LCD_writeData(players[k].color);
               break;
             }
           }

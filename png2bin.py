@@ -17,12 +17,7 @@ def getBitmaps(img, name, move):
                                    (c[2] << 5) |
                                    (c[1] << 6) |
                                    (c[0] << 7))
-        images = []
-        keys = []
-        x0 = []
-        y0 = []
-        x1 = []
-        y1 = []
+        structs = []
 
         last_col = 0
         last_row = 0
@@ -54,47 +49,24 @@ def getBitmaps(img, name, move):
             yield ',\n'.join(bitmap)
             yield '\n};\n\n'
 
-            images.append(f'{name}_bm_{hex(key)}')
-            keys.append(hex(key))
+            structs.append('{'+f'{first_col},{last_col},{first_row},{last_row},{hex(key)},{name}_bm_{hex(key)}'+'}')
 
-            x0.append(str(first_col))
 
-            x1.append(str(last_col))
+        yield f'layer layers_{name}[] = '+'{\n  '
+        yield ',\n  '.join(structs)
+        yield '\n};\n'
 
-            y0.append(str(first_row))
-
-            y1.append(str(last_row))
-
-        yield f'const short x0_{name}[] = '+'{\n  '
-        yield ',\n  '.join(x0)
-        yield '\n};\n'
-        yield f'const short y0_{name}[] = '+'{\n  '
-        yield ',\n  '.join(y0)
-        yield '\n};\n'
-        yield f'const short x1_{name}[] = '+'{\n  '
-        yield ',\n  '.join(x1)
-        yield '\n};\n'
-        yield f'const short y1_{name}[] = '+'{\n  '
-        yield ',\n  '.join(y1)
-        yield '\n};\n'
-        yield f'const uint8_t* images_{name}[] = '+'{\n  '
-        yield ',\n  '.join(images)
-        yield '\n};\n'
-        yield f'const uint16_t rgb_{name}[] = '+'{\n  '
-        yield ',\n  '.join(keys)
-        yield '\n};\n'
         yield(
             f'void draw_{name}(void) ' + '{\n'
             if not move else
             f'void draw_{name}(short x, short y) ' + '{\n'
         )
         yield(
-            f'  draw(x0_{name},y0_{name},x1_{name},y1_{name},images_{name},rgb_{name},{len(images)},{0},{0},{131},{131},false);'
+            f'  draw(layers_{name},{len(structs)},{0},{0},{131},{131},false);'
             if not move else
-            f'  draw(x0_{name},y0_{name},x1_{name},y1_{name},images_{name},rgb_{name},{len(images)},x-{image_width//2+image_width%2},y-{image_height//2+image_height%2},x+{image_width//2},y+{image_height//2},true);'
+            f'  draw(layers_{name},{len(structs)},x-{image_width//2+image_width%2},y-{image_height//2+image_height%2},x+{image_width//2},y+{image_height//2},true);'
         )
         yield '\n};\n'
-        assert((len(x0) == len(y0)) and (len(x1) == len(y1)) and (len(images) == len(keys)) and (len(keys) == len(x0)) and (len(y0) == len(y1)))
 
 def main(names, move):
     layer = np.ma.zeros((132,132)).astype(np.uint16)

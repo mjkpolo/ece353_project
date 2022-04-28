@@ -8,11 +8,13 @@ GEN_OPTS__FLAG :=
 GEN_CMDS__FLAG := 
 
 ORDERED_OBJS += \
+"./circular_buffer.obj" \
 "./i2c.obj" \
 "./lcd.obj" \
 "./main.obj" \
 "./opt3001.obj" \
 "./ps2.obj" \
+"./serial_debug.obj" \
 "./startup_msp432p401r_ccs.obj" \
 "./system_msp432p401r.obj" \
 "./timer32.obj" \
@@ -173,8 +175,8 @@ duckhunt_FreeRtos.hex: $(EXE_OUTPUTS)
 # Other Targets
 clean:
 	-$(RM) $(BIN_OUTPUTS__QUOTED)$(EXE_OUTPUTS__QUOTED)
-	-$(RM) "i2c.obj" "lcd.obj" "main.obj" "opt3001.obj" "ps2.obj" "startup_msp432p401r_ccs.obj" "system_msp432p401r.obj" "timer32.obj" "FreeRTOS/croutine.obj" "FreeRTOS/event_groups.obj" "FreeRTOS/heap_4.obj" "FreeRTOS/list.obj" "FreeRTOS/queue.obj" "FreeRTOS/stream_buffer.obj" "FreeRTOS/tasks.obj" "FreeRTOS/timers.obj" "FreeRTOS/portable/port.obj" "FreeRTOS/portable/portasm.obj" 
-	-$(RM) "i2c.d" "lcd.d" "main.d" "opt3001.d" "ps2.d" "startup_msp432p401r_ccs.d" "system_msp432p401r.d" "timer32.d" "FreeRTOS/croutine.d" "FreeRTOS/event_groups.d" "FreeRTOS/heap_4.d" "FreeRTOS/list.d" "FreeRTOS/queue.d" "FreeRTOS/stream_buffer.d" "FreeRTOS/tasks.d" "FreeRTOS/timers.d" "FreeRTOS/portable/port.d" 
+	-$(RM) "circular_buffer.obj" "i2c.obj" "lcd.obj" "main.obj" "opt3001.obj" "ps2.obj" "serial_debug.obj" "startup_msp432p401r_ccs.obj" "system_msp432p401r.obj" "timer32.obj" "FreeRTOS/croutine.obj" "FreeRTOS/event_groups.obj" "FreeRTOS/heap_4.obj" "FreeRTOS/list.obj" "FreeRTOS/queue.obj" "FreeRTOS/stream_buffer.obj" "FreeRTOS/tasks.obj" "FreeRTOS/timers.obj" "FreeRTOS/portable/port.obj" "FreeRTOS/portable/portasm.obj" 
+	-$(RM) "circular_buffer.d" "i2c.d" "lcd.d" "main.d" "opt3001.d" "ps2.d" "serial_debug.d" "startup_msp432p401r_ccs.d" "system_msp432p401r.d" "timer32.d" "FreeRTOS/croutine.d" "FreeRTOS/event_groups.d" "FreeRTOS/heap_4.d" "FreeRTOS/list.d" "FreeRTOS/queue.d" "FreeRTOS/stream_buffer.d" "FreeRTOS/tasks.d" "FreeRTOS/timers.d" "FreeRTOS/portable/port.d" 
 	-$(RM) "FreeRTOS/portable/portasm.d" 
 	-@echo 'Finished clean'
 	-@echo ' '

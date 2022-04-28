@@ -1,4 +1,4 @@
-#include "lcd.h"
+#include <string.h>
 
 const uint8_t crosshair_bm_0x0[] =
 {
@@ -38,30 +38,36 @@ const uint8_t crosshair_bm_0xc718[] =
 0x0, 0x0
 };
 
-const short x0_crosshair[] = {
-  58,
-  58
-};
-const short y0_crosshair[] = {
-  52,
-  52
-};
-const short x1_crosshair[] = {
-  72,
-  72
-};
-const short y1_crosshair[] = {
-  66,
-  66
-};
-const uint8_t* images_crosshair[] = {
-  crosshair_bm_0x0,
-  crosshair_bm_0xc718
-};
-const uint16_t rgb_crosshair[] = {
-  0x0,
-  0xc718
+short first_row_fg = 132;
+short first_col_fg = 132;
+short last_row_fg = 0;
+short last_col_fg = 0;
+layer* moving_layers = NULL;
+size_t num_moving_layers = 0;
+
+
+layer layers_crosshair[] = {
+  {58,72,52,66,0x0,crosshair_bm_0x0},
+  {58,72,52,66,0xc718,crosshair_bm_0xc718}
 };
 void draw_crosshair(short x, short y) {
-  draw(x0_crosshair,y0_crosshair,x1_crosshair,y1_crosshair,images_crosshair,rgb_crosshair,2,x-8,y-8,x+7,y+7,true);
+  int i;
+  for (i = 0; i<2; i++) {
+    short image_width = layers_crosshair[0].x1 - layers_crosshair[0].x0;
+    short image_height = layers_crosshair[0].y1 - layers_crosshair[0].y0;
+
+    layers_crosshair[i].x0 = x-(image_width/2+image_width%2);
+    layers_crosshair[i].x1 = x+(image_width/2);
+  
+    layers_crosshair[i].y0 = y-(image_height/2+image_height%2);
+    layers_crosshair[i].y1 = y+(image_height/2);
+    first_row_fg = first_row_fg < layers_crosshair[i].y0 ? first_row_fg : layers_crosshair[i].y0;
+    last_row_fg = last_row_fg > layers_crosshair[i].y1 ? last_row_fg : layers_crosshair[i].y1;
+    first_col_fg = first_col_fg < layers_crosshair[i].x0 ? first_col_fg : layers_crosshair[i].x0;
+    last_col_fg = last_col_fg > layers_crosshair[i].x1 ? last_col_fg : layers_crosshair[i].x1;
+  }
+  // add textures to the rest
+  moving_layers = (layer*) realloc(moving_layers, (num_moving_layers+2)*sizeof(layer));
+  memcpy(&moving_layers[num_moving_layers],layers_crosshair,sizeof(layer)*2);
+  num_moving_layers+=2;
 };

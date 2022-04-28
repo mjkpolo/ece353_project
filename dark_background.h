@@ -248,66 +248,16 @@ const uint8_t dark_background_bm_0x4308[] =
 0x80
 };
 
-const short x0_dark_background[] = {
-  0,
-  0,
-  0,
-  0,
-  0,
-  0,
-  1,
-  21
-};
-const short y0_dark_background[] = {
-  0,
-  93,
-  118,
-  92,
-  95,
-  91,
-  91,
-  94
-};
-const short x1_dark_background[] = {
-  131,
-  131,
-  131,
-  131,
-  131,
-  130,
-  131,
-  21
-};
-const short y1_dark_background[] = {
-  94,
-  119,
-  131,
-  122,
-  131,
-  96,
-  95,
-  94
-};
-const uint8_t* images_dark_background[] = {
-  dark_background_bm_0x8,
-  dark_background_bm_0x4410,
-  dark_background_bm_0x4110,
-  dark_background_bm_0x4310,
-  dark_background_bm_0x4210,
-  dark_background_bm_0x4208,
-  dark_background_bm_0x4108,
-  dark_background_bm_0x4308
-};
-const uint16_t rgb_dark_background[] = {
-  0x8,
-  0x4410,
-  0x4110,
-  0x4310,
-  0x4210,
-  0x4208,
-  0x4108,
-  0x4308
+layer layers_dark_background[] = {
+  {0,131,0,94,0x8,dark_background_bm_0x8},
+  {0,131,93,119,0x4410,dark_background_bm_0x4410},
+  {0,131,118,131,0x4110,dark_background_bm_0x4110},
+  {0,131,92,122,0x4310,dark_background_bm_0x4310},
+  {0,131,95,131,0x4210,dark_background_bm_0x4210},
+  {0,130,91,96,0x4208,dark_background_bm_0x4208},
+  {1,131,91,95,0x4108,dark_background_bm_0x4108},
+  {21,21,94,94,0x4308,dark_background_bm_0x4308}
 };
 void draw_dark_background(void) {
-  draw(x0_dark_background,y0_dark_background,x1_dark_background,y1_dark_background,images_dark_background,rgb_dark_background,8,0,0,131,131,false);
+  draw(layers_dark_background,8,0,0,131,131,false);
 };

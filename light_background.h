@@ -352,120 +352,25 @@ const uint8_t light_background_bm_0x4408[] =
 0x0, 0x0, 0x0, 0x0, 0x4
 };
 
-const short x0_light_background[] = {
-  0,
-  0,
-  0,
-  0,
-  0,
-  0,
-  0,
-  0,
-  0,
-  4,
-  0,
-  10,
-  1,
-  11,
-  1,
-  6,
-  39
-};
-const short y0_light_background[] = {
-  0,
-  117,
-  97,
-  95,
-  97,
-  97,
-  116,
-  94,
-  93,
-  98,
-  98,
-  96,
-  92,
-  95,
-  93,
-  97,
-  98
-};
-const short x1_light_background[] = {
-  131,
-  131,
-  131,
-  131,
-  131,
-  131,
-  131,
-  131,
-  131,
-  130,
-  131,
-  125,
-  129,
-  108,
-  81,
-  52,
-  76
-};
-const short y1_light_background[] = {
-  96,
-  131,
-  118,
-  120,
-  117,
-  122,
-  122,
-  99,
-  98,
-  121,
-  112,
-  99,
-  97,
-  96,
-  96,
-  97,
-  99
-};
-const uint8_t* images_light_background[] = {
-  light_background_bm_0x8718,
-  light_background_bm_0x200,
-  light_background_bm_0x4600,
-  light_background_bm_0x4500,
-  light_background_bm_0x500,
-  light_background_bm_0x400,
-  light_background_bm_0x300,
-  light_background_bm_0x4508,
-  light_background_bm_0x4610,
-  light_background_bm_0x4400,
-  light_background_bm_0x600,
-  light_background_bm_0x4608,
-  light_background_bm_0x4718,
-  light_background_bm_0x4710,
-  light_background_bm_0x4510,
-  light_background_bm_0x508,
-  light_background_bm_0x4408
-};
-const uint16_t rgb_light_background[] = {
-  0x8718,
-  0x200,
-  0x4600,
-  0x4500,
-  0x500,
-  0x400,
-  0x300,
-  0x4508,
-  0x4610,
-  0x4400,
-  0x600,
-  0x4608,
-  0x4718,
-  0x4710,
-  0x4510,
-  0x508,
-  0x4408
+layer layers_light_background[] = {
+  {0,131,0,96,0x8718,light_background_bm_0x8718},
+  {0,131,117,131,0x200,light_background_bm_0x200},
+  {0,131,97,118,0x4600,light_background_bm_0x4600},
+  {0,131,95,120,0x4500,light_background_bm_0x4500},
+  {0,131,97,117,0x500,light_background_bm_0x500},
+  {0,131,97,122,0x400,light_background_bm_0x400},
+  {0,131,116,122,0x300,light_background_bm_0x300},
+  {0,131,94,99,0x4508,light_background_bm_0x4508},
+  {0,131,93,98,0x4610,light_background_bm_0x4610},
+  {4,130,98,121,0x4400,light_background_bm_0x4400},
+  {0,131,98,112,0x600,light_background_bm_0x600},
+  {10,125,96,99,0x4608,light_background_bm_0x4608},
+  {1,129,92,97,0x4718,light_background_bm_0x4718},
+  {11,108,95,96,0x4710,light_background_bm_0x4710},
+  {1,81,93,96,0x4510,light_background_bm_0x4510},
+  {6,52,97,97,0x508,light_background_bm_0x508},
+  {39,76,98,99,0x4408,light_background_bm_0x4408}
 };
 void draw_light_background(void) {
-  draw(x0_light_background,y0_light_background,x1_light_background,y1_light_background,images_light_background,rgb_light_background,17,0,0,131,131,false);
+  draw(layers_light_background,17,0,0,131,131,false);
 };
