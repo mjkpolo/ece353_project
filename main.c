@@ -81,10 +81,10 @@ void Task_newFrame(void *pvParameters)
 
 void Task_joystick(void *pvParameters) {
 	while(true) {
-	  if (PS2_Y_VAL == PS2_DIR_UP) y-= 1;
-	  else if (PS2_Y_VAL == PS2_DIR_DOWN) y+= 1;
-	  if (PS2_X_VAL == PS2_DIR_LEFT) x-= 1;
-	  else if (PS2_X_VAL == PS2_DIR_RIGHT) x+= 1;
+	  if (PS2_Y_VAL == PS2_DIR_UP) y-= 2;
+	  else if (PS2_Y_VAL == PS2_DIR_DOWN) y+= 2;
+	  if (PS2_X_VAL == PS2_DIR_LEFT) x-= 2;
+	  else if (PS2_X_VAL == PS2_DIR_RIGHT) x+= 2;
     vTaskDelay(pdMS_TO_TICKS(17));
 	}
 }
@@ -99,7 +99,7 @@ int main(void)
     xSemaphoreGive(Sem_LCD);
     xTaskCreate(Task_newFrame, "newFrame", configMINIMAL_STACK_SIZE, NULL, 1, &TaskH_newFrame);
     xTaskCreate(Task_joystick, "joystick", configMINIMAL_STACK_SIZE, NULL, 4, &TaskH_joystick);
-    xTaskCreate(Task_s2, "s2", configMINIMAL_STACK_SIZE, NULL, 1, &TaskH_s2);
+    xTaskCreate(Task_s2, "s2", configMINIMAL_STACK_SIZE, NULL, 4, &TaskH_s2);
 
     vTaskStartScheduler();
 
