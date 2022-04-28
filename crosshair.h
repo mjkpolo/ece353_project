@@ -1,5 +1,11 @@
 #include "lcd.h"
 
+// Crosshair values
+#define CROSSHAIR_WIDTH    18
+#define CROSSHAIR_HEIGHT   20
+#define SKY_BOTTOM_Y       95
+#define STEP_VAL           3
+
 const uint8_t crosshair_bm_0x0[] =
 {
 0x1, 0x0,

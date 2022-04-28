@@ -74,6 +74,7 @@ inline void init(void)
 	  opt3001_init();
 }
 
+// TODO Create header and move this to its own task_updateBackground.c file
 void Task_updateBackground(void *pvParameters) {
 	while(true) {
     enum light {DARK,MEDIUM,BRIGHT,foo};
@@ -94,6 +95,8 @@ void Task_updateBackground(void *pvParameters) {
 					draw_dark_background();
 					break;
 			}
+			// Draw crosshair so that it doesn't seem to disapear when the background color changes
+			draw_crosshair(x,y);
 		}
 		pl = l;
     vTaskDelay(pdMS_TO_TICKS(10));
@@ -101,17 +104,34 @@ void Task_updateBackground(void *pvParameters) {
 }
 /******************************************************************************
 * Tasked used to blink LED1 on MSP432 Launchpad
+* TODO Update header and move this to its own task_newFrame.c file
 ******************************************************************************/
 void Task_newFrame(void *pvParameters)
 {
 	while(true) {
     vTaskDelay(pdMS_TO_TICKS(10));
-		if (PS2_Y_VAL == PS2_DIR_UP) y-= 3;
-		else if (PS2_Y_VAL == PS2_DIR_DOWN) y+= 3;
-		if (PS2_X_VAL == PS2_DIR_LEFT) x-= 3;
-		else if (PS2_X_VAL == PS2_DIR_RIGHT) x+= 3;
-		if (PS2_Y_VAL != PS2_DIR_NONE ||
-			  PS2_X_VAL != PS2_DIR_NONE) {
+		if (PS2_Y_VAL == PS2_DIR_UP) {
+            // Move up unless the crosshair is already at the upper boundary. In which case, stay at the boundary
+		    if(y > (CROSSHAIR_HEIGHT / 2) + STEP_VAL) y -= STEP_VAL;
+		    else y = 1 + CROSSHAIR_HEIGHT / 2;
+		}
+		else if (PS2_Y_VAL == PS2_DIR_DOWN) {
+            // Move down unless the crosshair is already at the bottom of the sky. In which case, stay at the bottom of the sky
+		    if(y < SKY_BOTTOM_Y - (CROSSHAIR_HEIGHT / 2) - STEP_VAL) y += STEP_VAL;
+		    else y = SKY_BOTTOM_Y - CROSSHAIR_HEIGHT / 2;
+		}
+		if (PS2_X_VAL == PS2_DIR_LEFT) {
+            // Move to the left unless the crosshair is already at the left boundary. In which case, stay at the boundary
+		    if(x > (CROSSHAIR_WIDTH / 2) + STEP_VAL) x -= STEP_VAL;
+		    else x = 1 + CROSSHAIR_WIDTH / 2;
+		}
+		else if ((PS2_X_VAL == PS2_DIR_RIGHT)) {
+		    // Move to the right unless the crosshair is already at the right boundary. In which case, stay at the boundary
+		    if(x < LCD_HORIZONTAL_MAX - (CROSSHAIR_WIDTH / 2) - STEP_VAL) x += STEP_VAL;
+		    else x = LCD_HORIZONTAL_MAX - (CROSSHAIR_WIDTH / 2);
+		}
+		if ((PS2_Y_VAL != PS2_DIR_NONE) ||
+			(PS2_X_VAL != PS2_DIR_NONE)) {
 			draw_crosshair(x,y);
 		}
 	}
