@@ -93,6 +93,12 @@ extern short first_row_fg;
 extern short first_col_fg;
 extern short last_row_fg;
 extern short last_col_fg;
+
+extern short pfirst_row_fg;
+extern short pfirst_col_fg;
+extern short plast_row_fg;
+extern short plast_col_fg;
+
 extern layer* moving_layers;
 extern size_t num_moving_layers;
 

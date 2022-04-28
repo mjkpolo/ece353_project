@@ -215,10 +215,22 @@ void Crystalfontz128x128_Init(void)
 }
 
 void draw_moving_layers() {
-    draw(moving_layers,num_moving_layers,first_col_fg,first_row_fg,last_col_fg,last_row_fg,true);
+    draw(moving_layers,
+         num_moving_layers,
+         first_col_fg < pfirst_col_fg ? first_col_fg : pfirst_col_fg,
+         first_row_fg < pfirst_row_fg ? first_row_fg : pfirst_row_fg,
+         last_col_fg > plast_col_fg ? last_col_fg : plast_col_fg,
+         last_row_fg > plast_row_fg ? last_row_fg : plast_row_fg,
+         true);
     free(moving_layers);
     moving_layers = NULL;
     num_moving_layers = 0;
+
+    pfirst_col_fg = first_col_fg;
+    pfirst_row_fg = first_row_fg;
+    plast_col_fg = last_col_fg;
+    plast_row_fg = last_row_fg;
+
     first_col_fg = 132;
     first_row_fg = 132;
     last_col_fg = 0;
@@ -247,15 +259,18 @@ void draw(
   static short plast_col = NULL;
 
 
-  if (pnumLayers != NULL && moving)
-    draw(players,pnumLayers,pfirst_col,pfirst_row,plast_col,plast_row,false);
+  //if (pnumLayers != NULL && moving)
+  //  draw(players,pnumLayers,pfirst_col,pfirst_row,plast_col,plast_row,false);
 
-  players = moving ? players : layers;
-  pnumLayers = moving ? pnumLayers : numLayers;
-  pfirst_row = moving ? first_row : pfirst_row;
-  pfirst_col = moving ? first_col : pfirst_col;
-  plast_row = moving ? last_row : plast_row;
-  plast_col = moving ? last_col : plast_col;
+  if (moving) {
+      pfirst_row = pfirst_row < first_row ? pfirst_row : first_row;
+      pfirst_col = pfirst_col < first_col ? pfirst_col : first_col;
+      plast_row = plast_row > last_row ? plast_row : last_row;
+      plast_col = plast_col > last_col ? plast_col : last_col;
+  } else {
+      players = layers;
+      pnumLayers = numLayers;
+  }
 
   xSemaphoreTake(Sem_LCD, portMAX_DELAY);
   Crystalfontz128x128_SetDrawFrame(first_col,first_row,last_col,last_row);

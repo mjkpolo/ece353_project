@@ -42,6 +42,12 @@ short first_row_fg = 132;
 short first_col_fg = 132;
 short last_row_fg = 0;
 short last_col_fg = 0;
+
+short pfirst_row_fg = 132;
+short pfirst_col_fg = 132;
+short plast_row_fg = 0;
+short plast_col_fg = 0;
+
 layer* moving_layers = NULL;
 size_t num_moving_layers = 0;
 

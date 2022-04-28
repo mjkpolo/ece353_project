@@ -72,7 +72,8 @@ void Task_newFrame(void *pvParameters)
 		pl = l;
 		draw_crosshair(x,y);
 		draw_crosshair(64,64);
-		//draw_crosshair(0,0);
+		draw_crosshair(70,70);
+		draw_crosshair(40,50);
 		draw_moving_layers();
 	}
 }
