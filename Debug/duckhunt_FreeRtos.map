@@ -1,17 +1,17 @@
 ******************************************************************************
                   TI ARM Linker Unix v20.2.5                   
 ******************************************************************************
->> Linked Thu Apr 28 01:55:39 2022
+>> Linked Thu Apr 28 02:26:35 2022
 
 OUTPUT FILE NAME:   <duckhunt_FreeRtos.out>
-ENTRY POINT SYMBOL: "_c_int00_noargs"  address: 00006289
+ENTRY POINT SYMBOL: "_c_int00_noargs"  address: 00006261
 
 
 MEMORY CONFIGURATION
 
          name            origin    length      used     unused   attr    fill
 ----------------------  --------  ---------  --------  --------  ----  --------
-  MAIN                  00000000   00040000  00009460  00036ba0  R  X
+  MAIN                  00000000   00040000  00009438  00036bc8  R  X
   INFO                  00200000   00004000  00000000  00004000  R  X
   SRAM_CODE             01000000   00010000  00008af1  0000750f  RW X
   SRAM_DATA             20000000   00010000  00008af1  0000750f  RW  
@@ -21,11 +21,11 @@ SEGMENT ALLOCATION MAP
 
 run origin  load origin   length   init length attrs members
 ----------  ----------- ---------- ----------- ----- -------
-00000000    00000000    00009460   00009460    r-x
+00000000    00000000    00009438   00009438    r-x
   00000000    00000000    000000e4   000000e4    r-- .intvecs
-  000000e4    000000e4    000062b8   000062b8    r-x .text
-  0000639c    0000639c    00002ec4   00002ec4    r-- .const
-  00009260    00009260    00000200   00000200    r-- .cinit
+  000000e4    000000e4    00006290   00006290    r-x .text
+  00006374    00006374    00002ec4   00002ec4    r-- .const
+  00009238    00009238    00000200   00000200    r-- .cinit
 20000000    20000000    000088f3   00000000    rw-
   20000000    20000000    00008176   00000000    rw- .bss
   20008178    20008178    00000400   00000000    rw- .sysmem
@@ -42,98 +42,97 @@ section   page    origin      length       input sections
 .intvecs   0    00000000    000000e4     
                   00000000    000000e4     startup_msp432p401r_ccs.obj (.intvecs:retain)
 
-.text      0    000000e4    000062b8     
+.text      0    000000e4    00006290     
                   000000e4    000020b4     tasks.obj (.text)
                   00002198    00001110     queue.obj (.text)
                   000032a8    000007d8     lcd.obj (.text)
                   00003a80    000007a4     timers.obj (.text)
                   00004224    00000454     heap_4.obj (.text)
                   00004678    00000438     port.obj (.text)
-                  00004ab0    00000420     main.obj (.text)
-                  00004ed0    00000354     system_msp432p401r.obj (.text)
-                  00005224    000001c2     circular_buffer.obj (.text)
-                  000053e6    00000002     rtsv7M4_T_le_v4SPD16_eabi.lib : _lock.c.obj (.text:_nop)
-                  000053e8    000001c0     i2c.obj (.text)
-                  000055a8    000001ac     serial_debug.obj (.text)
-                  00005754    00000130     ps2.obj (.text)
-                  00005884    0000012a     list.obj (.text)
-                  000059ae    00000002     rtsv7M4_T_le_v4SPD16_eabi.lib : div0.asm.obj (.text)
-                  000059b0    00000108     timer32.obj (.text)
-                  00005ab8    00000100     rtsv7M4_T_le_v4SPD16_eabi.lib : memory.c.obj (.text:aligned_alloc)
-                  00005bb8    000000fc                                   : fd_mul_t2.asm.obj (.text)
-                  00005cb4    000000e4                                   : memory.c.obj (.text:free)
-                  00005d98    000000e4                                   : memory.c.obj (.text:realloc)
-                  00005e7c    000000da     portasm.obj (.text)
-                  00005f56    0000009c     rtsv7M4_T_le_v4SPD16_eabi.lib : memcpy_t2.asm.obj (.text)
-                  00005ff2    0000007a                                   : memset_t2.asm.obj (.text)
-                  0000606c    00000070                                   : memory.c.obj (.text:split)
-                  000060dc    0000006e                                   : fd_tos_t2.asm.obj (.text)
-                  0000614a    00000068                                   : copy_decompress_lzss.c.obj (.text:decompress:lzss:__TI_decompress_lzss)
-                  000061b2    00000002     --HOLE-- [fill = 0]
-                  000061b4    00000050     opt3001.obj (.text)
-                  00006204    00000044     rtsv7M4_T_le_v4SPD16_eabi.lib : autoinit.c.obj (.text:__TI_auto_init_nobinit_nopinit:__TI_auto_init_nobinit_nopinit)
-                  00006248    00000040                                   : u_divt2.asm.obj (.text)
-                  00006288    00000034                                   : boot_cortex_m.c.obj (.text:_c_int00_noargs:_c_int00_noargs)
-                  000062bc    00000034     main.obj (.text:init)
-                  000062f0    0000002e     rtsv7M4_T_le_v4SPD16_eabi.lib : i_tofd_t2.asm.obj (.text)
-                  0000631e    00000002     --HOLE-- [fill = 0]
-                  00006320    00000028                                   : memory.c.obj (.text:free_list_insert)
-                  00006348    0000001c                                   : memory.c.obj (.text:free_list_remove)
-                  00006364    0000000e                                   : copy_decompress_none.c.obj (.text:decompress:none:__TI_decompress_none)
-                  00006372    0000000e     startup_msp432p401r_ccs.obj (.text)
-                  00006380    0000000c     rtsv7M4_T_le_v4SPD16_eabi.lib : copy_zero_init.c.obj (.text:decompress:ZI:__TI_zero_init)
-                  0000638c    00000008                                   : memory.c.obj (.text:malloc)
-                  00006394    00000004                                   : pre_init.c.obj (.text:_system_pre_init)
-                  00006398    00000004                                   : exit.c.obj (.text:abort:abort)
+                  00004ab0    000003f8     main.obj (.text)
+                  00004ea8    00000354     system_msp432p401r.obj (.text)
+                  000051fc    000001c2     circular_buffer.obj (.text)
+                  000053be    00000002     rtsv7M4_T_le_v4SPD16_eabi.lib : _lock.c.obj (.text:_nop)
+                  000053c0    000001c0     i2c.obj (.text)
+                  00005580    000001ac     serial_debug.obj (.text)
+                  0000572c    00000130     ps2.obj (.text)
+                  0000585c    0000012a     list.obj (.text)
+                  00005986    00000002     rtsv7M4_T_le_v4SPD16_eabi.lib : div0.asm.obj (.text)
+                  00005988    00000108     timer32.obj (.text)
+                  00005a90    00000100     rtsv7M4_T_le_v4SPD16_eabi.lib : memory.c.obj (.text:aligned_alloc)
+                  00005b90    000000fc                                   : fd_mul_t2.asm.obj (.text)
+                  00005c8c    000000e4                                   : memory.c.obj (.text:free)
+                  00005d70    000000e4                                   : memory.c.obj (.text:realloc)
+                  00005e54    000000da     portasm.obj (.text)
+                  00005f2e    0000009c     rtsv7M4_T_le_v4SPD16_eabi.lib : memcpy_t2.asm.obj (.text)
+                  00005fca    0000007a                                   : memset_t2.asm.obj (.text)
+                  00006044    00000070                                   : memory.c.obj (.text:split)
+                  000060b4    0000006e                                   : fd_tos_t2.asm.obj (.text)
+                  00006122    00000068                                   : copy_decompress_lzss.c.obj (.text:decompress:lzss:__TI_decompress_lzss)
+                  0000618a    00000002     --HOLE-- [fill = 0]
+                  0000618c    00000050     opt3001.obj (.text)
+                  000061dc    00000044     rtsv7M4_T_le_v4SPD16_eabi.lib : autoinit.c.obj (.text:__TI_auto_init_nobinit_nopinit:__TI_auto_init_nobinit_nopinit)
+                  00006220    00000040                                   : u_divt2.asm.obj (.text)
+                  00006260    00000034                                   : boot_cortex_m.c.obj (.text:_c_int00_noargs:_c_int00_noargs)
+                  00006294    00000034     main.obj (.text:init)
+                  000062c8    0000002e     rtsv7M4_T_le_v4SPD16_eabi.lib : i_tofd_t2.asm.obj (.text)
+                  000062f6    00000002     --HOLE-- [fill = 0]
+                  000062f8    00000028                                   : memory.c.obj (.text:free_list_insert)
+                  00006320    0000001c                                   : memory.c.obj (.text:free_list_remove)
+                  0000633c    0000000e                                   : copy_decompress_none.c.obj (.text:decompress:none:__TI_decompress_none)
+                  0000634a    0000000e     startup_msp432p401r_ccs.obj (.text)
+                  00006358    0000000c     rtsv7M4_T_le_v4SPD16_eabi.lib : copy_zero_init.c.obj (.text:decompress:ZI:__TI_zero_init)
+                  00006364    00000008                                   : memory.c.obj (.text:malloc)
+                  0000636c    00000004                                   : pre_init.c.obj (.text:_system_pre_init)
+                  00006370    00000004                                   : exit.c.obj (.text:abort:abort)
 
-.const     0    0000639c    00002ec4     
-                  0000639c    00000671     main.obj (.const:.string:light_background_bm_0x8718)
-                  00006a0d    00000660     main.obj (.const:.string:medium_background_bm_0x8410)
-                  0000706d    0000064f     main.obj (.const:.string:dark_background_bm_0x8)
-                  000076bc    00000275     main.obj (.const:.string:dark_background_bm_0x4210)
-                  00007931    00000275     main.obj (.const:.string:medium_background_bm_0x4408)
-                  00007ba6    0000020f     main.obj (.const:.string:dark_background_bm_0x4310)
-                  00007db5    000001cb     main.obj (.const:.string:dark_background_bm_0x4410)
-                  00007f80    000001cb     main.obj (.const:.string:medium_background_bm_0x4508)
-                  0000814b    000001ba     main.obj (.const:.string:light_background_bm_0x400)
-                  00008305    000001ba     main.obj (.const:.string:light_background_bm_0x4500)
-                  000084bf    00000180     main.obj (.const:.string:light_background_bm_0x4400)
-                  0000863f    00000176     main.obj (.const:.string:light_background_bm_0x4600)
-                  000087b5    00000165     main.obj (.const:.string:light_background_bm_0x500)
-                  0000891a    00000110     main.obj (.const:.string:medium_background_bm_0x4308)
-                  00008a2a    000000ff     main.obj (.const:.string:light_background_bm_0x200)
-                  00008b29    000000ff     main.obj (.const:.string:light_background_bm_0x600)
-                  00008c28    000000ee     main.obj (.const:.string:dark_background_bm_0x4110)
-                  00008d16    000000d0     main.obj (.const:.string:medium_background_bm_0x4608)
-                  00008de6    000000c0     main.obj (.const:.string:medium_background_bm_0x8508)
-                  00008ea6    00000077     main.obj (.const:.string:light_background_bm_0x300)
-                  00008f1d    00000077     main.obj (.const:.string:medium_background_bm_0x8510)
-                  00008f94    00000066     main.obj (.const:.string:dark_background_bm_0x4208)
-                  00008ffa    00000066     main.obj (.const:.string:light_background_bm_0x4508)
-                  00009060    00000066     main.obj (.const:.string:light_background_bm_0x4610)
-                  000090c6    00000066     main.obj (.const:.string:light_background_bm_0x4718)
-                  0000912c    00000055     main.obj (.const:.string:dark_background_bm_0x4108)
-                  00009181    0000003c     main.obj (.const:.string:light_background_bm_0x4608)
-                  000091bd    0000002c     main.obj (.const:.string:light_background_bm_0x4510)
-                  000091e9    0000001e     main.obj (.const:.string:crosshair_bm_0x0)
-                  00009207    0000001e     main.obj (.const:.string:crosshair_bm_0xc718)
-                  00009225    0000001a     main.obj (.const:.string:light_background_bm_0x4710)
-                  0000923f    0000000a     main.obj (.const:.string:light_background_bm_0x4408)
-                  00009249    00000001     main.obj (.const:.string:dark_background_bm_0x4308)
-                  0000924a    00000001     main.obj (.const:.string:medium_background_bm_0x8608)
-                  0000924b    00000001     --HOLE-- [fill = 0]
-                  0000924c    00000008     port.obj (.const)
-                  00009254    00000006     main.obj (.const:.string:light_background_bm_0x508)
-                  0000925a    00000002     --HOLE-- [fill = 0]
-                  0000925c    00000004     tasks.obj (.const)
+.const     0    00006374    00002ec4     
+                  00006374    00000671     main.obj (.const:.string:light_background_bm_0x8718)
+                  000069e5    00000660     main.obj (.const:.string:medium_background_bm_0x8410)
+                  00007045    0000064f     main.obj (.const:.string:dark_background_bm_0x8)
+                  00007694    00000275     main.obj (.const:.string:dark_background_bm_0x4210)
+                  00007909    00000275     main.obj (.const:.string:medium_background_bm_0x4408)
+                  00007b7e    0000020f     main.obj (.const:.string:dark_background_bm_0x4310)
+                  00007d8d    000001cb     main.obj (.const:.string:dark_background_bm_0x4410)
+                  00007f58    000001cb     main.obj (.const:.string:medium_background_bm_0x4508)
+                  00008123    000001ba     main.obj (.const:.string:light_background_bm_0x400)
+                  000082dd    000001ba     main.obj (.const:.string:light_background_bm_0x4500)
+                  00008497    00000180     main.obj (.const:.string:light_background_bm_0x4400)
+                  00008617    00000176     main.obj (.const:.string:light_background_bm_0x4600)
+                  0000878d    00000165     main.obj (.const:.string:light_background_bm_0x500)
+                  000088f2    00000110     main.obj (.const:.string:medium_background_bm_0x4308)
+                  00008a02    000000ff     main.obj (.const:.string:light_background_bm_0x200)
+                  00008b01    000000ff     main.obj (.const:.string:light_background_bm_0x600)
+                  00008c00    000000ee     main.obj (.const:.string:dark_background_bm_0x4110)
+                  00008cee    000000d0     main.obj (.const:.string:medium_background_bm_0x4608)
+                  00008dbe    000000c0     main.obj (.const:.string:medium_background_bm_0x8508)
+                  00008e7e    00000077     main.obj (.const:.string:light_background_bm_0x300)
+                  00008ef5    00000077     main.obj (.const:.string:medium_background_bm_0x8510)
+                  00008f6c    00000066     main.obj (.const:.string:dark_background_bm_0x4208)
+                  00008fd2    00000066     main.obj (.const:.string:light_background_bm_0x4508)
+                  00009038    00000066     main.obj (.const:.string:light_background_bm_0x4610)
+                  0000909e    00000066     main.obj (.const:.string:light_background_bm_0x4718)
+                  00009104    00000055     main.obj (.const:.string:dark_background_bm_0x4108)
+                  00009159    0000003c     main.obj (.const:.string:light_background_bm_0x4608)
+                  00009195    0000002c     main.obj (.const:.string:light_background_bm_0x4510)
+                  000091c1    0000001e     main.obj (.const:.string:crosshair_bm_0x0)
+                  000091df    0000001e     main.obj (.const:.string:crosshair_bm_0xc718)
+                  000091fd    0000001a     main.obj (.const:.string:light_background_bm_0x4710)
+                  00009217    0000000a     main.obj (.const:.string:light_background_bm_0x4408)
+                  00009221    00000001     main.obj (.const:.string:dark_background_bm_0x4308)
+                  00009222    00000001     main.obj (.const:.string:medium_background_bm_0x8608)
+                  00009223    00000001     --HOLE-- [fill = 0]
+                  00009224    00000008     port.obj (.const)
+                  0000922c    00000006     main.obj (.const:.string:light_background_bm_0x508)
+                  00009232    00000002     --HOLE-- [fill = 0]
+                  00009234    00000004     tasks.obj (.const)
 
-.cinit     0    00009260    00000200     
-                  00009260    000001d7     (.cinit..data.load) [load image, compression = lzss]
-                  00009437    00000001     --HOLE-- [fill = 0]
-                  00009438    0000000c     (__TI_handler_table)
-                  00009444    00000004     --HOLE-- [fill = 0]
-                  00009448    00000008     (.cinit..bss.load) [load image, compression = zero_init]
-                  00009450    00000010     (__TI_cinit_table)
+.cinit     0    00009238    00000200     
+                  00009238    000001d9     (.cinit..data.load) [load image, compression = lzss]
+                  00009411    00000003     --HOLE-- [fill = 0]
+                  00009414    0000000c     (__TI_handler_table)
+                  00009420    00000008     (.cinit..bss.load) [load image, compression = zero_init]
+                  00009428    00000010     (__TI_cinit_table)
 
 .init_array 
 *          0    00000000    00000000     UNINITIALIZED
@@ -193,7 +192,7 @@ MODULE SUMMARY
        Module                        code    ro data   rw data
        ------                        ----    -------   -------
     ./
-       main.obj                      1108    11957     1464   
+       main.obj                      1068    11957     1464   
        lcd.obj                       2008    0         28     
        system_msp432p401r.obj        852     0         8      
        circular_buffer.obj           450     0         0      
@@ -204,7 +203,7 @@ MODULE SUMMARY
        startup_msp432p401r_ccs.obj   14      228       0      
        opt3001.obj                   80      0         0      
     +--+-----------------------------+-------+---------+---------+
-       Total:                        5956    12185     1544   
+       Total:                        5916    12185     1544   
                                                               
     ./FreeRTOS/
        heap_4.obj                    1108    0         65600  
@@ -243,21 +242,21 @@ MODULE SUMMARY
                                                               
        Heap:                         0       0         2048   
        Stack:                        0       0         1024   
-       Linker Generated:             0       507       0      
+       Linker Generated:             0       509       0      
     +--+-----------------------------+-------+---------+---------+
-       Grand Total:                  25268   12704     71136  
+       Grand Total:                  25228   12706     71136  
 
 
 LINKER GENERATED COPY TABLES
 
-__TI_cinit_table @ 00009450 records: 2, size/record: 8, table size: 16
-	.data: load addr=00009260, load size=000001d7 bytes, run addr=20008578, run size=0000037b bytes, compression=lzss
-	.bss: load addr=00009448, load size=00000008 bytes, run addr=20000000, run size=00008176 bytes, compression=zero_init
+__TI_cinit_table @ 00009428 records: 2, size/record: 8, table size: 16
+	.data: load addr=00009238, load size=000001d9 bytes, run addr=20008578, run size=0000037b bytes, compression=lzss
+	.bss: load addr=00009420, load size=00000008 bytes, run addr=20000000, run size=00008176 bytes, compression=zero_init
 
 
 LINKER GENERATED HANDLER TABLE
 
-__TI_handler_table @ 00009438 records: 3, size/record: 4, table size: 12
+__TI_handler_table @ 00009414 records: 3, size/record: 4, table size: 12
 	index: 0, handler: __TI_decompress_lzss
 	index: 1, handler: __TI_decompress_none
 	index: 2, handler: __TI_zero_init
@@ -267,152 +266,152 @@ GLOBAL SYMBOLS: SORTED ALPHABETICALLY BY Name
 
 address   name                               
 -------   ----                               
-000057dd  ADC14_IRQHandler                   
-000057dd  ADC14_IRQHandler                   
-0000637f  AES256_IRQHandler                  
+000057b5  ADC14_IRQHandler                   
+000057b5  ADC14_IRQHandler                   
+00006357  AES256_IRQHandler                  
 20008175  ALERT_STRING                       
-0000637f  BusFault_Handler                   
-00006399  C$$EXIT                            
-0000637f  COMP_E0_IRQHandler                 
-0000637f  COMP_E1_IRQHandler                 
-0000637f  CS_IRQHandler                      
+00006357  BusFault_Handler                   
+00006371  C$$EXIT                            
+00006357  COMP_E0_IRQHandler                 
+00006357  COMP_E1_IRQHandler                 
+00006357  CS_IRQHandler                      
 000033f1  Crystalfontz128x128_Init           
 00003381  Crystalfontz128x128_SetDrawFrame   
-0000637f  DMA_ERR_IRQHandler                 
-0000637f  DMA_INT0_IRQHandler                
-0000637f  DMA_INT1_IRQHandler                
-0000637f  DMA_INT2_IRQHandler                
-0000637f  DMA_INT3_IRQHandler                
-0000637f  DebugMon_Handler                   
-0000637f  Default_Handler                    
-000056a9  EUSCIA0_IRQHandler                 
-000056a9  EUSCIA0_IRQHandler                 
-0000637f  EUSCIA1_IRQHandler                 
-0000637f  EUSCIA2_IRQHandler                 
-0000637f  EUSCIA3_IRQHandler                 
-0000637f  EUSCIB0_IRQHandler                 
-0000637f  EUSCIB1_IRQHandler                 
-0000637f  EUSCIB2_IRQHandler                 
-0000637f  EUSCIB3_IRQHandler                 
-0000637f  FLCTL_IRQHandler                   
-0000637f  FPU_IRQHandler                     
+00006357  DMA_ERR_IRQHandler                 
+00006357  DMA_INT0_IRQHandler                
+00006357  DMA_INT1_IRQHandler                
+00006357  DMA_INT2_IRQHandler                
+00006357  DMA_INT3_IRQHandler                
+00006357  DebugMon_Handler                   
+00006357  Default_Handler                    
+00005681  EUSCIA0_IRQHandler                 
+00005681  EUSCIA0_IRQHandler                 
+00006357  EUSCIA1_IRQHandler                 
+00006357  EUSCIA2_IRQHandler                 
+00006357  EUSCIA3_IRQHandler                 
+00006357  EUSCIB0_IRQHandler                 
+00006357  EUSCIB1_IRQHandler                 
+00006357  EUSCIB2_IRQHandler                 
+00006357  EUSCIB3_IRQHandler                 
+00006357  FLCTL_IRQHandler                   
+00006357  FPU_IRQHandler                     
 000032a9  HAL_LCD_PortInit                   
 000032f1  HAL_LCD_SpiInit                    
 00003325  HAL_LCD_writeCommand               
 0000335d  HAL_LCD_writeData                  
-0000637f  HardFault_Handler                  
-000059dd  MKII_S2                            
-0000637f  MemManage_Handler                  
+00006357  HardFault_Handler                  
+000059b5  MKII_S2                            
+00006357  MemManage_Handler                  
 200088f1  NEW_FRAME                          
-0000637f  NMI_Handler                        
-0000637f  PCM_IRQHandler                     
-0000637f  PORT1_IRQHandler                   
-0000637f  PORT2_IRQHandler                   
-0000637f  PORT3_IRQHandler                   
-0000637f  PORT4_IRQHandler                   
-0000637f  PORT5_IRQHandler                   
-0000637f  PORT6_IRQHandler                   
+00006357  NMI_Handler                        
+00006357  PCM_IRQHandler                     
+00006357  PORT1_IRQHandler                   
+00006357  PORT2_IRQHandler                   
+00006357  PORT3_IRQHandler                   
+00006357  PORT4_IRQHandler                   
+00006357  PORT5_IRQHandler                   
+00006357  PORT6_IRQHandler                   
 200088e4  PS2_X_VAL                          
 200088e8  PS2_Y_VAL                          
-0000637f  PSS_IRQHandler                     
-0000637f  PendSV_Handler                     
-0000637f  RTC_C_IRQHandler                   
-00006373  Reset_Handler                      
+00006357  PSS_IRQHandler                     
+00006357  PendSV_Handler                     
+00006357  RTC_C_IRQHandler                   
+0000634b  Reset_Handler                      
 200088c6  Rx_Char_Count                      
 2000816c  Rx_String                          
 200088f0  S2_P                               
-0000637f  SVC_Handler                        
+00006357  SVC_Handler                        
 20008880  Sem_LCD                            
-0000637f  SysTick_Handler                    
+00006357  SysTick_Handler                    
 200088ec  SystemCoreClock                    
-00004ed1  SystemCoreClockUpdate              
-00005149  SystemInit                         
-00005a43  T32_INT1_IRQHandler                
-00005a43  T32_INT1_IRQHandler                
-00005a75  T32_INT2_IRQHandler                
-00005a75  T32_INT2_IRQHandler                
-0000637f  T32_INTC_IRQHandler                
-0000637f  TA0_0_IRQHandler                   
-0000637f  TA0_N_IRQHandler                   
-0000637f  TA1_0_IRQHandler                   
-0000637f  TA1_N_IRQHandler                   
-0000637f  TA2_0_IRQHandler                   
-0000637f  TA2_N_IRQHandler                   
-0000637f  TA3_0_IRQHandler                   
-0000637f  TA3_N_IRQHandler                   
+00004ea9  SystemCoreClockUpdate              
+00005121  SystemInit                         
+00005a1b  T32_INT1_IRQHandler                
+00005a1b  T32_INT1_IRQHandler                
+00005a4d  T32_INT2_IRQHandler                
+00005a4d  T32_INT2_IRQHandler                
+00006357  T32_INTC_IRQHandler                
+00006357  TA0_0_IRQHandler                   
+00006357  TA0_N_IRQHandler                   
+00006357  TA1_0_IRQHandler                   
+00006357  TA1_N_IRQHandler                   
+00006357  TA2_0_IRQHandler                   
+00006357  TA2_N_IRQHandler                   
+00006357  TA3_0_IRQHandler                   
+00006357  TA3_N_IRQHandler                   
+20008878  TaskH_joystick                     
 2000887c  TaskH_newFrame                     
-20008878  TaskH_updateBackground             
-00004d69  Task_newFrame                      
-00004cd9  Task_updateBackground              
+00004d75  Task_joystick                      
+00004cd9  Task_newFrame                      
 20008170  Tx_Buffer                          
-0000637f  UsageFault_Handler                 
+00006357  UsageFault_Handler                 
 4000480c  WDTCTL_SYM                         
-0000637f  WDT_A_IRQHandler                   
+00006357  WDT_A_IRQHandler                   
 20010000  __STACK_END                        
 00000200  __STACK_SIZE                       
 00000400  __SYSMEM_SIZE                      
-00009450  __TI_CINIT_Base                    
-00009460  __TI_CINIT_Limit                   
-00009438  __TI_Handler_Table_Base            
-00009444  __TI_Handler_Table_Limit           
-00006205  __TI_auto_init_nobinit_nopinit     
-0000614b  __TI_decompress_lzss               
-00006365  __TI_decompress_none               
+00009428  __TI_CINIT_Base                    
+00009438  __TI_CINIT_Limit                   
+00009414  __TI_Handler_Table_Base            
+00009420  __TI_Handler_Table_Limit           
+000061dd  __TI_auto_init_nobinit_nopinit     
+00006123  __TI_decompress_lzss               
+0000633d  __TI_decompress_none               
 ffffffff  __TI_pprof_out_hndl                
 ffffffff  __TI_prof_data_size                
 ffffffff  __TI_prof_data_start               
 00000000  __TI_static_base__                 
-00006381  __TI_zero_init                     
-000060dd  __aeabi_d2f                        
-00005bb9  __aeabi_dmul                       
-000062f1  __aeabi_i2d                        
-000059af  __aeabi_idiv0                      
-000059af  __aeabi_ldiv0                      
-00005ff3  __aeabi_memclr                     
-00005ff3  __aeabi_memclr4                    
-00005ff3  __aeabi_memclr8                    
-00005f57  __aeabi_memcpy                     
-00005f57  __aeabi_memcpy4                    
-00005f57  __aeabi_memcpy8                    
-00005ff5  __aeabi_memset                     
-00005ff5  __aeabi_memset4                    
-00005ff5  __aeabi_memset8                    
-00006249  __aeabi_uidiv                      
-00006249  __aeabi_uidivmod                   
+00006359  __TI_zero_init                     
+000060b5  __aeabi_d2f                        
+00005b91  __aeabi_dmul                       
+000062c9  __aeabi_i2d                        
+00005987  __aeabi_idiv0                      
+00005987  __aeabi_ldiv0                      
+00005fcb  __aeabi_memclr                     
+00005fcb  __aeabi_memclr4                    
+00005fcb  __aeabi_memclr8                    
+00005f2f  __aeabi_memcpy                     
+00005f2f  __aeabi_memcpy4                    
+00005f2f  __aeabi_memcpy8                    
+00005fcd  __aeabi_memset                     
+00005fcd  __aeabi_memset4                    
+00005fcd  __aeabi_memset8                    
+00006221  __aeabi_uidiv                      
+00006221  __aeabi_uidivmod                   
 ffffffff  __binit__                          
 ffffffff  __c_args__                         
 UNDEFED   __mpu_init                         
 2000fe00  __stack                            
 20000000  __start___llvm_prf_cnts            
 20000000  __stop___llvm_prf_cnts             
-00006289  _c_int00_noargs                    
+00006261  _c_int00_noargs                    
 200088d4  _lock                              
-000053e7  _nop                               
+000053bf  _nop                               
 20008178  _sys_memory                        
 UNDEFED   _system_post_cinit                 
-00006395  _system_pre_init                   
+0000636d  _system_pre_init                   
 200088d8  _unlock                            
-00006399  abort                              
-00005781  adc14_init                         
-00005ab9  aligned_alloc                      
+00006371  abort                              
+00005759  adc14_init                         
+00005a91  aligned_alloc                      
 ffffffff  binit                              
-0000526b  circular_buffer_add                
-00005257  circular_buffer_delete             
-000052e7  circular_buffer_empty              
-00005303  circular_buffer_full               
-00005225  circular_buffer_init               
-000052a5  circular_buffer_remove             
-00005331  circular_buffer_test_0             
-000091e9  crosshair_bm_0x0                   
-00009207  crosshair_bm_0xc718                
-0000912c  dark_background_bm_0x4108          
-00008c28  dark_background_bm_0x4110          
-00008f94  dark_background_bm_0x4208          
-000076bc  dark_background_bm_0x4210          
-00009249  dark_background_bm_0x4308          
-00007ba6  dark_background_bm_0x4310          
-00007db5  dark_background_bm_0x4410          
-0000706d  dark_background_bm_0x8             
+00005243  circular_buffer_add                
+0000522f  circular_buffer_delete             
+000052bf  circular_buffer_empty              
+000052db  circular_buffer_full               
+000051fd  circular_buffer_init               
+0000527d  circular_buffer_remove             
+00005309  circular_buffer_test_0             
+000091c1  crosshair_bm_0x0                   
+000091df  crosshair_bm_0xc718                
+00009104  dark_background_bm_0x4108          
+00008c00  dark_background_bm_0x4110          
+00008f6c  dark_background_bm_0x4208          
+00007694  dark_background_bm_0x4210          
+00009221  dark_background_bm_0x4308          
+00007b7e  dark_background_bm_0x4310          
+00007d8d  dark_background_bm_0x4410          
+00007045  dark_background_bm_0x8             
 000035b1  draw                               
 00004b05  draw_crosshair                     
 00004ae9  draw_dark_background               
@@ -423,12 +422,12 @@ ffffffff  binit
 00000541  eTaskGetState                      
 2000886a  first_col_fg                       
 20008868  first_row_fg                       
-00005679  fputc                              
-00005cb5  free                               
-00005477  i2c_init                           
-00005513  i2c_read_16                        
-000054b7  i2c_write_16                       
-000062bd  init                               
+00005651  fputc                              
+00005c8d  free                               
+0000544f  i2c_init                           
+000054eb  i2c_read_16                        
+0000548f  i2c_write_16                       
+00006295  init                               
 00000000  interruptVectors                   
 2000886e  last_col_fg                        
 2000886c  last_row_fg                        
@@ -436,40 +435,40 @@ ffffffff  binit
 200086cc  layers_dark_background             
 20008578  layers_light_background            
 2000876c  layers_medium_background           
-00008a2a  light_background_bm_0x200          
-00008ea6  light_background_bm_0x300          
-0000814b  light_background_bm_0x400          
-000084bf  light_background_bm_0x4400         
-0000923f  light_background_bm_0x4408         
-00008305  light_background_bm_0x4500         
-00008ffa  light_background_bm_0x4508         
-000091bd  light_background_bm_0x4510         
-0000863f  light_background_bm_0x4600         
-00009181  light_background_bm_0x4608         
-00009060  light_background_bm_0x4610         
-00009225  light_background_bm_0x4710         
-000090c6  light_background_bm_0x4718         
-000087b5  light_background_bm_0x500          
-00009254  light_background_bm_0x508          
-00008b29  light_background_bm_0x600          
-0000639c  light_background_bm_0x8718         
-00004dfd  main                               
-0000638d  malloc                             
-0000891a  medium_background_bm_0x4308        
-00007931  medium_background_bm_0x4408        
-00007f80  medium_background_bm_0x4508        
-00008d16  medium_background_bm_0x4608        
-00006a0d  medium_background_bm_0x8410        
-00008de6  medium_background_bm_0x8508        
-00008f1d  medium_background_bm_0x8510        
-0000924a  medium_background_bm_0x8608        
-00005ab9  memalign                           
-00005f57  memcpy                             
-00005ffb  memset                             
+00008a02  light_background_bm_0x200          
+00008e7e  light_background_bm_0x300          
+00008123  light_background_bm_0x400          
+00008497  light_background_bm_0x4400         
+00009217  light_background_bm_0x4408         
+000082dd  light_background_bm_0x4500         
+00008fd2  light_background_bm_0x4508         
+00009195  light_background_bm_0x4510         
+00008617  light_background_bm_0x4600         
+00009159  light_background_bm_0x4608         
+00009038  light_background_bm_0x4610         
+000091fd  light_background_bm_0x4710         
+0000909e  light_background_bm_0x4718         
+0000878d  light_background_bm_0x500          
+0000922c  light_background_bm_0x508          
+00008b01  light_background_bm_0x600          
+00006374  light_background_bm_0x8718         
+00004ddd  main                               
+00006365  malloc                             
+000088f2  medium_background_bm_0x4308        
+00007909  medium_background_bm_0x4408        
+00007f58  medium_background_bm_0x4508        
+00008cee  medium_background_bm_0x4608        
+000069e5  medium_background_bm_0x8410        
+00008dbe  medium_background_bm_0x8508        
+00008ef5  medium_background_bm_0x8510        
+00009222  medium_background_bm_0x8608        
+00005a91  memalign                           
+00005f2f  memcpy                             
+00005fd3  memset                             
 20008870  moving_layers                      
 20008874  num_moving_layers                  
-000061b5  opt3001_init                       
-000061c5  opt3001_read_lux                   
+0000618d  opt3001_init                       
+0000619d  opt3001_read_lux                   
 00000bdd  pcTaskGetName                      
 00003cdb  pcTimerGetName                     
 00004225  pvPortMalloc                       
@@ -478,16 +477,16 @@ ffffffff  binit
 00004195  pvTimerGetTimerID                  
 2000880c  pxCurrentTCB                       
 00004679  pxPortInitialiseStack              
-00005d99  realloc                            
-00005667  serial_debug_init                  
-0000563d  serial_debug_put_string            
-000059f1  t32_init                           
+00005d71  realloc                            
+0000563f  serial_debug_init                  
+00005615  serial_debug_put_string            
+000059c9  t32_init                           
 00002fbf  ucQueueGetQueueType                
-0000924c  ulMaxSyscallInterruptPriority      
-00005e8d  ulPortGetIPSR                      
+00009224  ulMaxSyscallInterruptPriority      
+00005e65  ulPortGetIPSR                      
 00001a65  ulTaskGenericNotifyTake            
 00002093  ulTaskGenericNotifyValueClear      
-00005967  uxListRemove                       
+0000593f  uxListRemove                       
 00002f9f  uxQueueGetQueueNumber              
 00002eed  uxQueueMessagesWaiting             
 00002f51  uxQueueMessagesWaitingFromISR      
@@ -500,23 +499,23 @@ ffffffff  binit
 00001a23  uxTaskResetEventItemValue          
 00003c75  uxTimerGetReloadMode               
 000041f1  uxTimerGetTimerNumber              
-0000925c  uxTopUsedPriority                  
-00004e59  vApplicationMallocFailedHook       
-00004e5b  vApplicationStackOverflowHook      
-00005885  vListInitialise                    
-000058b5  vListInitialiseItem                
-00005901  vListInsert                        
-000058c5  vListInsertEnd                     
-00005f49  vPortEnableVFP                     
+00009234  uxTopUsedPriority                  
+00004e39  vApplicationMallocFailedHook       
+00004e3b  vApplicationStackOverflowHook      
+0000585d  vListInitialise                    
+0000588d  vListInitialiseItem                
+000058d9  vListInsert                        
+0000589d  vListInsertEnd                     
+00005f21  vPortEnableVFP                     
 000047bd  vPortEndScheduler                  
 000047e1  vPortEnterCritical                 
 00004823  vPortExitCritical                  
 000043b7  vPortFree                          
 000045b9  vPortGetHeapStats                  
 0000445d  vPortInitialiseBlocks              
-00005f05  vPortSVCHandler                    
+00005edd  vPortSVCHandler                    
 000049d5  vPortSetupTimerInterrupt           
-00005f25  vPortStartFirstTask                
+00005efd  vPortStartFirstTask                
 0000487d  vPortSuppressTicksAndSleep         
 00004a1d  vPortValidateInterruptPriority     
 00002f7b  vQueueDelete                       
@@ -550,7 +549,7 @@ ffffffff  binit
 000041ff  vTimerSetTimerNumber               
 00004451  xPortGetFreeHeapSize               
 00004457  xPortGetMinimumEverFreeHeapSize    
-00005ea5  xPortPendSVHandler                 
+00005e7d  xPortPendSVHandler                 
 00004705  xPortStartScheduler                
 0000484f  xPortSysTickHandler                
 00002437  xQueueCreateCountingSemaphore      
@@ -727,171 +726,171 @@ address   name
 00004acd  draw_medium_background             
 00004ae9  draw_dark_background               
 00004b05  draw_crosshair                     
-00004cd9  Task_updateBackground              
-00004d69  Task_newFrame                      
-00004dfd  main                               
-00004e59  vApplicationMallocFailedHook       
-00004e5b  vApplicationStackOverflowHook      
-00004ed1  SystemCoreClockUpdate              
-00005149  SystemInit                         
-00005225  circular_buffer_init               
-00005257  circular_buffer_delete             
-0000526b  circular_buffer_add                
-000052a5  circular_buffer_remove             
-000052e7  circular_buffer_empty              
-00005303  circular_buffer_full               
-00005331  circular_buffer_test_0             
-000053e7  _nop                               
-00005477  i2c_init                           
-000054b7  i2c_write_16                       
-00005513  i2c_read_16                        
-0000563d  serial_debug_put_string            
-00005667  serial_debug_init                  
-00005679  fputc                              
-000056a9  EUSCIA0_IRQHandler                 
-000056a9  EUSCIA0_IRQHandler                 
-00005781  adc14_init                         
-000057dd  ADC14_IRQHandler                   
-000057dd  ADC14_IRQHandler                   
-00005885  vListInitialise                    
-000058b5  vListInitialiseItem                
-000058c5  vListInsertEnd                     
-00005901  vListInsert                        
-00005967  uxListRemove                       
-000059af  __aeabi_idiv0                      
-000059af  __aeabi_ldiv0                      
-000059dd  MKII_S2                            
-000059f1  t32_init                           
-00005a43  T32_INT1_IRQHandler                
-00005a43  T32_INT1_IRQHandler                
-00005a75  T32_INT2_IRQHandler                
-00005a75  T32_INT2_IRQHandler                
-00005ab9  aligned_alloc                      
-00005ab9  memalign                           
-00005bb9  __aeabi_dmul                       
-00005cb5  free                               
-00005d99  realloc                            
-00005e8d  ulPortGetIPSR                      
-00005ea5  xPortPendSVHandler                 
-00005f05  vPortSVCHandler                    
-00005f25  vPortStartFirstTask                
-00005f49  vPortEnableVFP                     
-00005f57  __aeabi_memcpy                     
-00005f57  __aeabi_memcpy4                    
-00005f57  __aeabi_memcpy8                    
-00005f57  memcpy                             
-00005ff3  __aeabi_memclr                     
-00005ff3  __aeabi_memclr4                    
-00005ff3  __aeabi_memclr8                    
-00005ff5  __aeabi_memset                     
-00005ff5  __aeabi_memset4                    
-00005ff5  __aeabi_memset8                    
-00005ffb  memset                             
-000060dd  __aeabi_d2f                        
-0000614b  __TI_decompress_lzss               
-000061b5  opt3001_init                       
-000061c5  opt3001_read_lux                   
-00006205  __TI_auto_init_nobinit_nopinit     
-00006249  __aeabi_uidiv                      
-00006249  __aeabi_uidivmod                   
-00006289  _c_int00_noargs                    
-000062bd  init                               
-000062f1  __aeabi_i2d                        
-00006365  __TI_decompress_none               
-00006373  Reset_Handler                      
-0000637f  AES256_IRQHandler                  
-0000637f  BusFault_Handler                   
-0000637f  COMP_E0_IRQHandler                 
-0000637f  COMP_E1_IRQHandler                 
-0000637f  CS_IRQHandler                      
-0000637f  DMA_ERR_IRQHandler                 
-0000637f  DMA_INT0_IRQHandler                
-0000637f  DMA_INT1_IRQHandler                
-0000637f  DMA_INT2_IRQHandler                
-0000637f  DMA_INT3_IRQHandler                
-0000637f  DebugMon_Handler                   
-0000637f  Default_Handler                    
-0000637f  EUSCIA1_IRQHandler                 
-0000637f  EUSCIA2_IRQHandler                 
-0000637f  EUSCIA3_IRQHandler                 
-0000637f  EUSCIB0_IRQHandler                 
-0000637f  EUSCIB1_IRQHandler                 
-0000637f  EUSCIB2_IRQHandler                 
-0000637f  EUSCIB3_IRQHandler                 
-0000637f  FLCTL_IRQHandler                   
-0000637f  FPU_IRQHandler                     
-0000637f  HardFault_Handler                  
-0000637f  MemManage_Handler                  
-0000637f  NMI_Handler                        
-0000637f  PCM_IRQHandler                     
-0000637f  PORT1_IRQHandler                   
-0000637f  PORT2_IRQHandler                   
-0000637f  PORT3_IRQHandler                   
-0000637f  PORT4_IRQHandler                   
-0000637f  PORT5_IRQHandler                   
-0000637f  PORT6_IRQHandler                   
-0000637f  PSS_IRQHandler                     
-0000637f  PendSV_Handler                     
-0000637f  RTC_C_IRQHandler                   
-0000637f  SVC_Handler                        
-0000637f  SysTick_Handler                    
-0000637f  T32_INTC_IRQHandler                
-0000637f  TA0_0_IRQHandler                   
-0000637f  TA0_N_IRQHandler                   
-0000637f  TA1_0_IRQHandler                   
-0000637f  TA1_N_IRQHandler                   
-0000637f  TA2_0_IRQHandler                   
-0000637f  TA2_N_IRQHandler                   
-0000637f  TA3_0_IRQHandler                   
-0000637f  TA3_N_IRQHandler                   
-0000637f  UsageFault_Handler                 
-0000637f  WDT_A_IRQHandler                   
-00006381  __TI_zero_init                     
-0000638d  malloc                             
-00006395  _system_pre_init                   
-00006399  C$$EXIT                            
-00006399  abort                              
-0000639c  light_background_bm_0x8718         
-00006a0d  medium_background_bm_0x8410        
-0000706d  dark_background_bm_0x8             
-000076bc  dark_background_bm_0x4210          
-00007931  medium_background_bm_0x4408        
-00007ba6  dark_background_bm_0x4310          
-00007db5  dark_background_bm_0x4410          
-00007f80  medium_background_bm_0x4508        
-0000814b  light_background_bm_0x400          
-00008305  light_background_bm_0x4500         
-000084bf  light_background_bm_0x4400         
-0000863f  light_background_bm_0x4600         
-000087b5  light_background_bm_0x500          
-0000891a  medium_background_bm_0x4308        
-00008a2a  light_background_bm_0x200          
-00008b29  light_background_bm_0x600          
-00008c28  dark_background_bm_0x4110          
-00008d16  medium_background_bm_0x4608        
-00008de6  medium_background_bm_0x8508        
-00008ea6  light_background_bm_0x300          
-00008f1d  medium_background_bm_0x8510        
-00008f94  dark_background_bm_0x4208          
-00008ffa  light_background_bm_0x4508         
-00009060  light_background_bm_0x4610         
-000090c6  light_background_bm_0x4718         
-0000912c  dark_background_bm_0x4108          
-00009181  light_background_bm_0x4608         
-000091bd  light_background_bm_0x4510         
-000091e9  crosshair_bm_0x0                   
-00009207  crosshair_bm_0xc718                
-00009225  light_background_bm_0x4710         
-0000923f  light_background_bm_0x4408         
-00009249  dark_background_bm_0x4308          
-0000924a  medium_background_bm_0x8608        
-0000924c  ulMaxSyscallInterruptPriority      
-00009254  light_background_bm_0x508          
-0000925c  uxTopUsedPriority                  
-00009438  __TI_Handler_Table_Base            
-00009444  __TI_Handler_Table_Limit           
-00009450  __TI_CINIT_Base                    
-00009460  __TI_CINIT_Limit                   
+00004cd9  Task_newFrame                      
+00004d75  Task_joystick                      
+00004ddd  main                               
+00004e39  vApplicationMallocFailedHook       
+00004e3b  vApplicationStackOverflowHook      
+00004ea9  SystemCoreClockUpdate              
+00005121  SystemInit                         
+000051fd  circular_buffer_init               
+0000522f  circular_buffer_delete             
+00005243  circular_buffer_add                
+0000527d  circular_buffer_remove             
+000052bf  circular_buffer_empty              
+000052db  circular_buffer_full               
+00005309  circular_buffer_test_0             
+000053bf  _nop                               
+0000544f  i2c_init                           
+0000548f  i2c_write_16                       
+000054eb  i2c_read_16                        
+00005615  serial_debug_put_string            
+0000563f  serial_debug_init                  
+00005651  fputc                              
+00005681  EUSCIA0_IRQHandler                 
+00005681  EUSCIA0_IRQHandler                 
+00005759  adc14_init                         
+000057b5  ADC14_IRQHandler                   
+000057b5  ADC14_IRQHandler                   
+0000585d  vListInitialise                    
+0000588d  vListInitialiseItem                
+0000589d  vListInsertEnd                     
+000058d9  vListInsert                        
+0000593f  uxListRemove                       
+00005987  __aeabi_idiv0                      
+00005987  __aeabi_ldiv0                      
+000059b5  MKII_S2                            
+000059c9  t32_init                           
+00005a1b  T32_INT1_IRQHandler                
+00005a1b  T32_INT1_IRQHandler                
+00005a4d  T32_INT2_IRQHandler                
+00005a4d  T32_INT2_IRQHandler                
+00005a91  aligned_alloc                      
+00005a91  memalign                           
+00005b91  __aeabi_dmul                       
+00005c8d  free                               
+00005d71  realloc                            
+00005e65  ulPortGetIPSR                      
+00005e7d  xPortPendSVHandler                 
+00005edd  vPortSVCHandler                    
+00005efd  vPortStartFirstTask                
+00005f21  vPortEnableVFP                     
+00005f2f  __aeabi_memcpy                     
+00005f2f  __aeabi_memcpy4                    
+00005f2f  __aeabi_memcpy8                    
+00005f2f  memcpy                             
+00005fcb  __aeabi_memclr                     
+00005fcb  __aeabi_memclr4                    
+00005fcb  __aeabi_memclr8                    
+00005fcd  __aeabi_memset                     
+00005fcd  __aeabi_memset4                    
+00005fcd  __aeabi_memset8                    
+00005fd3  memset                             
+000060b5  __aeabi_d2f                        
+00006123  __TI_decompress_lzss               
+0000618d  opt3001_init                       
+0000619d  opt3001_read_lux                   
+000061dd  __TI_auto_init_nobinit_nopinit     
+00006221  __aeabi_uidiv                      
+00006221  __aeabi_uidivmod                   
+00006261  _c_int00_noargs                    
+00006295  init                               
+000062c9  __aeabi_i2d                        
+0000633d  __TI_decompress_none               
+0000634b  Reset_Handler                      
+00006357  AES256_IRQHandler                  
+00006357  BusFault_Handler                   
+00006357  COMP_E0_IRQHandler                 
+00006357  COMP_E1_IRQHandler                 
+00006357  CS_IRQHandler                      
+00006357  DMA_ERR_IRQHandler                 
+00006357  DMA_INT0_IRQHandler                
+00006357  DMA_INT1_IRQHandler                
+00006357  DMA_INT2_IRQHandler                
+00006357  DMA_INT3_IRQHandler                
+00006357  DebugMon_Handler                   
+00006357  Default_Handler                    
+00006357  EUSCIA1_IRQHandler                 
+00006357  EUSCIA2_IRQHandler                 
+00006357  EUSCIA3_IRQHandler                 
+00006357  EUSCIB0_IRQHandler                 
+00006357  EUSCIB1_IRQHandler                 
+00006357  EUSCIB2_IRQHandler                 
+00006357  EUSCIB3_IRQHandler                 
+00006357  FLCTL_IRQHandler                   
+00006357  FPU_IRQHandler                     
+00006357  HardFault_Handler                  
+00006357  MemManage_Handler                  
+00006357  NMI_Handler                        
+00006357  PCM_IRQHandler                     
+00006357  PORT1_IRQHandler                   
+00006357  PORT2_IRQHandler                   
+00006357  PORT3_IRQHandler                   
+00006357  PORT4_IRQHandler                   
+00006357  PORT5_IRQHandler                   
+00006357  PORT6_IRQHandler                   
+00006357  PSS_IRQHandler                     
+00006357  PendSV_Handler                     
+00006357  RTC_C_IRQHandler                   
+00006357  SVC_Handler                        
+00006357  SysTick_Handler                    
+00006357  T32_INTC_IRQHandler                
+00006357  TA0_0_IRQHandler                   
+00006357  TA0_N_IRQHandler                   
+00006357  TA1_0_IRQHandler                   
+00006357  TA1_N_IRQHandler                   
+00006357  TA2_0_IRQHandler                   
+00006357  TA2_N_IRQHandler                   
+00006357  TA3_0_IRQHandler                   
+00006357  TA3_N_IRQHandler                   
+00006357  UsageFault_Handler                 
+00006357  WDT_A_IRQHandler                   
+00006359  __TI_zero_init                     
+00006365  malloc                             
+0000636d  _system_pre_init                   
+00006371  C$$EXIT                            
+00006371  abort                              
+00006374  light_background_bm_0x8718         
+000069e5  medium_background_bm_0x8410        
+00007045  dark_background_bm_0x8             
+00007694  dark_background_bm_0x4210          
+00007909  medium_background_bm_0x4408        
+00007b7e  dark_background_bm_0x4310          
+00007d8d  dark_background_bm_0x4410          
+00007f58  medium_background_bm_0x4508        
+00008123  light_background_bm_0x400          
+000082dd  light_background_bm_0x4500         
+00008497  light_background_bm_0x4400         
+00008617  light_background_bm_0x4600         
+0000878d  light_background_bm_0x500          
+000088f2  medium_background_bm_0x4308        
+00008a02  light_background_bm_0x200          
+00008b01  light_background_bm_0x600          
+00008c00  dark_background_bm_0x4110          
+00008cee  medium_background_bm_0x4608        
+00008dbe  medium_background_bm_0x8508        
+00008e7e  light_background_bm_0x300          
+00008ef5  medium_background_bm_0x8510        
+00008f6c  dark_background_bm_0x4208          
+00008fd2  light_background_bm_0x4508         
+00009038  light_background_bm_0x4610         
+0000909e  light_background_bm_0x4718         
+00009104  dark_background_bm_0x4108          
+00009159  light_background_bm_0x4608         
+00009195  light_background_bm_0x4510         
+000091c1  crosshair_bm_0x0                   
+000091df  crosshair_bm_0xc718                
+000091fd  light_background_bm_0x4710         
+00009217  light_background_bm_0x4408         
+00009221  dark_background_bm_0x4308          
+00009222  medium_background_bm_0x8608        
+00009224  ulMaxSyscallInterruptPriority      
+0000922c  light_background_bm_0x508          
+00009234  uxTopUsedPriority                  
+00009414  __TI_Handler_Table_Base            
+00009420  __TI_Handler_Table_Limit           
+00009428  __TI_CINIT_Base                    
+00009438  __TI_CINIT_Limit                   
 20000000  __start___llvm_prf_cnts            
 20000000  __stop___llvm_prf_cnts             
 2000816c  Rx_String                          
@@ -909,7 +908,7 @@ address   name
 2000886e  last_col_fg                        
 20008870  moving_layers                      
 20008874  num_moving_layers                  
-20008878  TaskH_updateBackground             
+20008878  TaskH_joystick                     
 2000887c  TaskH_newFrame                     
 20008880  Sem_LCD                            
 200088c6  Rx_Char_Count                      

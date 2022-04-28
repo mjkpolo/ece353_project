@@ -51,7 +51,7 @@
 #include "ps2.h"
 #include "timer32.h"
 
-TaskHandle_t TaskH_updateBackground = NULL;
+TaskHandle_t TaskH_joystick = NULL;
 TaskHandle_t TaskH_newFrame = NULL;
 SemaphoreHandle_t Sem_LCD = NULL;
 
@@ -76,7 +76,11 @@ inline void init(void)
 	  serial_debug_init();
 }
 
-void Task_updateBackground(void *pvParameters) {
+/******************************************************************************
+* Tasked used to blink LED1 on MSP432 Launchpad
+******************************************************************************/
+void Task_newFrame(void *pvParameters)
+{
 	while(true) {
     enum light {DARK,MEDIUM,BRIGHT,foo};
     static enum light l, pl = foo; // so pl != l
@@ -99,25 +103,18 @@ void Task_updateBackground(void *pvParameters) {
 		}
 		pl = l;
     vTaskDelay(pdMS_TO_TICKS(10));
+		draw_crosshair(x,y);
+		draw_moving_layers();
 	}
 }
-/******************************************************************************
-* Tasked used to blink LED1 on MSP432 Launchpad
-******************************************************************************/
-void Task_newFrame(void *pvParameters)
-{
+
+void Task_joystick(void *pvParameters) {
 	while(true) {
-		draw_moving_layers();
-    vTaskDelay(pdMS_TO_TICKS(10));
-		if (PS2_Y_VAL == PS2_DIR_UP) y-= 3;
-		else if (PS2_Y_VAL == PS2_DIR_DOWN) y+= 3;
-		if (PS2_X_VAL == PS2_DIR_LEFT) x-= 3;
-		else if (PS2_X_VAL == PS2_DIR_RIGHT) x+= 3;
-		if (PS2_Y_VAL != PS2_DIR_NONE ||
-			  PS2_X_VAL != PS2_DIR_NONE) {
-		}
-		draw_crosshair(x,y);
-		draw_crosshair(x+4,y+4);
+	  if (PS2_Y_VAL == PS2_DIR_UP) y-= 1;
+	  else if (PS2_Y_VAL == PS2_DIR_DOWN) y+= 1;
+	  if (PS2_X_VAL == PS2_DIR_LEFT) x-= 1;
+	  else if (PS2_X_VAL == PS2_DIR_RIGHT) x+= 1;
+    vTaskDelay(pdMS_TO_TICKS(5));
 	}
 }
 
@@ -133,7 +130,7 @@ int main(void)
     Sem_LCD = xSemaphoreCreateBinary();
     xSemaphoreGive(Sem_LCD);
     xTaskCreate(Task_newFrame, "newFrame", configMINIMAL_STACK_SIZE, NULL, 1, &TaskH_newFrame);
-    xTaskCreate(Task_updateBackground, "updateBackground", configMINIMAL_STACK_SIZE, NULL, 2, &TaskH_updateBackground);
+    xTaskCreate(Task_joystick, "joystick", configMINIMAL_STACK_SIZE, NULL, 2, &TaskH_joystick);
 
     vTaskStartScheduler();
 
