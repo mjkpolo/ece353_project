@@ -34,10 +34,6 @@ void Task_updateBackground(void *pvParameters);
 * Prints a message to the Console
 ******************************************************************************/
 void Task_clayPigeon(void *pvParameters);
-/******************************************************************************
-* Prints a message to the Console
-******************************************************************************/
-void Task1(void *pvParameters);
 
 
 #endif /* MAIN_H_ */
