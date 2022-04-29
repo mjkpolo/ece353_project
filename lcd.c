@@ -214,109 +214,107 @@ void Crystalfontz128x128_Init(void)
     HAL_LCD_writeData(CM_MADCTL_MX | CM_MADCTL_MY | CM_MADCTL_BGR);
 }
 
-void draw_moving_layers() {
-    draw(moving_layers,
-         num_moving_layers,
-         first_col_fg < pfirst_col_fg ? first_col_fg : pfirst_col_fg,
-         first_row_fg < pfirst_row_fg ? first_row_fg : pfirst_row_fg,
-         last_col_fg > plast_col_fg ? last_col_fg : plast_col_fg,
-         last_row_fg > plast_row_fg ? last_row_fg : plast_row_fg,
-         true);
-    free(moving_layers);
-    moving_layers = NULL;
-    num_moving_layers = 0;
+image crosshair,background;
+static image** images = NULL;
+static size_t numImages = 0;
+static short first_col = 132;
+static short first_row = 132;
+static short pfirst_col = 132;
+static short pfirst_row = 132;
+static short last_col = 0;
+static short last_row = 0;
+static short plast_col = 0;
+static short plast_row = 0;
 
-    pfirst_col_fg = first_col_fg;
-    pfirst_row_fg = first_row_fg;
-    plast_col_fg = last_col_fg;
-    plast_row_fg = last_row_fg;
-
-    first_col_fg = 132;
-    first_row_fg = 132;
-    last_col_fg = 0;
-    last_row_fg = 0;
+void addImage(image* i) {
+  images = realloc(images,(numImages+1)*sizeof(image*));
+  images[numImages++] = i;
 }
 
-void draw(
-  layer* layers,
-  short numLayers,
-  short first_col,
-  short first_row,
-  short last_col,
-  short last_row,
-  bool moving) {
 
-  short i,j,k;
+void erase_image(image* image) {
+  free(image->layers);
+  image->layers = NULL;
+  image->numLayers = 0;
+  image->x0 = 132;
+  image->y0 = 132;
+  image->x1 = 0;
+  image->y1 = 0;
+}
 
-  /*
-  Previous Drawing
-  */
-  static layer* players = NULL;
-  static short pnumLayers = NULL;
-  static short pfirst_row = NULL;
-  static short pfirst_col = NULL;
-  static short plast_row = NULL;
-  static short plast_col = NULL;
-
-
-  //if (pnumLayers != NULL && moving)
-  //  draw(players,pnumLayers,pfirst_col,pfirst_row,plast_col,plast_row,false);
-
-  if (moving) {
-      pfirst_row = pfirst_row < first_row ? pfirst_row : first_row;
-      pfirst_col = pfirst_col < first_col ? pfirst_col : first_col;
-      plast_row = plast_row > last_row ? plast_row : last_row;
-      plast_col = plast_col > last_col ? plast_col : last_col;
-  } else {
-      players = layers;
-      pnumLayers = numLayers;
+void fill_image(image* image, layer* layers, size_t numLayers) {
+  image->layers = (layer*) realloc(image->layers, (image->numLayers+numLayers)*sizeof(layer));
+  memcpy(&image->layers[image->numLayers],layers,sizeof(layer)*numLayers);
+  image->numLayers += numLayers;
+  int i;
+  for (i=0; i<numLayers; i++) {
+    image->x0 = image->x0 < layers[i].x0 ? image->x0 : layers[i].x0;
+    image->y0 = image->y0 < layers[i].y0 ? image->y0 : layers[i].y0;
+    image->x1 = image->x1 > layers[i].x1 ? image->x1 : layers[i].x1;
+    image->y1 = image->y1 > layers[i].y1 ? image->y1 : layers[i].y1;
   }
+  first_col = image->x0 < first_col ? image->x0 : first_col;
+  first_row = image->y0 < first_row ? image->y0 : first_row;
+  last_row = image->y1 > last_row ? image->y1 : last_row;
+  last_col = image->x1 > last_col ? image->x1 : last_col;
+}
+
+
+bool draw_pixel(image* image, short i, short j) {
+  int k;
+  for (k=0; k<image->numLayers; k++) {
+    short image_width = image->layers[k].x1-image->layers[k].x0+1;
+    short image_height = image->layers[k].y1-image->layers[k].y0+1;
+    short bytes_per_row = image_width / 8;
+    bytes_per_row += image_width % 8 ? 1 : 0;
+    short relx = j-image->layers[k].x0;
+    short rely = i-image->layers[k].y0;
+    short byte_index = (rely*bytes_per_row) + relx/8;
+    bool inbounds = relx >= 0 ? (relx < image_width ? (rely >= 0 ? rely < image_height : false) : false) : false;
+    if (inbounds) {
+      if (image->layers[k].bitmap[byte_index] & (1 << (7-(relx%8)))) {
+        HAL_LCD_writeData(image->layers[k].color >> 8);
+        HAL_LCD_writeData(image->layers[k].color);
+        return true;
+      }
+    }
+  }
+  return false;
+}
+
+
+void draw(void) {
+
+  short i,j,k,x0,x1,y0,y1;
+
+  y0 = first_row < pfirst_row ? first_row : pfirst_row;
+  x0 = first_col < pfirst_col ? first_col : pfirst_col;
+  y1 = last_row > plast_row ? last_row : plast_row;
+  x1 = last_col > plast_col ? last_col : plast_col;
+
+  pfirst_col = first_col;
+  pfirst_row = first_row;
+  plast_col = last_col;
+  plast_row = last_row;
 
   xSemaphoreTake(Sem_LCD, portMAX_DELAY);
-  Crystalfontz128x128_SetDrawFrame(first_col,first_row,last_col,last_row);
+  Crystalfontz128x128_SetDrawFrame(x0,y0,x1,y1);
   HAL_LCD_writeCommand(CM_RAMWR);
 
-  for (i=first_row; i<=last_row; i++) {
-    for (j=first_col; j<=last_col; j++) {
-      for (k=0; k<numLayers; k++) {
-        short image_width = layers[k].x1-layers[k].x0+1;
-        short image_height = layers[k].y1-layers[k].y0+1;
-        short bytes_per_row = image_width / 8;
-        bytes_per_row += image_width % 8 ? 1 : 0;
-        short relx = j-layers[k].x0;
-        short rely = i-layers[k].y0;
-        short byte_index = (rely*bytes_per_row) + relx/8;
-        bool inbounds = relx >= 0 ? (relx < image_width ? (rely >= 0 ? rely < image_height : false) : false) : false;
-
-        if (inbounds) {
-          if (layers[k].bitmap[byte_index] & (1 << (7-(relx%8)))) {
-            HAL_LCD_writeData(layers[k].color >> 8);
-            HAL_LCD_writeData(layers[k].color);
-            break;
-          }
-        }
+  for (i=y0; i<=y1; i++) {
+    for (j=x0; j<=x1; j++) {
+      for (k=0; k<numImages; k++) {
+        if (draw_pixel(images[k],i,j)) break;
       }
-      if (k==numLayers) {
-        for (k=0; k<pnumLayers; k++) {
-          short image_width = players[k].x1-players[k].x0+1;
-          short image_height = players[k].y1-players[k].y0+1;
-          short bytes_per_row = image_width / 8;
-          bytes_per_row += image_width % 8 ? 1 : 0;
-          short relx = j-players[k].x0;
-          short rely = i-players[k].y0;
-          short byte_index = (rely*bytes_per_row) + relx/8;
-          bool inbounds = relx >= 0 ? (relx < image_width ? (rely >= 0 ? rely < image_height : false) : false) : false;
-
-          if (inbounds) {
-            if (players[k].bitmap[byte_index] & (1 << (7-(relx%8)))) {
-              HAL_LCD_writeData(players[k].color >> 8);
-              HAL_LCD_writeData(players[k].color);
-              break;
-            }
-          }
-        }
+      if (k==numImages) { // just draw white if no pixel found
+        HAL_LCD_writeData(0xFF);
+        HAL_LCD_writeData(0xFF);
       }
     }
   }
   xSemaphoreGive(Sem_LCD);
+  first_col = 132;
+  first_row = 132;
+  last_col = 0;
+  last_row = 0;
 }

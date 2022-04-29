@@ -18,7 +18,8 @@ TaskHandle_t TaskH_joystick = NULL;
 TaskHandle_t TaskH_newFrame = NULL;
 TaskHandle_t TaskH_s2 = NULL;
 SemaphoreHandle_t Sem_LCD = NULL;
-
+extern image background;
+extern image crosshair;
 static uint8_t x = 64, y = 64;
 
 inline void init(void)
@@ -58,24 +59,20 @@ void Task_newFrame(void *pvParameters)
 		else if (lux < 75) l=MEDIUM;
 		else l=BRIGHT;
 		if (pl != l) {
+			erase_image(&background);
 			switch (l) {
 			  case BRIGHT :
-					draw_light_background();
+					draw_light_background(&background);
 					break;
 			  case MEDIUM :
-					draw_medium_background();
+					draw_medium_background(&background);
 					break;
 			  case DARK :
-					draw_dark_background();
+					draw_dark_background(&background);
 					break;
 			}
 		}
 		pl = l;
-		draw_crosshair(x,y);
-		draw_crosshair(64,64);
-		draw_crosshair(70,70);
-		draw_crosshair(40,50);
-		draw_moving_layers();
 	}
 }
 
@@ -85,6 +82,8 @@ void Task_joystick(void *pvParameters) {
 	  else if (PS2_Y_VAL == PS2_DIR_DOWN) y+= 2;
 	  if (PS2_X_VAL == PS2_DIR_LEFT) x-= 2;
 	  else if (PS2_X_VAL == PS2_DIR_RIGHT) x+= 2;
+		draw_crosshair(&crosshair,x,y);
+		draw();
     vTaskDelay(pdMS_TO_TICKS(17));
 	}
 }
@@ -96,6 +95,8 @@ int main(void)
     init();
 
     Sem_LCD = xSemaphoreCreateBinary();
+		addImage(&crosshair);
+		addImage(&background);
     xSemaphoreGive(Sem_LCD);
     xTaskCreate(Task_newFrame, "newFrame", configMINIMAL_STACK_SIZE, NULL, 1, &TaskH_newFrame);
     xTaskCreate(Task_joystick, "joystick", configMINIMAL_STACK_SIZE, NULL, 4, &TaskH_joystick);

@@ -371,6 +371,8 @@ layer layers_light_background[] = {
   {6,52,97,97,0x508,light_background_bm_0x508},
   {39,76,98,99,0x4408,light_background_bm_0x4408}
 };
-void draw_light_background(void) {
-  draw(layers_light_background,17,0,0,131,131,false);
+
+
+void draw_light_background(image* image) {
+  fill_image(image,layers_light_background,17);
 };

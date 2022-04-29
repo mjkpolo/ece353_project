@@ -258,6 +258,6 @@ layer layers_dark_background[] = {
   {1,131,91,95,0x4108,dark_background_bm_0x4108},
   {21,21,94,94,0x4308,dark_background_bm_0x4308}
 };
-void draw_dark_background(void) {
-  draw(layers_dark_background,8,0,0,131,131,false);
+void draw_dark_background(image* image) {
+  fill_image(image,layers_dark_background,8);
 };

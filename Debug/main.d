@@ -51,6 +51,7 @@ main.obj: ../dark_background.h
 main.obj: ../lcd.h
 main.obj: ../lcd.h
 main.obj: ../crosshair.h
+main.obj: ../lcd.h
 main.obj: ../ps2.h
 main.obj: ../timer32.h
 
@@ -155,6 +156,8 @@ main.obj: ../timer32.h
 ../lcd.h:
 
 ../crosshair.h:
+
+../lcd.h:
 
 ../ps2.h:
 

@@ -36,8 +36,8 @@ def getBitmaps(img, name, move):
             first_col = min(p[1])
             first_row = min(p[0])
 
-            image_height = last_row-first_row+1
-            image_width = last_col-first_col+1
+            image_height = last_row-first_row
+            image_width = last_col-first_col
 
             pixels = pixels[first_row:last_row+1,first_col:last_col+1]
             bytes_per_row = (image_width + 8-image_width%8)//8
@@ -64,7 +64,7 @@ def getBitmaps(img, name, move):
         yield(
             f'  draw(layers_{name},{len(structs)},{0},{0},{131},{131},false);'
             if not move else
-            f'  draw(layers_{name},{len(structs)},x-{image_width//2+image_width%2},y-{image_height//2+image_height%2},x+{image_width//2},y+{image_height//2},true);'
+            f'  update_foreground(layers_{name},{len(structs)},x-{image_width//2+image_width%2},x+{image_width//2},y-{image_height//2+image_height%2},y+{image_height//2});'
         )
         yield '\n};\n'
 

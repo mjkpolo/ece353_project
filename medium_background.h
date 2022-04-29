@@ -251,6 +251,6 @@ layer layers_medium_background[] = {
   {1,125,94,105,0x8508,medium_background_bm_0x8508},
   {90,91,103,103,0x8608,medium_background_bm_0x8608}
 };
-void draw_medium_background(void) {
-  draw(layers_medium_background,8,0,0,131,131,false);
+void draw_medium_background(image* image) {
+  fill_image(image,layers_medium_background,8);
 };
