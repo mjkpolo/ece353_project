@@ -9,6 +9,10 @@
 
 volatile uint32_t PS2_X_VAL = 0;
 volatile uint32_t PS2_Y_VAL = 0;
+volatile uint32_t ACCEL_X = 0;
+volatile uint32_t ACCEL_Y = 0;
+
+TaskHandle_t TaskH_clayPigeon; // TODO
 
 void adc14_init(void) {
     // Configure the X direction of the joystick as an analog input pin.
@@ -24,15 +28,11 @@ void adc14_init(void) {
     P4->SEL0 |= BIT0;
     P4->SEL1 |= BIT0;
 
-    // Configure CTL0 to sample 16-times in pulsed sample mode.
-    // NEW -- Indicate that this is a sequence-of-channels.
+    // Configure CTL0 to sample 16-times in pulsed sample mode. This is a sequence-of-channels.
     ADC14->CTL0 = ADC14_CTL0_SHP | ADC14_CTL0_SHT02 | ADC14_CTL0_CONSEQ_1;
 
     // Configure ADC to return 12-bit values
     ADC14->CTL1 = ADC14_CTL1_RES_2;
-
-    // Set high and low thresholds for joystick
-
 
     // Associate the X direction analog signal with MEM[0]
     ADC14->MCTL[0] = ADC14_MCTLN_INCH_15;
@@ -50,83 +50,76 @@ void adc14_init(void) {
 
     // Enable ADC Interrupt in the NVIC
     NVIC_EnableIRQ(ADC14_IRQn);
+    // Set ADC Interrupt priority. Priority is greater than 2 to ensure it doesn't interrupt the FreeRTOS scheduler
+    NVIC_SetPriority(ADC14_IRQn, 3);
     // Turn ADC ON
     ADC14->CTL0 |= ADC14_CTL0_ON;
-
-  /* TODO __enable_irq();
-  P6->SEL0 |= BIT0;
-  P6->SEL1 |= BIT0;
-
-  P4->SEL0 |= BIT4;
-  P4->SEL1 |= BIT4;
-
-  ADC14->CTL0 = ADC14_CTL0_SHP | ADC14_CTL0_SHT02 | ADC14_CTL0_CONSEQ_1;
-  ADC14->CTL1 = ADC14_CTL1_RES_2;
-  ADC14->MCTL[0] = ADC14_MCTLN_INCH_15;
-  ADC14->MCTL[1] = ADC14_MCTLN_INCH_9 | ADC14_MCTLN_EOS;
-  ADC14->IER0 = ADC14_IER0_IE1;
-
-  NVIC_EnableIRQ(ADC14_IRQn);
-  ADC14->CTL0 |= ADC14_CTL0_ON;*/
 }
 
 void ADC14_IRQHandler(void) {
-
+    BaseType_t xHigherPriorityTaskWoken;
     static uint8_t x_tilt_l_state = 0;
     static uint8_t x_tilt_r_state = 0;
     static uint8_t y_tilt_f_state = 0;
     static uint8_t y_tilt_b_state = 0;
 
-    if ((ADC14->IFGR0 & ADC14_IFGR0_IFG1) != 0) {
-      // TODO Maybe use a window comparator and notify the newFrame task, or maybe keep it like it is but add the new x/y values to a queue and notify the newFrame task
-      uint32_t tempX = ADC14->MEM[0]; // TODO Remove; Just a temporary variable to take in joystick x
-        /* TODO
+    // TODO Add ADC14_IER0_IE1 | Above again????
+    // TODO if ((ADC14->IFGR0 & ADC14_IFGR0_IFG1) != 0) {
+
+      // TODO Maybe use a window comparator and notify the newFrame task, or maybe keep it like it is but add the new x/y values to length 1 queues and notify the newFrame task
+
       PS2_X_VAL = ADC14->MEM[0];
       if (PS2_X_VAL > VOLT_2P70) PS2_X_VAL=PS2_DIR_RIGHT;
       else if (PS2_X_VAL < VOLT_0P6) PS2_X_VAL=PS2_DIR_LEFT;
-      else PS2_X_VAL=PS2_DIR_NONE;*/
+      else PS2_X_VAL=PS2_DIR_NONE;
 
-      uint32_t tempY = ADC14->MEM[1]; // TODO Remove; Just a temporary variable to take in joystick y
-      /* TODO PS2_Y_VAL = ADC14->MEM[1];
+      PS2_Y_VAL = ADC14->MEM[1];
       if (PS2_Y_VAL > VOLT_2P70) PS2_Y_VAL=PS2_DIR_UP;
       else if (PS2_Y_VAL < VOLT_0P6) PS2_Y_VAL=PS2_DIR_DOWN;
-      else PS2_Y_VAL=PS2_DIR_NONE;*/
-    }
-    if((ADC14->IFGR0 & ADC14_IFGR0_IFG3) != 0) {
-        PS2_X_VAL = ADC14->MEM[2];
+      else PS2_Y_VAL=PS2_DIR_NONE;
+    //}
 
+    // TODO if((ADC14->IFGR0 & ADC14_IFGR0_IFG3) != 0) {
+        ACCEL_X = ADC14->MEM[2];
+
+        // TODO Make this the same as tilting forward/backward (or make those the same as this)???
         x_tilt_r_state = x_tilt_r_state << 1; //| (PS2_X_VAL > VOLT_TILT_HI);
-        if(PS2_X_VAL > VOLT_TILT_R) {
+        if(ACCEL_X > VOLT_TILT_R) {
             x_tilt_r_state |= 0x0F;
         }
         x_tilt_l_state = x_tilt_l_state << 1; //| (PS2_X_VAL < VOLT_TILT_LO);
-        if(PS2_X_VAL < VOLT_TILT_L) {
+        if(ACCEL_X < VOLT_TILT_L) {
             x_tilt_l_state |= 0x0F;
         }
 
-        PS2_Y_VAL = ADC14->MEM[3];
+        ACCEL_Y = ADC14->MEM[3];
 
-        y_tilt_f_state = y_tilt_f_state << 1 | (PS2_Y_VAL > VOLT_TILT_F);
-        y_tilt_b_state = y_tilt_b_state << 1 | (PS2_Y_VAL < VOLT_TILT_B);
+        y_tilt_f_state = y_tilt_f_state << 1 | (ACCEL_Y > VOLT_TILT_F);
+        y_tilt_b_state = y_tilt_b_state << 1 | (ACCEL_Y < VOLT_TILT_B);
 
         if(x_tilt_r_state == 0xFF) {
-            PS2_X_VAL=PS2_DIR_RIGHT;
+            ACCEL_X = ACCEL_DIR_RIGHT;
         } else if(x_tilt_l_state == 0xFF) {
-            PS2_X_VAL=PS2_DIR_LEFT;
+            ACCEL_X = ACCEL_DIR_LEFT;
         } else {
-            PS2_X_VAL=PS2_DIR_NONE;
+            ACCEL_X = ACCEL_DIR_NONE;
         }
 
-        if(y_tilt_f_state == 0xFF) {
-            PS2_Y_VAL=PS2_DIR_UP;
-        } else if(y_tilt_b_state == 0xFF) {
-            PS2_Y_VAL=PS2_DIR_DOWN;
-        } else {
-            PS2_Y_VAL=PS2_DIR_NONE;
+        // Only launch one clay pigeon when the user tilts the board forward
+        // TODO Add something so it doesn't allow the clayPigeon task to be notified while it is already running
+        // /\/\ Could use a semaphore for this. Take the semaphore in Task_clayPigeon() and give it at the end of the task.
+        //      Here, try to take the semaphore before notifying the task, but have a small delay/wait. If it times out, don't notify the task. If it successfully takes the semaphore, give it back right away and notify the task
+        if(y_tilt_f_state == 0x7F) {
+            // Notify clay pigeon task to pull clay pigeon
+            vTaskNotifyGiveFromISR(TaskH_clayPigeon, &xHigherPriorityTaskWoken);
+
+            portYIELD_FROM_ISR( xHigherPriorityTaskWoken );
+        }
+        // Only reload once when the user tilts the board backward
+        // TODO Add something so it doesn't reload when ammo supply is full
+        else if(y_tilt_b_state == 0x7F) {
+            // TODO Reload cartridge
         }
 
-        //if (PS2_X_VAL > VOLT_TILT_RIGHT) PS2_X_VAL=PS2_DIR_RIGHT;
-        //else if (PS2_X_VAL < VOLT_TILT_LEFT) PS2_X_VAL=PS2_DIR_LEFT;
-        //else PS2_X_VAL=PS2_DIR_NONE;
-    }
+    //}
 }

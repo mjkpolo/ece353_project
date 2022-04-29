@@ -78,7 +78,7 @@ inline void init(void)
 // TODO Create header and move this to its own task_updateBackground.c file with a corresponding task_updateBackground.h file
 void Task_updateBackground(void *pvParameters) {
 	while(true) {
-	    ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
+	    // TODO ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
         enum light {DARK,MEDIUM,BRIGHT,foo};
         static enum light l, pl = foo; // so pl != l
           float lux = opt3001_read_lux();
@@ -98,12 +98,13 @@ void Task_updateBackground(void *pvParameters) {
                         break;
                 }
                 // Draw crosshair so that it doesn't seem to disappear when the background color changes
-                draw_crosshair(x,y);
+                //draw_crosshair(x,y); TODO
             }
             pl = l;
         vTaskDelay(pdMS_TO_TICKS(10));
 	}
 }
+
 /******************************************************************************
 * Tasked used to blink LED1 on MSP432 Launchpad
 * TODO Update header and move this to its own task_newFrame.c file with a corresponding task_newFrame.h file
@@ -127,7 +128,7 @@ void Task_newFrame(void *pvParameters)
 		    if(x > (CROSSHAIR_WIDTH / 2) + STEP_VAL) x -= STEP_VAL;
 		    else x = 1 + CROSSHAIR_WIDTH / 2;
 		}
-		else if ((PS2_X_VAL == PS2_DIR_RIGHT)) {
+		else if (PS2_X_VAL == PS2_DIR_RIGHT) {
 		    // Move to the right unless the crosshair is already at the right boundary. In which case, stay at the boundary
 		    if(x < LCD_HORIZONTAL_MAX - (CROSSHAIR_WIDTH / 2) - STEP_VAL) x += STEP_VAL;
 		    else x = LCD_HORIZONTAL_MAX - (CROSSHAIR_WIDTH / 2);
@@ -139,6 +140,42 @@ void Task_newFrame(void *pvParameters)
 	}
 }
 
+// TODO Header and move to its own file
+void Task_clayPigeon(void *pvParameters)
+{
+    // Boolean used to track whether the clay pigeon should move up or down
+    bool move_up;
+
+    while(true) {
+        ulTaskNotifyTake(pdTRUE, portMAX_DELAY); // Wait until task is notified to start
+
+        move_up = true; // The clay pigeon should initially be moving up
+        // TODO Use different x and y variables
+        y = SKY_BOTTOM_Y - (CROSSHAIR_HEIGHT / 2) - 1; // TODO Replace CROSSHAIR_HEIGHT with clay pigeon height
+        x = LCD_HORIZONTAL_MAX / 2; // TODO Randomize initial x position
+
+        while(y < SKY_BOTTOM_Y - (CROSSHAIR_HEIGHT / 2)) { // TODO Replace CROSSHAIR_HEIGHT with clay pigeon height
+            if(move_up) y--; // TODO y -= level #
+            else y++; // TODO y += level #
+
+            if(y <= (CROSSHAIR_HEIGHT / 2)) move_up = false;
+
+            if(ACCEL_X == ACCEL_DIR_LEFT) {
+                // Move to the left unless the clay pigeon is already at the left boundary. In which case, stay at the boundary
+                if(x > (CROSSHAIR_WIDTH / 2) + STEP_VAL) x -= STEP_VAL; // TODO Replace CROSSHAIR_WIDTH with clay pigeon width
+                else x = 1 + CROSSHAIR_WIDTH / 2; // TODO Replace CROSSHAIR_WIDTH with clay pigeon width
+            } else if (ACCEL_X == ACCEL_DIR_RIGHT) {
+                // Move to the right unless the clay pigeon is already at the right boundary. In which case, stay at the boundary
+                if(x < LCD_HORIZONTAL_MAX - (CROSSHAIR_WIDTH / 2) - STEP_VAL) x += STEP_VAL; // TODO Replace CROSSHAIR_WIDTH with clay pigeon width
+                else x = LCD_HORIZONTAL_MAX - (CROSSHAIR_WIDTH / 2); // TODO Replace CROSSHAIR_WIDTH with clay pigeon width
+            }
+
+            draw_crosshair(x,y); // TODO Replace with draw clay pigeon
+
+            vTaskDelay(pdMS_TO_TICKS(20)); // TODO Could slow down the delay when the clay pigeon gets closer to the top of the screen/peak of its arc
+        }
+    }
+}
 
 /*
  *  ======== main ========
@@ -150,6 +187,7 @@ int main(void)
 
     Sem_LCD = xSemaphoreCreateBinary();
     xSemaphoreGive(Sem_LCD);
+    xTaskCreate(Task_clayPigeon, "pullClay", configMINIMAL_STACK_SIZE, NULL, 3, &TaskH_clayPigeon);
     xTaskCreate(TaskBlast, "blast", configMINIMAL_STACK_SIZE, NULL, 3, &TaskH_TaskBlast);
     xTaskCreate(Task_newFrame, "newFrame", configMINIMAL_STACK_SIZE, NULL, 2, &TaskH_newFrame);
     xTaskCreate(Task_updateBackground, "updateBackground", configMINIMAL_STACK_SIZE, NULL, 2, &TaskH_updateBackground);

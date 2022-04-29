@@ -20,6 +20,24 @@
 extern SemaphoreHandle_t Sem_LCD;
 extern TaskHandle_t TaskH_TaskBlast;
 extern TaskHandle_t TaskH_updateBackground;
+extern TaskHandle_t TaskH_clayPigeon;
+
+/******************************************************************************
+* Prints a message to the Console
+******************************************************************************/
+void Task_newFrame(void *pvParameters);
+/******************************************************************************
+* Prints a message to the Console
+******************************************************************************/
+void Task_updateBackground(void *pvParameters);
+/******************************************************************************
+* Prints a message to the Console
+******************************************************************************/
+void Task_clayPigeon(void *pvParameters);
+/******************************************************************************
+* Prints a message to the Console
+******************************************************************************/
+void Task1(void *pvParameters);
 
 
 #endif /* MAIN_H_ */
