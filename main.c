@@ -47,7 +47,7 @@ void Task_s2(void *pvParameters) {
 		if (S2_P) printf("S2 true\r\n");
 		S2_P = false;
     ADC14->CTL0 |= ADC14_CTL0_SC | ADC14_CTL0_ENC;
-		vTaskDelay(pdMS_TO_TICKS(7));
+		vTaskDelay(pdMS_TO_TICKS(50));
 	}
 }
 
@@ -56,7 +56,7 @@ void Task_newFrame(void *pvParameters)
 	while(true) {
     enum light {DARK,MEDIUM,BRIGHT,foo};
     static enum light l, pl = foo; // so pl != l
-    vTaskDelay(pdMS_TO_TICKS(10));
+    vTaskDelay(pdMS_TO_TICKS(20));
 	  float lux = opt3001_read_lux();
 		if (lux < 20) l=DARK;
 		else if (lux < 75) l=MEDIUM;
@@ -91,7 +91,7 @@ void Task_joystick(void *pvParameters) {
 		draw_crosshair(&crosshair,x,y);
 		draw_crosshair(&crosshair2,2+x,y-40);
 		draw_clay(&crosshair3,131-x,131-y);
-    vTaskDelay(pdMS_TO_TICKS(5));
+    vTaskDelay(pdMS_TO_TICKS(20));
 	}
 }
 
