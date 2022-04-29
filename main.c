@@ -90,7 +90,7 @@ void Task_joystick(void *pvParameters) {
 		draw_crosshair(&crosshair,x,y);
 		draw_crosshair(&crosshair2,2+x,y-40);
 		draw_crosshair(&crosshair3,131-x,131-y);
-    vTaskDelay(pdMS_TO_TICKS(12));
+    vTaskDelay(pdMS_TO_TICKS(5));
 	}
 }
 
