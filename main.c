@@ -11,6 +11,7 @@
 #include "dark_background.h"
 #include "lcd.h"
 #include "crosshair.h"
+#include "clay.h"
 #include "ps2.h"
 #include "timer32.h"
 
@@ -55,7 +56,7 @@ void Task_newFrame(void *pvParameters)
 	while(true) {
     enum light {DARK,MEDIUM,BRIGHT,foo};
     static enum light l, pl = foo; // so pl != l
-    vTaskDelay(pdMS_TO_TICKS(5));
+    vTaskDelay(pdMS_TO_TICKS(10));
 	  float lux = opt3001_read_lux();
 		if (lux < 20) l=DARK;
 		else if (lux < 75) l=MEDIUM;
@@ -89,7 +90,7 @@ void Task_joystick(void *pvParameters) {
 		y = y<0 ? 0 : y>131 ? 131 : y;
 		draw_crosshair(&crosshair,x,y);
 		draw_crosshair(&crosshair2,2+x,y-40);
-		draw_crosshair(&crosshair3,131-x,131-y);
+		draw_clay(&crosshair3,131-x,131-y);
     vTaskDelay(pdMS_TO_TICKS(5));
 	}
 }
@@ -106,7 +107,7 @@ int main(void)
 		add_image(&crosshair3);
 		add_image(&background);
     xSemaphoreGive(Sem_LCD);
-    xTaskCreate(Task_newFrame, "newFrame", configMINIMAL_STACK_SIZE, NULL, 1, &TaskH_newFrame);
+    xTaskCreate(Task_newFrame, "newFrame", configMINIMAL_STACK_SIZE, NULL, 2, &TaskH_newFrame);
     xTaskCreate(Task_joystick, "joystick", configMINIMAL_STACK_SIZE, NULL, 2, &TaskH_joystick);
     xTaskCreate(Task_s2, "s2", configMINIMAL_STACK_SIZE, NULL, 2, &TaskH_s2);
 
