@@ -103,7 +103,7 @@ void TaskBlast(void *pvParameters)
         {NOTE_D, 2, 15},
     };*/
 
-    // Sound made when a target is missed
+    /* TODO Remove: Sound made when a target is missed
     Note_t sound_byte[] =
     {
         {NOTE_B, 1, 10},
@@ -120,15 +120,26 @@ void TaskBlast(void *pvParameters)
         {NOTE_B, 0, 5},
         {NOTE_C, 1, 10},
         {NOTE_A, 0, 5},
-        {NOTE_F, 0, 10},
+        {NOTE_F, 0, 7},
         {NOTE_DS, 0, 5},
-        {NOTE_D, 0, 10},
-        {NOTE_CS, 0, 5},
-        {NOTE_C, 0, 20},
-    };
+        {NOTE_D, 0, 7},
+        {NOTE_CS, 0, 10},
+        {NOTE_C, 0, 25},
+    };/*
+    Note_t sound_byte[] =
+    {
+        {NOTE_B, 5, 50},
+        //{NOTE_D, 11, 1},
+        {NOTE_AS, 5, 50},
+        {NOTE_A, 5, 50},
+        //{NOTE_D, 11, 1},
+        //{NOTE_A, 12, 1},
+        //{NOTE_C, 11, 1},
+        {NOTE_C, 0, 25},
+    };*/
 
     // Sound made when a target is hit
-    Note_t sound_byte2[] =
+    Note_t hit_sound[] =
     {
         {NOTE_B, 3, 10},
         {NOTE_AS, 3, 10},
@@ -151,42 +162,42 @@ void TaskBlast(void *pvParameters)
         {NOTE_DS, 2, 20},
     };
 
-    int arrSize = sizeof sound_byte / sizeof sound_byte[0];
-    int arrSize2 = sizeof sound_byte2 / sizeof sound_byte2[0];
-    int i=0; // TODO
+    int hit_sound_size = sizeof hit_sound / sizeof hit_sound[0];
+    int i = 0;
+    int max = (int)(NOTE_C * pow(2, 3.25)); // TODO Replace with constant value
 
     while(1)
     {
         // Wait for ISR to let us know that the button has been pressed
         ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
 
-        // Play target missed sound
-        for(i=0; i < arrSize; i++) {
+        // Play target missed sound (upside-down exponential curve to create a decreasing tone, sampled at intervals to allow each sampled frequency to be played longer without extending the time for which the sound is played)
+        for(i=0; i < max; i+=7) {
             // Configure TimerA0 with the specified period of the PWM pulse
-            MKII_Buzzer_Init((uint32_t)floor(24000000.0/(sound_byte[i].note * pow(2,sound_byte[i].octave))));
+            MKII_Buzzer_Init((uint32_t) floor(24000000.0 / (max - max*pow(2.71828, (i - max)/((double)max)))));
             // Turn the buzzer on (start playing note)
             MKII_Buzzer_On();
             // Wait while buzzer plays the note
-            vTaskDelay(pdMS_TO_TICKS(sound_byte[i].time));
+            vTaskDelay(pdMS_TO_TICKS(5));
             // Turn the buzzer off (stop playing note)
             MKII_Buzzer_Off();
         }
 
-        vTaskDelay(pdMS_TO_TICKS(500));
+        vTaskDelay(pdMS_TO_TICKS(500)); // TODO Wait (just for testing)
 
         // Play target hit sound
-        for(i=0; i < arrSize2; i++) {
+        for(i=0; i < hit_sound_size; i++) {
             // Configure TimerA0 with the specified period of the PWM pulse
-            MKII_Buzzer_Init((uint32_t)floor(24000000.0/(sound_byte2[i].note * pow(2,sound_byte2[i].octave))));
+            MKII_Buzzer_Init((uint32_t)floor(24000000.0/(hit_sound[i].note * pow(2, hit_sound[i].octave))));
             // Turn the buzzer on (start playing note)
             MKII_Buzzer_On();
             // Wait while buzzer plays the note
-            vTaskDelay(pdMS_TO_TICKS(sound_byte2[i].time));
+            vTaskDelay(pdMS_TO_TICKS(hit_sound[i].time));
             // Turn the buzzer off (stop playing note)
             MKII_Buzzer_Off();
         }
 
-        // Notify blast task to shoot at the crosshairs
+        // TODO Notify blast task to shoot at the crosshairs
         xTaskNotifyGive(TaskH_updateBackground);
                 // TODO vTaskNotifyGive(TaskH_updateBackground, &xHigherPriorityTaskWoken);
 

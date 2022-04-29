@@ -97,7 +97,7 @@ void Task_updateBackground(void *pvParameters) {
                         draw_dark_background();
                         break;
                 }
-                // Draw crosshair so that it doesn't seem to disapear when the background color changes
+                // Draw crosshair so that it doesn't seem to disappear when the background color changes
                 draw_crosshair(x,y);
             }
             pl = l;

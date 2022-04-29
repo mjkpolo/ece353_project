@@ -28,7 +28,7 @@
 typedef struct{
     double note;
     uint8_t octave;
-    uint8_t time; // TODO uint8_t ???
+    uint8_t time;
 }Note_t;
 
 
