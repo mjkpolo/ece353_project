@@ -233,9 +233,9 @@ void add_image(image* i) {
 
 
 void erase_image(image* image) {
+  image->numLayers = 0;
   free(image->layers);
   image->layers = NULL;
-  image->numLayers = 0;
   image->x0 = 132;
   image->y0 = 132;
   image->x1 = 0;
@@ -304,7 +304,6 @@ void draw(void) {
   plast_row = last_row;
   
   
-  xSemaphoreTake(Sem_LCD, portMAX_DELAY);
   Crystalfontz128x128_SetDrawFrame(x0,y0,x1,y1);
   HAL_LCD_writeCommand(CM_RAMWR);
   
@@ -319,7 +318,6 @@ void draw(void) {
       }
     }
   }
-  xSemaphoreGive(Sem_LCD);
 
   first_col = 132;
   first_row = 132;

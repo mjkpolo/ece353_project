@@ -17,7 +17,5 @@
 #include <stdbool.h>
 #include "msp.h"
 
-extern SemaphoreHandle_t Sem_LCD;
-
 
 #endif /* MAIN_H_ */

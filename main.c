@@ -18,7 +18,6 @@
 TaskHandle_t TaskH_joystick = NULL;
 TaskHandle_t TaskH_newFrame = NULL;
 TaskHandle_t TaskH_s2 = NULL;
-SemaphoreHandle_t Sem_LCD = NULL;
 extern image background;
 extern image crosshair;
 extern image crosshair2;
@@ -56,7 +55,7 @@ void Task_newFrame(void *pvParameters)
 	while(true) {
     enum light {DARK,MEDIUM,BRIGHT,foo};
     static enum light l, pl = foo; // so pl != l
-    vTaskDelay(pdMS_TO_TICKS(40));
+    vTaskDelay(pdMS_TO_TICKS(20));
 	  float lux = opt3001_read_lux();
 		if (lux < 20) l=DARK;
 		else if (lux < 75) l=MEDIUM;
@@ -89,9 +88,9 @@ void Task_joystick(void *pvParameters) {
 		x = x<0 ? 0 : x>131 ? 131 : x;
 		y = y<0 ? 0 : y>131 ? 131 : y;
 		draw_crosshair(&crosshair,x,y);
-		draw_crosshair(&crosshair2,2+x,y-40);
-		draw_clay(&crosshair3,131-x,131-y);
-    vTaskDelay(pdMS_TO_TICKS(40));
+		draw_clay(&crosshair2,x-5,y+5);
+		draw_clay(&crosshair3,x+5,y-5);
+    vTaskDelay(pdMS_TO_TICKS(10));
 	}
 }
 
@@ -101,12 +100,10 @@ int main(void)
     WDT_A->CTL = WDT_A_CTL_PW | WDT_A_CTL_HOLD;     // stop watchdog timer
     init();
 
-    Sem_LCD = xSemaphoreCreateBinary();
 		add_image(&crosshair);
 		add_image(&crosshair2);
 		add_image(&crosshair3);
 		add_image(&background);
-    xSemaphoreGive(Sem_LCD);
     xTaskCreate(Task_newFrame, "newFrame", configMINIMAL_STACK_SIZE, NULL, 2, &TaskH_newFrame);
     xTaskCreate(Task_joystick, "joystick", configMINIMAL_STACK_SIZE, NULL, 2, &TaskH_joystick);
     xTaskCreate(Task_s2, "s2", configMINIMAL_STACK_SIZE, NULL, 2, &TaskH_s2);
