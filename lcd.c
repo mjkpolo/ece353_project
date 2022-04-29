@@ -292,32 +292,35 @@ void draw(void) {
   y1 = last_row > plast_row ? last_row : plast_row;
   x1 = last_col > plast_col ? last_col : plast_col;
 
-  if (!(y0<0 || y1>131 || x0<0 || x1>131)) {
+  x0 = (x0>131 ? 131 : (x0<0 ? 0 : x0));
+  y0 = (y0>131 ? 131 : (y0<0 ? 0 : y0));
+  x1 = (x1>131 ? 131 : (x1<0 ? 0 : x1));
+  y1 = (y1>131 ? 131 : (y1<0 ? 0 : y1));
 
-    pfirst_col = first_col;
-    pfirst_row = first_row;
-    plast_col = last_col;
-    plast_row = last_row;
+
+  pfirst_col = first_col;
+  pfirst_row = first_row;
+  plast_col = last_col;
+  plast_row = last_row;
   
   
-    xSemaphoreTake(Sem_LCD, portMAX_DELAY);
-    Crystalfontz128x128_SetDrawFrame(x0,y0,x1,y1);
-    HAL_LCD_writeCommand(CM_RAMWR);
+  xSemaphoreTake(Sem_LCD, portMAX_DELAY);
+  Crystalfontz128x128_SetDrawFrame(x0,y0,x1,y1);
+  HAL_LCD_writeCommand(CM_RAMWR);
   
-    for (i=y0; i<=y1; i++) {
-      for (j=x0; j<=x1; j++) {
-        for (k=0; k<numImages; k++) {
-          if (draw_pixel(images[k],i,j)) break;
-        }
-        if (k==numImages) { // just draw white if no pixel found
-          HAL_LCD_writeData(0xFF);
-          HAL_LCD_writeData(0xFF);
-        }
+  for (i=y0; i<=y1; i++) {
+    for (j=x0; j<=x1; j++) {
+      for (k=0; k<numImages; k++) {
+        if (draw_pixel(images[k],i,j)) break;
+      }
+      if (k==numImages) { // just draw white if no pixel found
+        HAL_LCD_writeData(0xFF);
+        HAL_LCD_writeData(0xFF);
       }
     }
-    xSemaphoreGive(Sem_LCD);
-
   }
+  xSemaphoreGive(Sem_LCD);
+
   first_col = 132;
   first_row = 132;
   last_col = 0;
