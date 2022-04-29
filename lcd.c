@@ -214,7 +214,7 @@ void Crystalfontz128x128_Init(void)
     HAL_LCD_writeData(CM_MADCTL_MX | CM_MADCTL_MY | CM_MADCTL_BGR);
 }
 
-image crosshair,background;
+image crosshair2,crosshair,background;
 static image** images = NULL;
 static size_t numImages = 0;
 static short first_col = 132;
