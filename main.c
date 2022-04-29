@@ -21,6 +21,7 @@ SemaphoreHandle_t Sem_LCD = NULL;
 extern image background;
 extern image crosshair;
 extern image crosshair2;
+extern image crosshair3;
 static short x = 64, y = 64;
 
 inline void init(void)
@@ -54,7 +55,7 @@ void Task_newFrame(void *pvParameters)
 	while(true) {
     enum light {DARK,MEDIUM,BRIGHT,foo};
     static enum light l, pl = foo; // so pl != l
-    vTaskDelay(pdMS_TO_TICKS(10));
+    vTaskDelay(pdMS_TO_TICKS(5));
 	  float lux = opt3001_read_lux();
 		if (lux < 20) l=DARK;
 		else if (lux < 75) l=MEDIUM;
@@ -84,9 +85,12 @@ void Task_joystick(void *pvParameters) {
 	  else if (PS2_Y_VAL == PS2_DIR_DOWN) y+= 1;
 	  if (PS2_X_VAL == PS2_DIR_LEFT) x-= 1;
 	  else if (PS2_X_VAL == PS2_DIR_RIGHT) x+= 1;
+		x = x<0 ? 0 : x>131 ? 131 : x;
+		y = y<0 ? 0 : y>131 ? 131 : y;
 		draw_crosshair(&crosshair,x,y);
-		draw_crosshair(&crosshair2,y,x);
-    vTaskDelay(pdMS_TO_TICKS(9));
+		draw_crosshair(&crosshair2,2+x,y-40);
+		draw_crosshair(&crosshair3,131-x,131-y);
+    vTaskDelay(pdMS_TO_TICKS(5));
 	}
 }
 
@@ -97,9 +101,10 @@ int main(void)
     init();
 
     Sem_LCD = xSemaphoreCreateBinary();
-		addImage(&crosshair);
-		addImage(&crosshair2);
-		addImage(&background);
+		add_image(&crosshair);
+		add_image(&crosshair2);
+		add_image(&crosshair3);
+		add_image(&background);
     xSemaphoreGive(Sem_LCD);
     xTaskCreate(Task_newFrame, "newFrame", configMINIMAL_STACK_SIZE, NULL, 1, &TaskH_newFrame);
     xTaskCreate(Task_joystick, "joystick", configMINIMAL_STACK_SIZE, NULL, 2, &TaskH_joystick);

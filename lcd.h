@@ -98,6 +98,7 @@ typedef struct {
 
 void draw(void);
 
+void add_image(image* image);
 void erase_image(image* image);
 void fill_image(image* image, layer* layers, size_t numLayers);
 

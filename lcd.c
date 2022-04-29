@@ -214,7 +214,7 @@ void Crystalfontz128x128_Init(void)
     HAL_LCD_writeData(CM_MADCTL_MX | CM_MADCTL_MY | CM_MADCTL_BGR);
 }
 
-image crosshair2,crosshair,background;
+image crosshair3,crosshair2,crosshair,background;
 static image** images = NULL;
 static size_t numImages = 0;
 static short first_col = 132;
@@ -226,7 +226,7 @@ static short last_row = 0;
 static short plast_col = 0;
 static short plast_row = 0;
 
-void addImage(image* i) {
+void add_image(image* i) {
   images = realloc(images,(numImages+1)*sizeof(image*));
   images[numImages++] = i;
 }
@@ -292,27 +292,32 @@ void draw(void) {
   y1 = last_row > plast_row ? last_row : plast_row;
   x1 = last_col > plast_col ? last_col : plast_col;
 
-  pfirst_col = first_col;
-  pfirst_row = first_row;
-  plast_col = last_col;
-  plast_row = last_row;
+  if (!(y0<0 || y1>131 || x0<0 || x1>131)) {
 
-  xSemaphoreTake(Sem_LCD, portMAX_DELAY);
-  Crystalfontz128x128_SetDrawFrame(x0,y0,x1,y1);
-  HAL_LCD_writeCommand(CM_RAMWR);
-
-  for (i=y0; i<=y1; i++) {
-    for (j=x0; j<=x1; j++) {
-      for (k=0; k<numImages; k++) {
-        if (draw_pixel(images[k],i,j)) break;
-      }
-      if (k==numImages) { // just draw white if no pixel found
-        HAL_LCD_writeData(0xFF);
-        HAL_LCD_writeData(0xFF);
+    pfirst_col = first_col;
+    pfirst_row = first_row;
+    plast_col = last_col;
+    plast_row = last_row;
+  
+  
+    xSemaphoreTake(Sem_LCD, portMAX_DELAY);
+    Crystalfontz128x128_SetDrawFrame(x0,y0,x1,y1);
+    HAL_LCD_writeCommand(CM_RAMWR);
+  
+    for (i=y0; i<=y1; i++) {
+      for (j=x0; j<=x1; j++) {
+        for (k=0; k<numImages; k++) {
+          if (draw_pixel(images[k],i,j)) break;
+        }
+        if (k==numImages) { // just draw white if no pixel found
+          HAL_LCD_writeData(0xFF);
+          HAL_LCD_writeData(0xFF);
+        }
       }
     }
+    xSemaphoreGive(Sem_LCD);
+
   }
-  xSemaphoreGive(Sem_LCD);
   first_col = 132;
   first_row = 132;
   last_col = 0;
