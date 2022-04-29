@@ -19,16 +19,12 @@ def getBitmaps(img, name, move):
                                    (c[0] << 7))
         structs = []
 
-        last_col = 0
-        last_row = 0
-        first_col = 132
-        first_row = 132
         yield '#include "lcd.h"\n\n'
 
 
         for key,pixels in sections:
             bitmap = []
-            yield f'const uint8_t {name}_bm_{hex(key)}[] =\n' + '{\n'
+            yield f'static const uint8_t {name}_bm_{hex(key)}[] = ' + '{\n  '
 
             p = np.where(pixels) if not move else np.where(~img.mask)
             last_col = max(p[1])
@@ -46,27 +42,37 @@ def getBitmaps(img, name, move):
                 chunks = np.concatenate((line,np.zeros(8-len(line)%8)),axis=0).reshape((bytes_per_row,8)).astype(bool) # seperate into bytes
                 bitmap.append(', '.join(map(bool2byte,(row for row in chunks))))
 
-            yield ',\n'.join(bitmap)
+            yield ',\n  '.join(bitmap)
             yield '\n};\n\n'
 
             structs.append('{'+f'{first_col},{last_col},{first_row},{last_row},{hex(key)},{name}_bm_{hex(key)}'+'}')
 
 
-        yield f'layer layers_{name}[] = '+'{\n  '
+        yield f'static layer layers_{name}[] = '+'{\n  '
         yield ',\n  '.join(structs)
-        yield '\n};\n'
+        yield '\n};\n\n'
 
         yield(
-            f'void draw_{name}(void) ' + '{\n'
+            f'void draw_{name}(image* image) ' + '{\n'
             if not move else
-            f'void draw_{name}(short x, short y) ' + '{\n'
+            f'void draw_{name}(image* image, short x, short y) ' + '{\n'
         )
         yield(
-            f'  draw(layers_{name},{len(structs)},{0},{0},{131},{131},false);'
+            f'  fill_image(image,layers_{name},{len(structs)});\n'
             if not move else
-            f'  update_foreground(layers_{name},{len(structs)},x-{image_width//2+image_width%2},x+{image_width//2},y-{image_height//2+image_height%2},y+{image_height//2});'
+            '  int i;\n' \
+            '  erase_image(image);\n' \
+            f'  for (i=0; i<{len(structs)}; i++) '+'{\n' \
+            f'    short image_width = layers_{name}[i].x1-layers_{name}[i].x0;\n' \
+            f'    short image_height = layers_{name}[i].y1-layers_{name}[i].y0;\n' \
+            f'    layers_{name}[i].x0 = x-(image_width/2+image_width%2);\n' \
+            f'    layers_{name}[i].x1 = x+(image_width/2);\n' \
+            f'    layers_{name}[i].y0 = y-(image_height/2+image_height%2);\n' \
+            f'    layers_{name}[i].y1 = y+(image_height/2);\n' \
+            '  }\n' \
+            f'  fill_image(image,layers_{name},{len(structs)});\n'
         )
-        yield '\n};\n'
+        yield '};\n'
 
 def main(names, move):
     layer = np.ma.zeros((132,132)).astype(np.uint16)

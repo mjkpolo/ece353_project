@@ -1,7 +1,7 @@
 ******************************************************************************
                   TI ARM Linker Unix v20.2.5                   
 ******************************************************************************
->> Linked Fri Apr 29 01:56:12 2022
+>> Linked Fri Apr 29 02:35:19 2022
 
 OUTPUT FILE NAME:   <duckhunt_FreeRtos.out>
 ENTRY POINT SYMBOL: "_c_int00_noargs"  address: 000084b9
@@ -573,16 +573,6 @@ ffffffff  binit
 20008324  crosshair                          
 20008334  crosshair2                         
 20008344  crosshair3                         
-0000b692  crosshair_bm_0x0                   
-0000b6b0  crosshair_bm_0xc718                
-0000b5d5  dark_background_bm_0x4108          
-0000b0d1  dark_background_bm_0x4110          
-0000b43d  dark_background_bm_0x4208          
-00009a64  dark_background_bm_0x4210          
-0000b6f2  dark_background_bm_0x4308          
-00009f4e  dark_background_bm_0x4310          
-0000a15d  dark_background_bm_0x4410          
-00009415  dark_background_bm_0x8             
 00004315  draw                               
 00005575  draw_crosshair                     
 00005565  draw_dark_background               
@@ -608,40 +598,11 @@ ffffffff  binit
 00006383  i2c_write_16                       
 0000851d  init                               
 00000000  interruptVectors                   
-2000877c  layers_crosshair                   
-20008580  layers_dark_background             
-20008380  layers_light_background            
-20008600  layers_medium_background           
 00006ee1  ldexp                              
 00006ee1  ldexpl                             
-0000aed3  light_background_bm_0x200          
-0000b34f  light_background_bm_0x300          
-0000a4f3  light_background_bm_0x400          
-0000a867  light_background_bm_0x4400         
-0000b6e8  light_background_bm_0x4408         
-0000a6ad  light_background_bm_0x4500         
-0000b4a3  light_background_bm_0x4508         
-0000b666  light_background_bm_0x4510         
-0000a9e7  light_background_bm_0x4600         
-0000b62a  light_background_bm_0x4608         
-0000b509  light_background_bm_0x4610         
-0000b6ce  light_background_bm_0x4710         
-0000b56f  light_background_bm_0x4718         
-0000ab5d  light_background_bm_0x500          
-0000b6fc  light_background_bm_0x508          
-0000afd2  light_background_bm_0x600          
-00008744  light_background_bm_0x8718         
 000085d1  lseek                              
 00005845  main                               
 0000872d  malloc                             
-0000acc2  medium_background_bm_0x4308        
-00009cd9  medium_background_bm_0x4408        
-0000a328  medium_background_bm_0x4508        
-0000b1bf  medium_background_bm_0x4608        
-00008db5  medium_background_bm_0x8410        
-0000b28f  medium_background_bm_0x8508        
-0000b3c6  medium_background_bm_0x8510        
-0000b6f3  medium_background_bm_0x8608        
 000070f9  memalign                           
 0000865d  memccpy                            
 00008621  memchr                             
@@ -1102,43 +1063,8 @@ address   name
 0000873d  _system_pre_init                   
 00008741  C$$EXIT                            
 00008741  abort                              
-00008744  light_background_bm_0x8718         
-00008db5  medium_background_bm_0x8410        
-00009415  dark_background_bm_0x8             
-00009a64  dark_background_bm_0x4210          
-00009cd9  medium_background_bm_0x4408        
-00009f4e  dark_background_bm_0x4310          
-0000a15d  dark_background_bm_0x4410          
-0000a328  medium_background_bm_0x4508        
-0000a4f3  light_background_bm_0x400          
-0000a6ad  light_background_bm_0x4500         
-0000a867  light_background_bm_0x4400         
-0000a9e7  light_background_bm_0x4600         
-0000ab5d  light_background_bm_0x500          
-0000acc2  medium_background_bm_0x4308        
 0000add2  _ctypes_                           
-0000aed3  light_background_bm_0x200          
-0000afd2  light_background_bm_0x600          
-0000b0d1  dark_background_bm_0x4110          
-0000b1bf  medium_background_bm_0x4608        
-0000b28f  medium_background_bm_0x8508        
-0000b34f  light_background_bm_0x300          
-0000b3c6  medium_background_bm_0x8510        
-0000b43d  dark_background_bm_0x4208          
-0000b4a3  light_background_bm_0x4508         
-0000b509  light_background_bm_0x4610         
-0000b56f  light_background_bm_0x4718         
-0000b5d5  dark_background_bm_0x4108          
-0000b62a  light_background_bm_0x4608         
-0000b666  light_background_bm_0x4510         
-0000b692  crosshair_bm_0x0                   
-0000b6b0  crosshair_bm_0xc718                
-0000b6ce  light_background_bm_0x4710         
-0000b6e8  light_background_bm_0x4408         
-0000b6f2  dark_background_bm_0x4308          
-0000b6f3  medium_background_bm_0x8608        
 0000b6f4  ulMaxSyscallInterruptPriority      
-0000b6fc  light_background_bm_0x508          
 0000b704  uxTopUsedPriority                  
 0000b938  __TI_Handler_Table_Base            
 0000b944  __TI_Handler_Table_Limit           
@@ -1156,14 +1082,10 @@ address   name
 20008374  Rx_String                          
 20008378  Tx_Buffer                          
 2000837d  ALERT_STRING                       
-20008380  layers_light_background            
 20008490  _ftable                            
-20008580  layers_dark_background             
-20008600  layers_medium_background           
 20008680  _device                            
 200086f8  _stream                            
 20008748  pxCurrentTCB                       
-2000877c  layers_crosshair                   
 200087e4  TaskH_joystick                     
 200087e8  TaskH_newFrame                     
 200087ec  TaskH_s2                           
@@ -1197,4 +1119,4 @@ ffffffff  binit
 UNDEFED   __mpu_init                         
 UNDEFED   _system_post_cinit                 
 
-[401 symbols]
+[362 symbols]
