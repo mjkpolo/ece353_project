@@ -174,6 +174,11 @@ void Task_clayPigeon(void *pvParameters)
 
             vTaskDelay(pdMS_TO_TICKS(20)); // TODO Could slow down the delay when the clay pigeon gets closer to the top of the screen/peak of its arc
         }
+
+        // Clear task notification's value so that the task cannot be notified while it is running (e.g. if the inner while loop is running and the
+        // user tilts forward/notifies the task again, this will make sure any such notification attempts are not seen/processed at the next iteration
+        // of the outer while loop/when the task runs again)
+        ulTaskNotifyValueClear(TaskH_clayPigeon, 0xFFFFFFFF);
     }
 }
 
@@ -186,7 +191,9 @@ int main(void)
     init();
 
     Sem_LCD = xSemaphoreCreateBinary();
+
     xSemaphoreGive(Sem_LCD);
+
     xTaskCreate(Task_clayPigeon, "pullClay", configMINIMAL_STACK_SIZE, NULL, 3, &TaskH_clayPigeon);
     xTaskCreate(TaskBlast, "blast", configMINIMAL_STACK_SIZE, NULL, 3, &TaskH_TaskBlast);
     xTaskCreate(Task_newFrame, "newFrame", configMINIMAL_STACK_SIZE, NULL, 2, &TaskH_newFrame);

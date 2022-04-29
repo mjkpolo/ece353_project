@@ -106,9 +106,6 @@ void ADC14_IRQHandler(void) {
         }
 
         // Only launch one clay pigeon when the user tilts the board forward
-        // TODO Add something so it doesn't allow the clayPigeon task to be notified while it is already running
-        // /\/\ Could use a semaphore for this. Take the semaphore in Task_clayPigeon() and give it at the end of the task.
-        //      Here, try to take the semaphore before notifying the task, but have a small delay/wait. If it times out, don't notify the task. If it successfully takes the semaphore, give it back right away and notify the task
         if(y_tilt_f_state == 0x7F) {
             // Notify clay pigeon task to pull clay pigeon
             vTaskNotifyGiveFromISR(TaskH_clayPigeon, &xHigherPriorityTaskWoken);
