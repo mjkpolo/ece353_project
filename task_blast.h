@@ -9,7 +9,11 @@
 #define TASK_BLAST_H_
 
 #include "main.h"
+#include "buzzer.h"
 
+
+// TODO Play a note for the given duration
+void play_note(uint32_t period, uint16_t ms_time);
 
 /******************************************************************************
 * TODO Prints a message to the Console

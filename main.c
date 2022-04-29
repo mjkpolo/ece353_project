@@ -36,7 +36,7 @@
 
 /* RTOS header files */
 #include "main.h"
-#include "lcd.h"
+#include "lcd.h" // TODO Move hardware-related/non-FreeRTOS headers into main.h
 #include "msp.h"
 #include "msp432p401r.h"
 #include <stdint.h>
@@ -150,7 +150,7 @@ int main(void)
 
     Sem_LCD = xSemaphoreCreateBinary();
     xSemaphoreGive(Sem_LCD);
-    xTaskCreate(TaskBlast, "blast", configMINIMAL_STACK_SIZE, NULL, 2, &TaskH_TaskBlast);
+    xTaskCreate(TaskBlast, "blast", configMINIMAL_STACK_SIZE, NULL, 3, &TaskH_TaskBlast);
     xTaskCreate(Task_newFrame, "newFrame", configMINIMAL_STACK_SIZE, NULL, 2, &TaskH_newFrame);
     xTaskCreate(Task_updateBackground, "updateBackground", configMINIMAL_STACK_SIZE, NULL, 2, &TaskH_updateBackground);
 
