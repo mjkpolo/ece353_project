@@ -15,6 +15,7 @@
 #include <stdbool.h>
 #include <stdint.h>
 #include <task.h>
+#include "task_clayPigeon.h"
 
 extern SemaphoreHandle_t Sem_LCD;
 

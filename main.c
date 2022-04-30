@@ -72,49 +72,6 @@ inline void draw_crosshair_basic(uint8_t x, uint8_t y, uint8_t px, uint8_t py) {
     }
 
 
-    /* TODO if(x > px) {
-        lcd_draw_rectangle(px - 2, py + 6, STEP_VAL + 1, 10, sky_color); // TODO Could have width be 8 instead of 9
-        lcd_draw_rectangle(px - 2, py - 6, STEP_VAL + 1, 10, sky_color); // TODO Could have width be 8 instead of 9
-        lcd_draw_rectangle(px - 11, py, STEP_VAL + 1, 4, sky_color);
-    } else {
-        lcd_draw_rectangle(px + 10, py, STEP_VAL + 1, 4, sky_color);
-        lcd_draw_rectangle(px + 1, py + 6, STEP_VAL + 1, 10, sky_color); // TODO Could have width be 8 instead of 9
-        lcd_draw_rectangle(px + 1, py - 6, STEP_VAL + 1, 10, sky_color); // TODO Could have width be 8 instead of 9
-    }
-
-    if(y > py) {
-        lcd_draw_rectangle(px - 6, py - 2, 10, STEP_VAL + 1, sky_color);
-        lcd_draw_rectangle(px + 6, py - 2, 10, STEP_VAL + 1, sky_color); // TODO Could have width be 9 instead of 10
-        lcd_draw_rectangle(px, py - 11, 4, STEP_VAL + 1, sky_color);
-    } else {
-        lcd_draw_rectangle(px - 6, py + 1, 10, STEP_VAL + 1, sky_color);
-        lcd_draw_rectangle(px + 6, py + 1, 10, STEP_VAL + 1, sky_color); // TODO Could have width be 9 instead of 10
-        lcd_draw_rectangle(px, py + 10, 4, STEP_VAL + 1, sky_color);
-    }*/
-
-
-    /*if(x > px) {
-        lcd_draw_rectangle(px - 2, py + 6, 1, 10, sky_color); // TODO Could have width be 8 instead of 9
-        lcd_draw_rectangle(px - 2, py - 6, 1, 10, sky_color); // TODO Could have width be 8 instead of 9
-        lcd_draw_rectangle(px - 11, py, 1, 4, sky_color);
-    } else {
-        lcd_draw_rectangle(px + 10, py, 1, 4, sky_color);
-        lcd_draw_rectangle(px + 1, py + 6, 1, 10, sky_color); // TODO Could have width be 8 instead of 9
-        lcd_draw_rectangle(px + 1, py - 6, 1, 10, sky_color); // TODO Could have width be 8 instead of 9
-    }
-
-    if(y > py) {
-        lcd_draw_rectangle(px - 6, py - 2, 10, 1, sky_color);
-        lcd_draw_rectangle(px + 6, py - 2, 10, 1, sky_color); // TODO Could have width be 9 instead of 10
-        lcd_draw_rectangle(px, py - 11, 4, 1, sky_color);
-    } else {
-        lcd_draw_rectangle(px - 6, py + 1, 10, 1, sky_color);
-        lcd_draw_rectangle(px + 6, py + 1, 10, 1, sky_color); // TODO Could have width be 9 instead of 10
-        lcd_draw_rectangle(px, py + 10, 4, 1, sky_color);
-    }*/
-
-
-
     lcd_draw_rectangle(x + 10, y, 1, 4, 0x0000);
     lcd_draw_rectangle(x - 11, y, 1, 4, 0x0000);
     lcd_draw_rectangle(x, y - 11, 4, 1, 0x0000);
@@ -127,9 +84,6 @@ inline void draw_crosshair_basic(uint8_t x, uint8_t y, uint8_t px, uint8_t py) {
     lcd_draw_rectangle(x + 1, y + 6, 1, 8, 0x0000);
     lcd_draw_rectangle(x - 2, y - 6, 1, 8, 0x0000);
     lcd_draw_rectangle(x + 1, y - 6, 1, 8, 0x0000);
-
-    //lcd_draw_rectangle(x,y,22,4,0x0000);
-    //lcd_draw_rectangle(x,y,4,22,0x0000);
     lcd_draw_rectangle(x,y,20,2,0xFFFF);
     lcd_draw_rectangle(x,y,2,20,0xFFFF);
     xSemaphoreGive(Sem_LCD);
@@ -149,20 +103,6 @@ inline void init(void)
     opt3001_init();
     serial_debug_init();
 }
-/*TODO
-void Task_s2(void* pvParameters)
-{
-    while (true) {
-        static uint8_t buttonState = 0;
-        buttonState = buttonState << 1 | MKII_S2();
-
-        if (buttonState == 0xF) S2_P = true;
-        if (S2_P) hits++;
-        S2_P = false;
-        ADC14->CTL0 |= ADC14_CTL0_SC | ADC14_CTL0_ENC;
-        vTaskDelay(pdMS_TO_TICKS(30));
-    }
-}*/
 
 void Task_newFrame(void* pvParameters)
 {
@@ -277,23 +217,10 @@ void Task_newFrame(void* pvParameters)
         if(show_clay) {
             xSemaphoreTake(Sem_LCD, portMAX_DELAY);
             // TODO Account for movement when erasing
-            lcd_draw_rectangle(pcx,pcy,22,4,sky_color); // TODO Replace color with whatever color the sky is
+            lcd_draw_rectangle(pcx,pcy,22,4,sky_color);
             lcd_draw_rectangle(cx,cy,22,4,0x0000);
             lcd_draw_rectangle(cx,cy,20,2,0xFF0F);
             xSemaphoreGive(Sem_LCD);
-
-            /* TODO
-            if(sqrt(pow(x-cx, 2) + pow(y-cy, 2)) >= 40) {
-                xSemaphoreTake(Sem_LCD, portMAX_DELAY);
-                // TODO Account for movement when erasing
-                lcd_draw_rectangle(pcx,pcy,22,4,sky_color); // TODO Replace color with whatever color the sky is
-                lcd_draw_rectangle(cx,cy,22,4,0x0000);
-                lcd_draw_rectangle(cx,cy,20,2,0xFF0F);
-                xSemaphoreGive(Sem_LCD);
-            } else {
-                draw_clay(&pidgeon, cx, cy);
-            }*/
-
 
             // Update previous clay x and y
             pcx = cx;
@@ -338,27 +265,6 @@ void Task_joystick(void* pvParameters)
             x -= STEP_VAL;
         else if ((PS2_X_VAL == PS2_DIR_RIGHT) && (x < (LCD_HORIZONTAL_MAX - (CROSSHAIR_WIDTH / 2) - STEP_VAL - 1)))
             x += STEP_VAL;
-        /* TODO x = x < 0 ? 0 : x > 131 ? 131
-                                : x;
-        y = y < 0 ? 0 : y > 131 ? 131
-                                : y;*/
-        /* TODO Remove
-        x = x < (CROSSHAIR_WIDTH / 2) + STEP_VAL ? (CROSSHAIR_WIDTH / 2)
-                                       : (x > (LCD_HORIZONTAL_MAX - (CROSSHAIR_WIDTH / 2) - STEP_VAL) ? (LCD_HORIZONTAL_MAX - (CROSSHAIR_WIDTH / 2)) : x);
-        y =  ? (CROSSHAIR_HEIGHT / 2)
-                                        :  ? (SKY_BOTTOM_Y - (CROSSHAIR_HEIGHT / 2)) : y);
-*/
-        /* TODO This worked
-        draw_crosshair_basic(x, y, px, py); // TODO
-
-        /* TODO
-        if(px != x || py != y) {
-            if(sqrt(pow(x-cx, 2) + pow(y-cy, 2)) >= 40) {
-                draw_crosshair_basic(x, y, px, py);
-            } else {
-                draw_crosshair(&crosshair, x, y);
-            }
-        }*/
 
 
         /* TODO This worked
@@ -374,92 +280,7 @@ void Task_joystick(void* pvParameters)
     }
 }
 
-// TODO Header and move to its own file
-void Task_clayPigeon(void *pvParameters)
-{
-    // Boolean used to track whether the clay pigeon should move up or down
-    bool move_up;
-    //short crosshair_height = crosshair.y1 - crosshair.y0+1; // TODO Change to clay
-    //short crosshair_width = crosshair.x1 - crosshair.x0+1; // TODO Change to clay
 
-    while(true) {
-        short x,y;
-        ulTaskNotifyTake(pdTRUE, portMAX_DELAY); // Wait until task is notified to start
-
-        move_up = true; // The clay pigeon should initially be moving up
-        // TODO Use different x and y variables
-        cx = LCD_HORIZONTAL_MAX / 2; // todo randomize initial x position
-        cy = SKY_BOTTOM_Y - (CLAY_HEIGHT / 2) - STEP_VAL - 1; // todo replace crosshair_height with clay pigeon height
-        // Initialize previous clay pigeon x and y
-        pcx = cx;
-        pcy = cy;
-
-        show_clay = true;
-
-        while(cy < SKY_BOTTOM_Y - (CLAY_HEIGHT / 2) - STEP_VAL) { // todo replace crosshair_height with clay pigeon height
-            if(cy <= (CLAY_HEIGHT / 2) + STEP_VAL + 1) move_up = false;
-
-            if(move_up) cy--; // todo y -= level #
-            else cy++; // todo y += level #
-
-
-            if(ACCEL_X == ACCEL_DIR_LEFT) {
-                // move to the left unless the clay pigeon is already at the left boundary. in which case, stay at the boundary
-                if(cx > (CLAY_WIDTH / 2) + STEP_VAL) cx -= STEP_VAL; // TODO replace crosshair_width with clay pigeon width
-                // TODO else cx = 1 + CLAY_WIDTH / 2; // todo replace crosshair_width with clay pigeon width
-            } else if (ACCEL_X == ACCEL_DIR_RIGHT) {
-                // move to the right unless the clay pigeon is already at the right boundary. in which case, stay at the boundary
-                if(cx < LCD_HORIZONTAL_MAX - (CLAY_WIDTH / 2) - STEP_VAL) cx += STEP_VAL; // todo replace crosshair_width with clay pigeon width
-                // TODO else cx = LCD_HORIZONTAL_MAX - (CLAY_WIDTH / 2); // todo replace crosshair_width with clay pigeon width
-            }
-
-
-            /* TODO This worked
-            // TODO
-            xSemaphoreTake(Sem_LCD, portMAX_DELAY);
-            // TODO Account for movement when erasing
-            lcd_draw_rectangle(pcx,pcy,22,4,sky_color); // TODO Replace color with whatever color the sky is
-            lcd_draw_rectangle(cx,cy,22,4,0x0000);
-            lcd_draw_rectangle(cx,cy,20,2,0xFF0F);
-            xSemaphoreGive(Sem_LCD);
-
-            */
-
-            /* TODO
-            if(sqrt(pow(x-cx, 2) + pow(y-cy, 2)) >= 40) {
-                xSemaphoreTake(Sem_LCD, portMAX_DELAY);
-                // TODO Account for movement when erasing
-                lcd_draw_rectangle(pcx,pcy,22,4,sky_color); // TODO Replace color with whatever color the sky is
-                lcd_draw_rectangle(cx,cy,22,4,0x0000);
-                lcd_draw_rectangle(cx,cy,20,2,0xFF0F);
-                xSemaphoreGive(Sem_LCD);
-            } else {
-                draw_clay(&pidgeon, cx, cy);
-            }*/
-
-
-            /* TODO This worked
-            // Update previous clay x and y
-            pcx = cx;
-            pcy = cy;*/
-
-            // TODO draw_clay(&pidgeon,x,y); // todo replace with draw clay pigeon
-            vTaskDelay(pdMS_TO_TICKS(20)); // TODO Could slow down the delay when the clay pigeon gets closer to the top of the screen/peak of its arc
-        }
-
-        show_clay = false;
-
-        xSemaphoreTake(Sem_LCD, portMAX_DELAY);
-        // TODO Account for movement when erasing
-        lcd_draw_rectangle(pcx,pcy,22,4,sky_color); // TODO Replace color with whatever color the sky is
-        xSemaphoreGive(Sem_LCD);
-
-        // Clear task notification's value so that the task cannot be notified while it is running (e.g. if the inner while loop is running and the
-        // user tilts forward/notifies the task again, this will make sure any such notification attempts are not seen/processed at the next iteration
-        // of the outer while loop/when the task runs again)
-        ulTaskNotifyValueClear(TaskH_clayPigeon, 0xFFFFFFFF);
-    }
-}
 
 int main(void)
 {
@@ -472,6 +293,9 @@ int main(void)
     add_image(&score);
     add_image(&background);
     draw_scoreboard(&score);
+
+    Queue_Accelerometer = xQueueCreate(1, sizeof(MOVE_DIR)); // TODO sizeof(LEFT) or sizeof(uint8_t) or 1???
+    Queue_PS2 = xQueueCreate(1, sizeof(MOVE_t)); // TODO size ???
 
     xSemaphoreGive(Sem_LCD);
     xTaskCreate(Task_clayPigeon, "pullClay", configMINIMAL_STACK_SIZE, NULL, 3, &TaskH_clayPigeon);

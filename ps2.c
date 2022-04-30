@@ -58,6 +58,10 @@ void adc14_init(void) {
 
 void ADC14_IRQHandler(void) {
     BaseType_t xHigherPriorityTaskWoken;
+    BaseType_t status;
+    MOVE_t ps2_move;
+    MOVE_DIR accelerometer_x;
+
     static uint8_t x_tilt_l_state = 0;
     static uint8_t x_tilt_r_state = 0;
     static uint8_t y_tilt_f_state = 0;
@@ -68,18 +72,33 @@ void ADC14_IRQHandler(void) {
 
       // TODO Maybe use a window comparator and notify the newFrame task, or maybe keep it like it is but add the new x/y values to length 1 queues and notify the newFrame task
 
+      // Get x position of joystick and set ps2_move.x accordingly
       PS2_X_VAL = ADC14->MEM[0];
-      if (PS2_X_VAL > VOLT_2P70) PS2_X_VAL=PS2_DIR_RIGHT;
-      else if (PS2_X_VAL < VOLT_0P6) PS2_X_VAL=PS2_DIR_LEFT;
-      else PS2_X_VAL=PS2_DIR_NONE;
+      if (PS2_X_VAL > VOLT_2P70)
+          ps2_move.x = RIGHT;
+      else if (PS2_X_VAL < VOLT_0P6)
+          ps2_move.x = LEFT;
+      else
+          ps2_move.x = NO_MOVE;
 
+      // Get y position of joystick and set ps2_move.y accordingly
       PS2_Y_VAL = ADC14->MEM[1];
-      if (PS2_Y_VAL > VOLT_2P70) PS2_Y_VAL=PS2_DIR_UP;
-      else if (PS2_Y_VAL < VOLT_0P6) PS2_Y_VAL=PS2_DIR_DOWN;
-      else PS2_Y_VAL=PS2_DIR_NONE;
+      if (PS2_Y_VAL > VOLT_2P70)
+          ps2_move.y = UP;
+      else if (PS2_Y_VAL < VOLT_0P6)
+          ps2_move.y = DOWN;
+      else
+          ps2_move.y = NO_MOVE;
+
+      // Add joystick's x and y positions to queue for crosshair task
+      // TODO Remove: status = xQueueSendToBack(Queue_LED, &msg, portMAX_DELAY);
+      status = xQueueOverwriteFromISR(Queue_PS2, &ps2_move, &xHigherPriorityTaskWoken);
+
     //}
 
     // TODO if((ADC14->IFGR0 & ADC14_IFGR0_IFG3) != 0) {
+
+        // Debounce accelerometer x value to filter out readings from shaking the board
         ACCEL_X = ADC14->MEM[2];
 
         // TODO Make this the same as tilting forward/backward (or make those the same as this)???
@@ -92,20 +111,30 @@ void ADC14_IRQHandler(void) {
             x_tilt_l_state |= 0x0F;
         }
 
+        // Debounce accelerometer y value to filter out readings from shaking the board
         ACCEL_Y = ADC14->MEM[3];
 
         y_tilt_f_state = y_tilt_f_state << 1 | (ACCEL_Y > VOLT_TILT_F);
         y_tilt_b_state = y_tilt_b_state << 1 | (ACCEL_Y < VOLT_TILT_B);
 
+        // Set accelerometer_x according to the x orientation of the accelerometer
         if(x_tilt_r_state == 0xFF) {
-            ACCEL_X = ACCEL_DIR_RIGHT;
+            accelerometer_x = RIGHT;
+            // TODO Remove: ACCEL_X = ACCEL_DIR_RIGHT;
         } else if(x_tilt_l_state == 0xFF) {
-            ACCEL_X = ACCEL_DIR_LEFT;
+            // TODO Remove: ACCEL_X = ACCEL_DIR_LEFT;
+            accelerometer_x = LEFT;
         } else {
-            ACCEL_X = ACCEL_DIR_NONE;
+            // TODO Remove: ACCEL_X = ACCEL_DIR_NONE;
+            accelerometer_x = NO_MOVE;
         }
 
-        // Only launch one clay pigeon when the user tilts the board forward
+        // Add accelerometer's x position (left/right/middle) to queue for clay pigeon task
+        // TODO Remove: status = xQueueSendToBack(Queue_LED, &msg, portMAX_DELAY);
+        status = xQueueOverwriteFromISR(Queue_Accelerometer, &accelerometer_x, &xHigherPriorityTaskWoken);
+
+
+        // Launch clay pigeon when the user tilts the board forward
         if(y_tilt_f_state == 0x7F) {
             // Notify clay pigeon task to pull clay pigeon
             vTaskNotifyGiveFromISR(TaskH_clayPigeon, &xHigherPriorityTaskWoken);
