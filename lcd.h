@@ -103,7 +103,7 @@ typedef struct {
 
 void draw(image* image);
 
-void add_image(image* image);
+size_t add_image(image* image);
 void erase_image(image* image);
 void fill_image(image* image, layer* layers, size_t numLayers);
 

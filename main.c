@@ -16,10 +16,10 @@
 
 #define STEP_VAL 1
 
-SemaphoreHandle_t Sem_LCD = NULL;
+SemaphoreHandle_t Sem_Background = NULL;
 QueueHandle_t Draw_Queue = NULL;
 TaskHandle_t TaskH_joystick = NULL;
-TaskHandle_t TaskH_newFrame = NULL;
+TaskHandle_t TaskH_background = NULL;
 TaskHandle_t TaskH_s2 = NULL;
 TaskHandle_t TaskH_drawScreen = NULL;
 extern image background;
@@ -54,7 +54,7 @@ void Task_s2(void* pvParameters)
         if (S2_P) hits++;
         S2_P = false;
         ADC14->CTL0 |= ADC14_CTL0_SC | ADC14_CTL0_ENC;
-        vTaskDelay(pdMS_TO_TICKS(30));
+        vTaskDelay(pdMS_TO_TICKS(15));
     }
 }
 
@@ -62,12 +62,12 @@ void Task_drawScreen(void* pvParameters) {
     while(true) {
       image* image = NULL;
       xQueueReceive(Draw_Queue, &image, portMAX_DELAY);
-      if (image) draw(image);
-      vTaskDelay(pdMS_TO_TICKS(30));
+      draw(image);
+      vTaskDelay(pdMS_TO_TICKS(5));
     }
 }
 
-void Task_newFrame(void* pvParameters)
+void Task_background(void* pvParameters)
 {
     while (true) {
         enum light { DARK,
@@ -146,7 +146,6 @@ void Task_newFrame(void* pvParameters)
           phits = hits;
         }
         static enum light l, pl = foo; // so pl != l
-        vTaskDelay(pdMS_TO_TICKS(30));
         float lux = opt3001_read_lux();
         if (lux < 20)
             l = DARK;
@@ -155,6 +154,7 @@ void Task_newFrame(void* pvParameters)
         else
             l = BRIGHT;
         if (pl != l) {
+            xSemaphoreTake(Sem_Background, portMAX_DELAY);
             erase_image(&background);
             switch (l) {
             case BRIGHT:
@@ -167,8 +167,10 @@ void Task_newFrame(void* pvParameters)
                 draw_dark_background(&background);
                 break;
             }
+          xSemaphoreGive(Sem_Background);
         }
-        pl = l;
+        pl=l;
+        vTaskDelay(pdMS_TO_TICKS(5));
     }
 }
 
@@ -187,11 +189,8 @@ void Task_joystick(void* pvParameters)
                                 : x;
         y = y < 0 ? 0 : y > 131 ? 131
                                 : y;
-        // xSemaphoreTake(Sem_LCD, portMAX_DELAY);
         draw_crosshair(&crosshair, x, y);
-        //draw_clay(&pidgeon, x + 15, y - 15);
-        // xSemaphoreGive(Sem_LCD);
-        vTaskDelay(pdMS_TO_TICKS(15));
+        vTaskDelay(pdMS_TO_TICKS(7));
     }
 }
 
@@ -206,6 +205,7 @@ void Task_clayPigeon(void *pvParameters)
     while(true) {
         short x,y;
         ulTaskNotifyTake(pdTRUE, portMAX_DELAY); // Wait until task is notified to start
+        xSemaphoreTake(Sem_Background, portMAX_DELAY);
 
         move_up = true; // The clay pigeon should initially be moving up
         // TODO Use different x and y variables
@@ -229,8 +229,9 @@ void Task_clayPigeon(void *pvParameters)
             }
 
             draw_clay(&pidgeon,x,y); // todo replace with draw clay pigeon
-            vTaskDelay(pdMS_TO_TICKS(30)); // TODO Could slow down the delay when the clay pigeon gets closer to the top of the screen/peak of its arc
+            vTaskDelay(pdMS_TO_TICKS(15)); // TODO Could slow down the delay when the clay pigeon gets closer to the top of the screen/peak of its arc
         }
+        xSemaphoreGive(Sem_Background);
 
         // Clear task notification's value so that the task cannot be notified while it is running (e.g. if the inner while loop is running and the
         // user tilts forward/notifies the task again, this will make sure any such notification attempts are not seen/processed at the next iteration
@@ -243,20 +244,20 @@ int main(void)
 {
     WDT_A->CTL = WDT_A_CTL_PW | WDT_A_CTL_HOLD; // stop watchdog timer
     init();
-    Draw_Queue = xQueueCreate(8,sizeof(image*));
+    size_t numImages;
 
-    Sem_LCD = xSemaphoreCreateBinary();
+    Sem_Background = xSemaphoreCreateBinary();
     add_image(&crosshair);
     add_image(&pidgeon);
     add_image(&score);
-    add_image(&background);
-    draw_scoreboard(&score);
+    numImages = add_image(&background);
+    Draw_Queue = xQueueCreate(numImages,sizeof(image*));
 
-    xSemaphoreGive(Sem_LCD);
+    xSemaphoreGive(Sem_Background);
     xTaskCreate(Task_clayPigeon, "pullClay", configMINIMAL_STACK_SIZE, NULL, 3, &TaskH_clayPigeon);
-    xTaskCreate(Task_newFrame, "newFrame", configMINIMAL_STACK_SIZE, NULL, 3, &TaskH_newFrame);
+    xTaskCreate(Task_background, "background", configMINIMAL_STACK_SIZE, NULL, 4, &TaskH_background);
     xTaskCreate(Task_joystick, "joystick", configMINIMAL_STACK_SIZE, NULL, 3, &TaskH_joystick);
-    xTaskCreate(Task_drawScreen, "drawScreen", configMINIMAL_STACK_SIZE, NULL, 3, &TaskH_drawScreen);
+    xTaskCreate(Task_drawScreen, "drawScreen", configMINIMAL_STACK_SIZE, NULL, 2, &TaskH_drawScreen);
     xTaskCreate(TaskBlast, "blast", configMINIMAL_STACK_SIZE, NULL, 4, &TaskH_TaskBlast);
     xTaskCreate(Task_s2, "s2", configMINIMAL_STACK_SIZE, NULL, 4, &TaskH_s2);
 

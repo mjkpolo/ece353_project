@@ -7,7 +7,7 @@
 
 #include "lcd.h"
 
-extern SemaphoreHandle_t Sem_LCD;
+extern SemaphoreHandle_t Sem_Background;
 extern QueueHandle_t Draw_Queue;
 
 /* ****************************************************************************
@@ -215,11 +215,12 @@ image pidgeon, score, crosshair, background;
 static image** images = NULL;
 static size_t numImages = 0;
 
-void add_image(image* i)
+size_t add_image(image* i)
 {
     i->inQueue = false;
     images = realloc(images, (numImages + 1) * sizeof(image*));
     images[numImages++] = i;
+    return numImages;
 }
 
 void erase_image(image* image)
@@ -299,7 +300,6 @@ void draw(image* image)
 
     for (i = y0; i <= y1; i++) {
         for (j = x0; j <= x1; j++) {
-            // xSemaphoreTake(Sem_LCD, portMAX_DELAY);
             for (k = 0; k < numImages; k++) {
                 if (draw_pixel(images[k], i, j))
                     break;
@@ -308,7 +308,6 @@ void draw(image* image)
                 HAL_LCD_writeData(0xFF);
                 HAL_LCD_writeData(0xFF);
             }
-            // xSemaphoreGive(Sem_LCD);
         }
     }
 }
