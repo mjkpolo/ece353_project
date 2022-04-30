@@ -14,7 +14,7 @@
 #include <stdint.h>
 #include <stdio.h>
 
-#define STEP_VAL 5
+#define STEP_VAL 1
 
 SemaphoreHandle_t Sem_LCD = NULL;
 TaskHandle_t TaskH_joystick = NULL;
@@ -24,7 +24,7 @@ extern image background;
 extern image crosshair;
 extern image score;
 extern image pidgeon;
-static short x = 64, y = 64;
+static short x = 64, y = 64, cx, cy;
 static uint8_t phits = 0xFF;
 static uint8_t hits = 0;
 
@@ -40,8 +40,9 @@ inline void init(void)
     i2c_init();
     opt3001_init();
     serial_debug_init();
+    t32_init();
 }
-
+/*TODO
 void Task_s2(void* pvParameters)
 {
     while (true) {
@@ -54,7 +55,7 @@ void Task_s2(void* pvParameters)
         ADC14->CTL0 |= ADC14_CTL0_SC | ADC14_CTL0_ENC;
         vTaskDelay(pdMS_TO_TICKS(30));
     }
-}
+}*/
 
 void Task_newFrame(void* pvParameters)
 {
@@ -135,7 +136,7 @@ void Task_joystick(void* pvParameters)
                                 : y;
         // xSemaphoreTake(Sem_LCD, portMAX_DELAY);
         draw_crosshair(&crosshair, x, y);
-        draw_clay(&pidgeon, x + 15, y - 15);
+        // TODO draw_clay(&pidgeon, x + 15, y - 15);
         // xSemaphoreGive(Sem_LCD);
         vTaskDelay(pdMS_TO_TICKS(15));
     }
@@ -146,34 +147,35 @@ void Task_clayPigeon(void *pvParameters)
 {
     // Boolean used to track whether the clay pigeon should move up or down
     bool move_up;
-    short crosshair_height = crosshair.y1 - crosshair.y0+1;
-    short crosshair_width = crosshair.x1 - crosshair.x0+1;
+    short pidgeon_height = pidgeon.y1 - pidgeon.y0+1;
+    short pidgeon_width = pidgeon.x1 - pidgeon.x0+1;
 
     while(true) {
         ulTaskNotifyTake(pdTRUE, portMAX_DELAY); // Wait until task is notified to start
 
         move_up = true; // The clay pigeon should initially be moving up
         // TODO Use different x and y variables
-        y = 131 - (crosshair_height / 2) - 1; // todo replace crosshair_height with clay pigeon height
-        x = 131 / 2; // todo randomize initial x position
+        cy = 131 - (pidgeon_height / 2) - 1; // todo replace crosshair_height with clay pigeon height
+        cx = 131 / 2; // todo randomize initial x position
 
-        while(y < 131 - (crosshair_height / 2)) { // todo replace crosshair_height with clay pigeon height
-            if(move_up) y--; // todo y -= level #
-            else y++; // todo y += level #
+        while(cy < 131 - (pidgeon_height / 2)) { // todo replace crosshair_height with clay pigeon height
+            if(move_up) cy--; // todo y -= level #
+            else cy++; // todo y += level #
 
-            if(y <= (crosshair_height / 2)) move_up = false;
+            if(cy <= (pidgeon_height / 2)) move_up = false;
 
             if(ACCEL_X == ACCEL_DIR_LEFT) {
                 // move to the left unless the clay pigeon is already at the left boundary. in which case, stay at the boundary
-                if(x > (crosshair_width / 2) + STEP_VAL) x -= STEP_VAL; // TODO replace crosshair_width with clay pigeon width
-                else x = 1 + crosshair_width / 2; // todo replace crosshair_width with clay pigeon width
+                if(cx > (pidgeon_width / 2) + STEP_VAL) cx -= STEP_VAL; // TODO replace crosshair_width with clay pigeon width
+                else cx = 1 + pidgeon_width / 2; // todo replace crosshair_width with clay pigeon width
             } else if (ACCEL_X == ACCEL_DIR_RIGHT) {
                 // move to the right unless the clay pigeon is already at the right boundary. in which case, stay at the boundary
-                if(x < 131 - (crosshair_width / 2) - STEP_VAL) x += STEP_VAL; // todo replace crosshair_width with clay pigeon width
-                else x = 131 - (crosshair_width / 2); // todo replace crosshair_width with clay pigeon width
+                if(cx < 131 - (pidgeon_width / 2) - STEP_VAL) cx += STEP_VAL; // todo replace crosshair_width with clay pigeon width
+                else cx = 131 - (pidgeon_width / 2); // todo replace crosshair_width with clay pigeon width
             }
 
-            draw_clay(&pidgeon,x,y); // todo replace with draw clay pigeon
+            // TODO draw_clay(&pidgeon, cx +, cy - 15);
+            draw_clay(&pidgeon,cx,cy); // todo replace with draw clay pigeon
 
             vTaskDelay(pdMS_TO_TICKS(20)); // TODO Could slow down the delay when the clay pigeon gets closer to the top of the screen/peak of its arc
         }
@@ -202,7 +204,7 @@ int main(void)
     xTaskCreate(TaskBlast, "blast", configMINIMAL_STACK_SIZE, NULL, 3, &TaskH_TaskBlast);
     xTaskCreate(Task_newFrame, "newFrame", configMINIMAL_STACK_SIZE, NULL, 2, &TaskH_newFrame);
     xTaskCreate(Task_joystick, "joystick", configMINIMAL_STACK_SIZE, NULL, 2, &TaskH_joystick);
-    xTaskCreate(Task_s2, "s2", configMINIMAL_STACK_SIZE, NULL, 4, &TaskH_s2);
+    // TODO xTaskCreate(Task_s2, "s2", configMINIMAL_STACK_SIZE, NULL, 4, &TaskH_s2);
 
     vTaskStartScheduler();
     while (true);
