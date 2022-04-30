@@ -47,7 +47,7 @@ void T32_INT1_IRQHandler() {
     buttonState = buttonState << 1 | MKII_S2();
 
     if (buttonState == 0x7F) {
-        S2_P = true;
+        S2_P = true; // TODO Remove
 
         // Notify blast task to shoot at the crosshairs
         vTaskNotifyGiveFromISR(TaskH_TaskBlast, &xHigherPriorityTaskWoken);

@@ -7,10 +7,10 @@
 
 #include <task_blast.h>
 
-TaskHandle_t TaskH_TaskBlast;
-TaskHandle_t TaskH_updateBackground;
+TaskHandle_t TaskH_TaskBlast; // TODO Is this necessary/useful??
+TaskHandle_t TaskH_updateBackground; // TODO Remove once actual implementation is done
 
-// TODO Play a note for the given duration
+// TODO Remove? Play a note for the given duration
 void play_note(uint32_t period, uint16_t ms_time)
 {
     // Configure TimerA0 with the specified period of the PWM pulse
@@ -173,6 +173,9 @@ void TaskBlast(void *pvParameters)
 
         // Play target missed sound (upside-down exponential curve to create a decreasing tone, sampled at intervals to allow each sampled frequency to be played longer without extending the time for which the sound is played)
         for(i=0; i < max; i+=7) {
+
+            // TODO Either use play_note() here or remove play_note() entirely
+
             // Configure TimerA0 with the specified period of the PWM pulse
             MKII_Buzzer_Init((uint32_t) floor(24000000.0 / (max - max*pow(2.71828, (i - max)/((double)max)))));
             // Turn the buzzer on (start playing note)
@@ -187,6 +190,9 @@ void TaskBlast(void *pvParameters)
 
         // Play target hit sound
         for(i=0; i < hit_sound_size; i++) {
+
+            // TODO Either use play_note() here or remove play_note() entirely
+
             // Configure TimerA0 with the specified period of the PWM pulse
             MKII_Buzzer_Init((uint32_t)floor(24000000.0/(hit_sound[i].note * pow(2, hit_sound[i].octave))));
             // Turn the buzzer on (start playing note)
@@ -197,13 +203,9 @@ void TaskBlast(void *pvParameters)
             MKII_Buzzer_Off();
         }
 
+        // TODO \/\/ Remove \/\/
         // TODO Notify blast task to shoot at the crosshairs
-        xTaskNotifyGive(TaskH_updateBackground);
-                // TODO vTaskNotifyGive(TaskH_updateBackground, &xHigherPriorityTaskWoken);
-
-                // TODO portYIELD_FROM_ISR( xHigherPriorityTaskWoken );
-        // TODO Sounds MKII buzzer for shot and shoot
-        //draw_light_background();
+        //xTaskNotifyGive(TaskH_updateBackground);
     }
 }
 
