@@ -1,14 +1,17 @@
 #include "main.h"
+#include "lcd.h" // TODO Move hardware-related/non-FreeRTOS headers into main.h
+#include "msp.h"
+#include "msp432p401r.h"
 #include "clay.h"
 #include "crosshair.h"
-#include "dark_background.h"
-#include "lcd.h"
 #include "light_background.h"
 #include "medium_background.h"
+#include "dark_background.h"
 #include "msp.h"
 #include "msp432p401r.h"
 #include "opt3001.h"
 #include "ps2.h"
+#include "task_blast.h"
 #include "serial_debug.h"
 #include "timer32.h"
 #include <stdbool.h>
@@ -25,8 +28,13 @@ extern image crosshair2;
 extern image crosshair3;
 static short x = 64, y = 64;
 
+TaskHandle_t TaskH_newFrame = NULL;
+SemaphoreHandle_t Sem_LCD;
+
+
 inline void init(void)
 {
+    // TODO P3->DIR &= ~BIT5;
     P5->DIR &= ~BIT1;
     P5->DIR &= ~BIT5;
 
@@ -110,6 +118,46 @@ void Task_joystick(void* pvParameters)
         draw_clay(&crosshair3, x + 15, y - 15);
         // xSemaphoreGive(Sem_LCD);
         vTaskDelay(pdMS_TO_TICKS(15));
+
+// TODO Header and move to its own file
+void Task_clayPigeon(void *pvParameters)
+{
+    // Boolean used to track whether the clay pigeon should move up or down
+    bool move_up;
+
+    while(true) {
+        ulTaskNotifyTake(pdTRUE, portMAX_DELAY); // Wait until task is notified to start
+
+        move_up = true; // The clay pigeon should initially be moving up
+        // TODO Use different x and y variables
+        y = SKY_BOTTOM_Y - (CROSSHAIR_HEIGHT / 2) - 1; // TODO Replace CROSSHAIR_HEIGHT with clay pigeon height
+        x = LCD_HORIZONTAL_MAX / 2; // TODO Randomize initial x position
+
+        while(y < SKY_BOTTOM_Y - (CROSSHAIR_HEIGHT / 2)) { // TODO Replace CROSSHAIR_HEIGHT with clay pigeon height
+            if(move_up) y--; // TODO y -= level #
+            else y++; // TODO y += level #
+
+            if(y <= (CROSSHAIR_HEIGHT / 2)) move_up = false;
+
+            if(ACCEL_X == ACCEL_DIR_LEFT) {
+                // Move to the left unless the clay pigeon is already at the left boundary. In which case, stay at the boundary
+                if(x > (CROSSHAIR_WIDTH / 2) + STEP_VAL) x -= STEP_VAL; // TODO Replace CROSSHAIR_WIDTH with clay pigeon width
+                else x = 1 + CROSSHAIR_WIDTH / 2; // TODO Replace CROSSHAIR_WIDTH with clay pigeon width
+            } else if (ACCEL_X == ACCEL_DIR_RIGHT) {
+                // Move to the right unless the clay pigeon is already at the right boundary. In which case, stay at the boundary
+                if(x < LCD_HORIZONTAL_MAX - (CROSSHAIR_WIDTH / 2) - STEP_VAL) x += STEP_VAL; // TODO Replace CROSSHAIR_WIDTH with clay pigeon width
+                else x = LCD_HORIZONTAL_MAX - (CROSSHAIR_WIDTH / 2); // TODO Replace CROSSHAIR_WIDTH with clay pigeon width
+            }
+
+            draw_crosshair(x,y); // TODO Replace with draw clay pigeon
+
+            vTaskDelay(pdMS_TO_TICKS(20)); // TODO Could slow down the delay when the clay pigeon gets closer to the top of the screen/peak of its arc
+        }
+
+        // Clear task notification's value so that the task cannot be notified while it is running (e.g. if the inner while loop is running and the
+        // user tilts forward/notifies the task again, this will make sure any such notification attempts are not seen/processed at the next iteration
+        // of the outer while loop/when the task runs again)
+        ulTaskNotifyValueClear(TaskH_clayPigeon, 0xFFFFFFFF);
     }
 }
 
@@ -123,14 +171,16 @@ int main(void)
     add_image(&crosshair2);
     add_image(&crosshair3);
     add_image(&background);
+
+    xSemaphoreGive(Sem_LCD);
+    xTaskCreate(Task_clayPigeon, "pullClay", configMINIMAL_STACK_SIZE, NULL, 3, &TaskH_clayPigeon);
+    xTaskCreate(TaskBlast, "blast", configMINIMAL_STACK_SIZE, NULL, 3, &TaskH_TaskBlast);
     xTaskCreate(Task_newFrame, "newFrame", configMINIMAL_STACK_SIZE, NULL, 2, &TaskH_newFrame);
     xTaskCreate(Task_joystick, "joystick", configMINIMAL_STACK_SIZE, NULL, 2, &TaskH_joystick);
     xTaskCreate(Task_s2, "s2", configMINIMAL_STACK_SIZE, NULL, 4, &TaskH_s2);
 
-    xSemaphoreGive(Sem_LCD);
     vTaskStartScheduler();
-    while (true)
-        ;
+    while (true);
     return 0;
 }
 
