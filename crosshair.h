@@ -1,6 +1,6 @@
 #include "lcd.h"
 
-static const uint8_t crosshair_bm_0x0[] = {
+static const uint8_t _crosshair_bm_0x0[] = {
   0x1, 0x0,
   0x3e, 0xfc,
   0x40, 0x4,
@@ -18,7 +18,7 @@ static const uint8_t crosshair_bm_0x0[] = {
   0x1, 0x0
 };
 
-static const uint8_t crosshair_bm_0xc718[] = {
+static const uint8_t _crosshair_bm_0xc718[] = {
   0x0, 0x0,
   0x1, 0x0,
   0x3f, 0xf8,
@@ -36,21 +36,21 @@ static const uint8_t crosshair_bm_0xc718[] = {
   0x0, 0x0
 };
 
-static layer layers_crosshair[] = {
-  {58,72,52,66,0x0,crosshair_bm_0x0},
-  {58,72,52,66,0xc718,crosshair_bm_0xc718}
+static layer _layers_crosshair[] = {
+  {58,72,52,66,0x0,_crosshair_bm_0x0},
+  {58,72,52,66,0xc718,_crosshair_bm_0xc718}
 };
 
 void draw_crosshair(image* image, short x, short y) {
   int i;
   erase_image(image);
   for (i=0; i<2; i++) {
-    short image_width = layers_crosshair[i].x1-layers_crosshair[i].x0;
-    short image_height = layers_crosshair[i].y1-layers_crosshair[i].y0;
-    layers_crosshair[i].x0 = x-(image_width/2+image_width%2);
-    layers_crosshair[i].x1 = x+(image_width/2);
-    layers_crosshair[i].y0 = y-(image_height/2+image_height%2);
-    layers_crosshair[i].y1 = y+(image_height/2);
+    short image_width = _layers_crosshair[i].x1-_layers_crosshair[i].x0;
+    short image_height = _layers_crosshair[i].y1-_layers_crosshair[i].y0;
+    _layers_crosshair[i].x0 = x-(image_width/2+image_width%2);
+    _layers_crosshair[i].x1 = x+(image_width/2);
+    _layers_crosshair[i].y0 = y-(image_height/2+image_height%2);
+    _layers_crosshair[i].y1 = y+(image_height/2);
   }
-  fill_image(image,layers_crosshair,2);
+  fill_image(image,_layers_crosshair,2);
 };

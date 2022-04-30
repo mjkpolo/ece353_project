@@ -1,12 +1,8 @@
 #include "main.h"
+#include "images.h"
 #include "lcd.h" // TODO Move hardware-related/non-FreeRTOS headers into main.h
 #include "msp.h"
 #include "msp432p401r.h"
-#include "clay.h"
-#include "crosshair.h"
-#include "light_background.h"
-#include "medium_background.h"
-#include "dark_background.h"
 #include "msp.h"
 #include "msp432p401r.h"
 #include "opt3001.h"
@@ -26,10 +22,11 @@ TaskHandle_t TaskH_newFrame = NULL;
 TaskHandle_t TaskH_s2 = NULL;
 extern image background;
 extern image crosshair;
-extern image crosshair2;
+extern image score;
 extern image pidgeon;
 static short x = 64, y = 64;
-
+static uint8_t phits = 0xFF;
+static uint8_t hits = 0;
 
 inline void init(void)
 {
@@ -51,13 +48,11 @@ void Task_s2(void* pvParameters)
         static uint8_t buttonState = 0;
         buttonState = buttonState << 1 | MKII_S2();
 
-        if (buttonState == 0x7F)
-            S2_P = true;
-        if (S2_P)
-            printf("S2 true\r\n");
+        if (buttonState == 0xF) S2_P = true;
+        if (S2_P) hits++;
         S2_P = false;
         ADC14->CTL0 |= ADC14_CTL0_SC | ADC14_CTL0_ENC;
-        vTaskDelay(pdMS_TO_TICKS(50));
+        vTaskDelay(pdMS_TO_TICKS(30));
     }
 }
 
@@ -68,6 +63,33 @@ void Task_newFrame(void* pvParameters)
             MEDIUM,
             BRIGHT,
             foo };
+        if (hits!=phits) {
+          erase_image(&score);
+          switch (hits%10) {
+              case 0 : draw_xx0(&score);
+                       break;
+              case 1 : draw_xx1(&score);
+                       break;
+              case 2 : draw_xx2(&score);
+                       break;
+              case 3 : draw_xx3(&score);
+                       break;
+              case 4 : draw_xx4(&score);
+                       break;
+              case 5 : draw_xx5(&score);
+                       break;
+              case 6 : draw_xx6(&score);
+                       break;
+              case 7 : draw_xx7(&score);
+                       break;
+              case 8 : draw_xx8(&score);
+                       break;
+              case 9 : draw_xx9(&score);
+                       break;
+          }
+          draw_scoreboard(&score);
+          phits = hits;
+        }
         static enum light l, pl = foo; // so pl != l
         vTaskDelay(pdMS_TO_TICKS(15));
         float lux = opt3001_read_lux();
@@ -92,7 +114,7 @@ void Task_newFrame(void* pvParameters)
             }
         }
         pl = l;
-        draw();
+    draw();
     }
 }
 
@@ -113,7 +135,6 @@ void Task_joystick(void* pvParameters)
                                 : y;
         // xSemaphoreTake(Sem_LCD, portMAX_DELAY);
         draw_crosshair(&crosshair, x, y);
-        draw_clay(&crosshair2, x - 15, y + 15);
         draw_clay(&pidgeon, x + 15, y - 15);
         // xSemaphoreGive(Sem_LCD);
         vTaskDelay(pdMS_TO_TICKS(15));
@@ -171,9 +192,10 @@ int main(void)
 
     Sem_LCD = xSemaphoreCreateBinary();
     add_image(&crosshair);
-    add_image(&crosshair2);
     add_image(&pidgeon);
+    add_image(&score);
     add_image(&background);
+    draw_scoreboard(&score);
 
     xSemaphoreGive(Sem_LCD);
     xTaskCreate(Task_clayPigeon, "pullClay", configMINIMAL_STACK_SIZE, NULL, 3, &TaskH_clayPigeon);

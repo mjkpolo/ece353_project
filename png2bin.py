@@ -24,7 +24,7 @@ def getBitmaps(img, name, move):
 
         for key,pixels in sections:
             bitmap = []
-            yield f'static const uint8_t {name}_bm_{hex(key)}[] = ' + '{\n  '
+            yield f'static const uint8_t _{name}_bm_{hex(key)}[] = ' + '{\n  '
 
             p = np.where(pixels) if not move else np.where(~img.mask)
             last_col = max(p[1])
@@ -45,10 +45,10 @@ def getBitmaps(img, name, move):
             yield ',\n  '.join(bitmap)
             yield '\n};\n\n'
 
-            structs.append('{'+f'{first_col},{last_col},{first_row},{last_row},{hex(key)},{name}_bm_{hex(key)}'+'}')
+            structs.append('{'+f'{first_col},{last_col},{first_row},{last_row},{hex(key)},_{name}_bm_{hex(key)}'+'}')
 
 
-        yield f'static layer layers_{name}[] = '+'{\n  '
+        yield f'static layer _layers_{name}[] = '+'{\n  '
         yield ',\n  '.join(structs)
         yield '\n};\n\n'
 
@@ -58,19 +58,19 @@ def getBitmaps(img, name, move):
             f'void draw_{name}(image* image, short x, short y) ' + '{\n'
         )
         yield(
-            f'  fill_image(image,layers_{name},{len(structs)});\n'
+            f'  fill_image(image,_layers_{name},{len(structs)});\n'
             if not move else
             '  int i;\n' \
             '  erase_image(image);\n' \
             f'  for (i=0; i<{len(structs)}; i++) '+'{\n' \
-            f'    short image_width = layers_{name}[i].x1-layers_{name}[i].x0;\n' \
-            f'    short image_height = layers_{name}[i].y1-layers_{name}[i].y0;\n' \
-            f'    layers_{name}[i].x0 = x-(image_width/2+image_width%2);\n' \
-            f'    layers_{name}[i].x1 = x+(image_width/2);\n' \
-            f'    layers_{name}[i].y0 = y-(image_height/2+image_height%2);\n' \
-            f'    layers_{name}[i].y1 = y+(image_height/2);\n' \
+            f'    short image_width = _layers_{name}[i].x1-_layers_{name}[i].x0;\n' \
+            f'    short image_height = _layers_{name}[i].y1-_layers_{name}[i].y0;\n' \
+            f'    _layers_{name}[i].x0 = x-(image_width/2+image_width%2);\n' \
+            f'    _layers_{name}[i].x1 = x+(image_width/2);\n' \
+            f'    _layers_{name}[i].y0 = y-(image_height/2+image_height%2);\n' \
+            f'    _layers_{name}[i].y1 = y+(image_height/2);\n' \
             '  }\n' \
-            f'  fill_image(image,layers_{name},{len(structs)});\n'
+            f'  fill_image(image,_layers_{name},{len(structs)});\n'
         )
         yield '};\n'
 
