@@ -17,9 +17,11 @@
 #define STEP_VAL 1
 
 SemaphoreHandle_t Sem_LCD = NULL;
+QueueHandle_t Draw_Queue = NULL;
 TaskHandle_t TaskH_joystick = NULL;
 TaskHandle_t TaskH_newFrame = NULL;
 TaskHandle_t TaskH_s2 = NULL;
+TaskHandle_t TaskH_drawScreen = NULL;
 extern image background;
 extern image crosshair;
 extern image score;
@@ -53,6 +55,15 @@ void Task_s2(void* pvParameters)
         S2_P = false;
         ADC14->CTL0 |= ADC14_CTL0_SC | ADC14_CTL0_ENC;
         vTaskDelay(pdMS_TO_TICKS(30));
+    }
+}
+
+void Task_drawScreen(void* pvParameters) {
+    while(true) {
+      image* image = NULL;
+      xQueueReceive(Draw_Queue, &image, portMAX_DELAY);
+      if (image) draw(image);
+      vTaskDelay(pdMS_TO_TICKS(30));
     }
 }
 
@@ -158,7 +169,6 @@ void Task_newFrame(void* pvParameters)
             }
         }
         pl = l;
-    draw();
     }
 }
 
@@ -233,6 +243,7 @@ int main(void)
 {
     WDT_A->CTL = WDT_A_CTL_PW | WDT_A_CTL_HOLD; // stop watchdog timer
     init();
+    Draw_Queue = xQueueCreate(8,sizeof(image*));
 
     Sem_LCD = xSemaphoreCreateBinary();
     add_image(&crosshair);
@@ -243,9 +254,10 @@ int main(void)
 
     xSemaphoreGive(Sem_LCD);
     xTaskCreate(Task_clayPigeon, "pullClay", configMINIMAL_STACK_SIZE, NULL, 3, &TaskH_clayPigeon);
-    xTaskCreate(TaskBlast, "blast", configMINIMAL_STACK_SIZE, NULL, 4, &TaskH_TaskBlast);
     xTaskCreate(Task_newFrame, "newFrame", configMINIMAL_STACK_SIZE, NULL, 3, &TaskH_newFrame);
     xTaskCreate(Task_joystick, "joystick", configMINIMAL_STACK_SIZE, NULL, 3, &TaskH_joystick);
+    xTaskCreate(Task_drawScreen, "drawScreen", configMINIMAL_STACK_SIZE, NULL, 3, &TaskH_drawScreen);
+    xTaskCreate(TaskBlast, "blast", configMINIMAL_STACK_SIZE, NULL, 4, &TaskH_TaskBlast);
     xTaskCreate(Task_s2, "s2", configMINIMAL_STACK_SIZE, NULL, 4, &TaskH_s2);
 
     vTaskStartScheduler();
