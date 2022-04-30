@@ -14,7 +14,7 @@
 #include <stdint.h>
 #include <stdio.h>
 
-#define STEP_VAL 5
+#define STEP_VAL 1
 
 SemaphoreHandle_t Sem_LCD = NULL;
 TaskHandle_t TaskH_joystick = NULL;
@@ -218,8 +218,7 @@ void Task_clayPigeon(void *pvParameters)
             }
 
             draw_clay(&pidgeon,x,y); // todo replace with draw clay pigeon
-
-            vTaskDelay(pdMS_TO_TICKS(20)); // TODO Could slow down the delay when the clay pigeon gets closer to the top of the screen/peak of its arc
+            vTaskDelay(pdMS_TO_TICKS(10)); // TODO Could slow down the delay when the clay pigeon gets closer to the top of the screen/peak of its arc
         }
 
         // Clear task notification's value so that the task cannot be notified while it is running (e.g. if the inner while loop is running and the
@@ -245,7 +244,7 @@ int main(void)
     xTaskCreate(Task_clayPigeon, "pullClay", configMINIMAL_STACK_SIZE, NULL, 3, &TaskH_clayPigeon);
     xTaskCreate(TaskBlast, "blast", configMINIMAL_STACK_SIZE, NULL, 3, &TaskH_TaskBlast);
     xTaskCreate(Task_newFrame, "newFrame", configMINIMAL_STACK_SIZE, NULL, 2, &TaskH_newFrame);
-    xTaskCreate(Task_joystick, "joystick", configMINIMAL_STACK_SIZE, NULL, 2, &TaskH_joystick);
+    xTaskCreate(Task_joystick, "joystick", configMINIMAL_STACK_SIZE, NULL, 3, &TaskH_joystick);
     xTaskCreate(Task_s2, "s2", configMINIMAL_STACK_SIZE, NULL, 4, &TaskH_s2);
 
     vTaskStartScheduler();
