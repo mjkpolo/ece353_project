@@ -9,7 +9,7 @@
 // TODO #include "main.h"
 
 volatile bool S2_P = false;
-volatile bool NEW_FRAME = false;
+// TODO volatile bool NEW_FRAME = false;
 
 TaskHandle_t TaskH_TaskBlast; // TODO
 

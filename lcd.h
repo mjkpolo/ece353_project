@@ -101,5 +101,12 @@ void draw(void);
 void add_image(image* image);
 void erase_image(image* image);
 void fill_image(image* image, layer* layers, size_t numLayers);
+void lcd_draw_rectangle(
+  uint16_t x,
+  uint16_t y,
+  uint16_t width_pixels,
+  uint16_t height_pixels,
+  uint16_t fColor
+);
 
 #endif /* LCD_H_ */

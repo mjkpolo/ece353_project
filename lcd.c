@@ -9,6 +9,75 @@
 
 extern SemaphoreHandle_t Sem_LCD;
 
+
+
+/*******************************************************************************
+* Function Name: lcd_draw_rectangle
+********************************************************************************
+* Summary: draws a filled rectangle centered at the coordinates set by x, y
+* Returns:
+*  Nothing
+*******************************************************************************/
+void lcd_draw_rectangle(
+  uint16_t x,
+  uint16_t y,
+  uint16_t width_pixels,
+  uint16_t height_pixels,
+  uint16_t fColor
+)
+{
+    uint16_t i,j;
+    uint16_t x0;
+    uint16_t x1;
+    uint16_t y0;
+    uint16_t y1;
+
+    // Set the left Col to be the center point minus half the width
+    x0 = x - (width_pixels/2);
+
+    // Set the Right Col to be the center point plus half the width
+    x1 = x + (width_pixels/2);
+
+    // Account for a width that is an even number
+    if( (width_pixels & 0x01) == 0x00)
+    {
+        x1--;
+    }
+
+    // Set the upper Row to be the center point minus half the height
+    y0 = y  - (height_pixels/2);
+
+    // Set the upper Row to be the center point minus half the height
+    y1 = y  + (height_pixels/2) ;
+
+    // Account for a height that is an  number
+    if( (height_pixels & 0x01) == 0x00)
+    {
+        y1--;
+    }
+
+    // Set the boundry of the image to draw
+    Crystalfontz128x128_SetDrawFrame(x0, y0, x1, y1);
+
+    // Inform the LCD we are going to send image data
+    HAL_LCD_writeCommand(CM_RAMWR);
+
+    // Write out the image data
+    for(i = 0; i < height_pixels; i++)
+    {
+        for(j=0; j < width_pixels; j++)
+        {
+            HAL_LCD_writeData(fColor >> 8);
+            HAL_LCD_writeData(fColor);
+        }
+    }
+
+}
+
+
+
+
+
 /* ****************************************************************************
  * Used to configure the 5 pins that control the LCD interface on the MKII.
  *
@@ -300,12 +369,14 @@ void draw(void)
     plast_col = last_col;
     plast_row = last_row;
 
+    xSemaphoreTake(Sem_LCD, portMAX_DELAY); // TODO
+
     Crystalfontz128x128_SetDrawFrame(x0, y0, x1, y1);
     HAL_LCD_writeCommand(CM_RAMWR);
 
     for (i = y0; i <= y1; i++) {
         for (j = x0; j <= x1; j++) {
-            // xSemaphoreTake(Sem_LCD, portMAX_DELAY);
+            // TODO Remove: xSemaphoreTake(Sem_LCD, portMAX_DELAY);
             for (k = 0; k < numImages; k++) {
                 if (draw_pixel(images[k], i, j))
                     break;
@@ -314,9 +385,11 @@ void draw(void)
                 HAL_LCD_writeData(0xFF);
                 HAL_LCD_writeData(0xFF);
             }
-            // xSemaphoreGive(Sem_LCD);
+            // TODO Remove: xSemaphoreGive(Sem_LCD);
         }
     }
+
+    xSemaphoreGive(Sem_LCD); // TODO
 
     first_col = 132;
     first_row = 132;
