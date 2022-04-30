@@ -257,7 +257,7 @@ void fill_image(image* image, layer* layers, size_t numLayers)
     last_col = image->x1 > last_col ? image->x1 : last_col;
 }
 
-bool draw_pixel(image* image, short i, short j)
+inline bool draw_pixel(image* image, short i, short j)
 {
     int k;
     for (k = 0; k < image->numLayers; k++) {
