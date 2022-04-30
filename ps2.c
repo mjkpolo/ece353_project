@@ -12,6 +12,7 @@ volatile uint32_t PS2_Y_VAL = 0;
 volatile uint32_t ACCEL_X = 0;
 volatile uint32_t ACCEL_Y = 0;
 
+TaskHandle_t TaskH_crosshair; // TODO
 TaskHandle_t TaskH_clayPigeon; // TODO
 
 void adc14_init(void) {
@@ -51,7 +52,7 @@ void adc14_init(void) {
     // Enable ADC Interrupt in the NVIC
     NVIC_EnableIRQ(ADC14_IRQn);
     // Set ADC Interrupt priority. Priority is greater than 2 to ensure it doesn't interrupt the FreeRTOS scheduler
-    NVIC_SetPriority(ADC14_IRQn, 3);
+    NVIC_SetPriority(ADC14_IRQn, 4);
     // Turn ADC ON
     ADC14->CTL0 |= ADC14_CTL0_ON;
 }
@@ -92,7 +93,15 @@ void ADC14_IRQHandler(void) {
 
       // Add joystick's x and y positions to queue for crosshair task
       // TODO Remove: status = xQueueSendToBack(Queue_LED, &msg, portMAX_DELAY);
-      status = xQueueOverwriteFromISR(Queue_PS2, &ps2_move, &xHigherPriorityTaskWoken);
+      // TODO status = xQueueOverwriteFromISR(Queue_PS2, &ps2_move, &xHigherPriorityTaskWoken);
+      status = xQueueSendFromISR(Queue_PS2, &ps2_move, &xHigherPriorityTaskWoken); // TODO
+      //status = xQueueSendToBack(Queue_PS2, &ps2_move, portMAX_DELAY); // TODO
+
+
+      // TODO Is this necessary to follow the project specifications??????????
+      vTaskNotifyGiveFromISR(TaskH_crosshair, &xHigherPriorityTaskWoken);
+
+      portYIELD_FROM_ISR( xHigherPriorityTaskWoken );
 
     //}
 
@@ -102,6 +111,7 @@ void ADC14_IRQHandler(void) {
         ACCEL_X = ADC14->MEM[2];
 
         // TODO Make this the same as tilting forward/backward (or make those the same as this)???
+        // TODO Instead of having two separate values that go from 0x0F to 0xFF, have one value that goes from 0x0F to 0xFF (left) or 0x00 (right)
         x_tilt_r_state = x_tilt_r_state << 1; //| (PS2_X_VAL > VOLT_TILT_HI);
         if(ACCEL_X > VOLT_TILT_R) {
             x_tilt_r_state |= 0x0F;
@@ -131,8 +141,8 @@ void ADC14_IRQHandler(void) {
 
         // Add accelerometer's x position (left/right/middle) to queue for clay pigeon task
         // TODO Remove: status = xQueueSendToBack(Queue_LED, &msg, portMAX_DELAY);
-        status = xQueueOverwriteFromISR(Queue_Accelerometer, &accelerometer_x, &xHigherPriorityTaskWoken);
-
+        // TODO status = xQueueOverwriteFromISR(Queue_Accelerometer, &accelerometer_x, &xHigherPriorityTaskWoken);
+        status = xQueueSendFromISR(Queue_Accelerometer, &accelerometer_x, &xHigherPriorityTaskWoken); // TODO
 
         // Launch clay pigeon when the user tilts the board forward
         if(y_tilt_f_state == 0x7F) {

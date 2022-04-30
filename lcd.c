@@ -8,75 +8,7 @@
 #include "lcd.h"
 
 extern SemaphoreHandle_t Sem_LCD;
-
-
-
-/*******************************************************************************
-* Function Name: lcd_draw_rectangle
-********************************************************************************
-* Summary: draws a filled rectangle centered at the coordinates set by x, y
-* Returns:
-*  Nothing
-*******************************************************************************/
-void lcd_draw_rectangle(
-  uint16_t x,
-  uint16_t y,
-  uint16_t width_pixels,
-  uint16_t height_pixels,
-  uint16_t fColor
-)
-{
-    uint16_t i,j;
-    uint16_t x0;
-    uint16_t x1;
-    uint16_t y0;
-    uint16_t y1;
-
-    // Set the left Col to be the center point minus half the width
-    x0 = x - (width_pixels/2);
-
-    // Set the Right Col to be the center point plus half the width
-    x1 = x + (width_pixels/2);
-
-    // Account for a width that is an even number
-    if( (width_pixels & 0x01) == 0x00)
-    {
-        x1--;
-    }
-
-    // Set the upper Row to be the center point minus half the height
-    y0 = y  - (height_pixels/2);
-
-    // Set the upper Row to be the center point minus half the height
-    y1 = y  + (height_pixels/2) ;
-
-    // Account for a height that is an  number
-    if( (height_pixels & 0x01) == 0x00)
-    {
-        y1--;
-    }
-
-    // Set the boundry of the image to draw
-    Crystalfontz128x128_SetDrawFrame(x0, y0, x1, y1);
-
-    // Inform the LCD we are going to send image data
-    HAL_LCD_writeCommand(CM_RAMWR);
-
-    // Write out the image data
-    for(i = 0; i < height_pixels; i++)
-    {
-        for(j=0; j < width_pixels; j++)
-        {
-            HAL_LCD_writeData(fColor >> 8);
-            HAL_LCD_writeData(fColor);
-        }
-    }
-
-}
-
-
-
-
+extern QueueHandle_t Draw_Queue;
 
 /* ****************************************************************************
  * Used to configure the 5 pins that control the LCD interface on the MKII.
@@ -282,17 +214,10 @@ void Crystalfontz128x128_Init(void)
 image pidgeon, score, crosshair, background;
 static image** images = NULL;
 static size_t numImages = 0;
-static short first_col = 132;
-static short first_row = 132;
-static short pfirst_col = 132;
-static short pfirst_row = 132;
-static short last_col = 0;
-static short last_row = 0;
-static short plast_col = 0;
-static short plast_row = 0;
 
 void add_image(image* i)
 {
+    i->inQueue = false;
     images = realloc(images, (numImages + 1) * sizeof(image*));
     images[numImages++] = i;
 }
@@ -320,10 +245,10 @@ void fill_image(image* image, layer* layers, size_t numLayers)
         image->x1 = image->x1 > layers[i].x1 ? image->x1 : layers[i].x1;
         image->y1 = image->y1 > layers[i].y1 ? image->y1 : layers[i].y1;
     }
-    first_col = image->x0 < first_col ? image->x0 : first_col;
-    first_row = image->y0 < first_row ? image->y0 : first_row;
-    last_row = image->y1 > last_row ? image->y1 : last_row;
-    last_col = image->x1 > last_col ? image->x1 : last_col;
+    if (!image->inQueue) {
+        xQueueSendToBack(Draw_Queue,&image,portMAX_DELAY);
+        image->inQueue = true;
+    }
 }
 
 inline bool draw_pixel(image* image, short i, short j)
@@ -349,34 +274,32 @@ inline bool draw_pixel(image* image, short i, short j)
     return false;
 }
 
-void draw(void)
+void draw(image* image)
 {
+    image->inQueue = false;
+    short i, j, k;
 
-    short i, j, k, x0, x1, y0, y1;
-
-    y0 = first_row < pfirst_row ? first_row : pfirst_row;
-    x0 = first_col < pfirst_col ? first_col : pfirst_col;
-    y1 = last_row > plast_row ? last_row : plast_row;
-    x1 = last_col > plast_col ? last_col : plast_col;
+    short y0 = image->y0 < image->py0 ? image->y0 : image->py0;
+    short x0 = image->x0 < image->px0 ? image->x0 : image->px0;
+    short y1 = image->y1 > image->py1 ? image->y1 : image->py1;
+    short x1 = image->x1 > image->px1 ? image->x1 : image->px1;
 
     x0 = (x0 > 131 ? 131 : (x0 < 0 ? 0 : x0));
     y0 = (y0 > 131 ? 131 : (y0 < 0 ? 0 : y0));
     x1 = (x1 > 131 ? 131 : (x1 < 0 ? 0 : x1));
     y1 = (y1 > 131 ? 131 : (y1 < 0 ? 0 : y1));
 
-    pfirst_col = first_col;
-    pfirst_row = first_row;
-    plast_col = last_col;
-    plast_row = last_row;
-
-    xSemaphoreTake(Sem_LCD, portMAX_DELAY); // TODO
+    image->px0 = image->x0;
+    image->py0 = image->y0;
+    image->px1 = image->x1;
+    image->py1 = image->y1;
 
     Crystalfontz128x128_SetDrawFrame(x0, y0, x1, y1);
     HAL_LCD_writeCommand(CM_RAMWR);
 
     for (i = y0; i <= y1; i++) {
         for (j = x0; j <= x1; j++) {
-            // TODO Remove: xSemaphoreTake(Sem_LCD, portMAX_DELAY);
+            // xSemaphoreTake(Sem_LCD, portMAX_DELAY);
             for (k = 0; k < numImages; k++) {
                 if (draw_pixel(images[k], i, j))
                     break;
@@ -385,14 +308,7 @@ void draw(void)
                 HAL_LCD_writeData(0xFF);
                 HAL_LCD_writeData(0xFF);
             }
-            // TODO Remove: xSemaphoreGive(Sem_LCD);
+            // xSemaphoreGive(Sem_LCD);
         }
     }
-
-    xSemaphoreGive(Sem_LCD); // TODO
-
-    first_col = 132;
-    first_row = 132;
-    last_col = 0;
-    last_row = 0;
 }

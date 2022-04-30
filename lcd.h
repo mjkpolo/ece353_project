@@ -92,21 +92,19 @@ typedef struct {
     short x1;
     short y0;
     short y1;
+    short px0;
+    short px1;
+    short py0;
+    short py1;
     layer* layers;
     size_t numLayers;
+    bool inQueue;
 } image;
 
-void draw(void);
+void draw(image* image);
 
 void add_image(image* image);
 void erase_image(image* image);
 void fill_image(image* image, layer* layers, size_t numLayers);
-void lcd_draw_rectangle(
-  uint16_t x,
-  uint16_t y,
-  uint16_t width_pixels,
-  uint16_t height_pixels,
-  uint16_t fColor
-);
 
 #endif /* LCD_H_ */

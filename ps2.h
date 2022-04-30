@@ -9,6 +9,8 @@
 #define PS2_H_
 
 #include "main.h"
+#include "task_clayPigeon.h"
+#include "task_crosshair.h"
 
 void adc14_init(void);
 
@@ -38,8 +40,7 @@ typedef struct {
 } MOVE_t;
 
 
-extern QueueHandle_t Queue_PS2;
-
+// TODO remove, or at least make not extern volatile
 extern volatile uint32_t ACCEL_X;
 extern volatile uint32_t ACCEL_Y;
 

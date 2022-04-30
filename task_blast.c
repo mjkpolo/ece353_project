@@ -175,6 +175,7 @@ void TaskBlast(void *pvParameters)
         for(i=0; i < max; i+=7) {
 
             // TODO Either use play_note() here or remove play_note() entirely
+            // TODO Use SystemClock instead of 24000000.0
 
             // Configure TimerA0 with the specified period of the PWM pulse
             MKII_Buzzer_Init((uint32_t) floor(24000000.0 / (max - max*pow(2.71828, (i - max)/((double)max)))));
@@ -192,6 +193,7 @@ void TaskBlast(void *pvParameters)
         for(i=0; i < hit_sound_size; i++) {
 
             // TODO Either use play_note() here or remove play_note() entirely
+            // TODO Use SystemClock instead of 24000000.0
 
             // Configure TimerA0 with the specified period of the PWM pulse
             MKII_Buzzer_Init((uint32_t)floor(24000000.0/(hit_sound[i].note * pow(2, hit_sound[i].octave))));

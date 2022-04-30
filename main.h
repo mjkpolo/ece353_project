@@ -15,13 +15,14 @@
 #include <stdbool.h>
 #include <stdint.h>
 #include <task.h>
-#include "task_clayPigeon.h"
+
+#define STEP_VAL 1
+#define SKY_BOTTOM_Y 95
 
 extern SemaphoreHandle_t Sem_LCD;
 
 extern TaskHandle_t TaskH_TaskBlast;
 extern TaskHandle_t TaskH_updateBackground;
-extern TaskHandle_t TaskH_clayPigeon;
 
 /******************************************************************************
 * Prints a message to the Console TODO Update header and move to a new file

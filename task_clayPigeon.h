@@ -13,6 +13,7 @@
 // TODO header
 void Task_clayPigeon(void *pvParameters);
 
+extern TaskHandle_t TaskH_clayPigeon;
 extern QueueHandle_t Queue_Accelerometer;
 
 

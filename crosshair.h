@@ -1,3 +1,10 @@
+/*
+ * crosshair.h
+ */
+
+#ifndef CROSSHAIR_H_
+#define CROSSHAIR_H_
+
 #include "lcd.h"
 
 static const uint8_t _crosshair_bm_0x0[] = {
@@ -54,3 +61,5 @@ void draw_crosshair(image* image, short x, short y) {
   }
   fill_image(image,_layers_crosshair,2);
 };
+
+#endif /* CROSSHAIR_H_ */

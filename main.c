@@ -1,93 +1,45 @@
 #include "main.h"
+#include "msp.h"
+#include "msp432p401r.h"
+// TODO Remove: #include "msp.h"
+// TODO Remove: #include "msp432p401r.h"
+
+
+// Tasks
+#include "task_blast.h"
+#include "task_clayPigeon.h"
+#include "task_crosshair.h"
+// Non-FreeRTOS
 #include "images.h"
 #include "lcd.h" // TODO Move hardware-related/non-FreeRTOS headers into main.h
-#include "msp.h"
-#include "msp432p401r.h"
-#include "msp.h"
-#include "msp432p401r.h"
 #include "opt3001.h"
 #include "ps2.h"
-#include "task_blast.h"
 #include "serial_debug.h"
 #include "timer32.h"
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdio.h>
 
-#define STEP_VAL 1
-#define SKY_BOTTOM_Y 95
 
 SemaphoreHandle_t Sem_LCD = NULL;
-TaskHandle_t TaskH_joystick = NULL;
+QueueHandle_t Draw_Queue = NULL;
 TaskHandle_t TaskH_newFrame = NULL;
-TaskHandle_t TaskH_s2 = NULL;
+// TODO Remove: TaskHandle_t TaskH_s2 = NULL;
+TaskHandle_t TaskH_drawScreen = NULL;
+TaskHandle_t TaskH_clayPigeon;
+TaskHandle_t TaskH_crosshair;
+
+// TODO Remove QueueHandle_t Queue_PS2; // TODO Move to joystick task file
+
+// TODO Add redefinition protection to all image headers (0xx.h, etc). Then, move these into main.h and just declare them w/out extern here
 extern image background;
 extern image crosshair;
 extern image score;
 extern image pidgeon;
-static short x = 64, y = 64, px=64, py=64, cx, cy, pcx, pcy;
+
 static uint8_t phits = 0xFF;
 static uint8_t hits = 0;
 
-const short CROSSHAIR_HEIGHT = 22;
-const short CROSSHAIR_WIDTH = 22;
-const short CLAY_HEIGHT = 4;
-const short CLAY_WIDTH = 22;
-uint16_t sky_color = 0x8718;
-
-static bool show_clay = false;
-
-
-inline void draw_crosshair_basic(uint8_t x, uint8_t y, uint8_t px, uint8_t py) {
-    xSemaphoreTake(Sem_LCD, portMAX_DELAY);
-    // TODO Account for movement when erasing
-
-    // TODO lcd_draw_rectangle(px,py,22,4,sky_color);
-    // TODO lcd_draw_rectangle(px,py,4,22,sky_color);
-
-
-
-    // TODO Mostly works when drawing everything in one function
-    lcd_draw_rectangle(px, py, 22, 4, sky_color);
-    lcd_draw_rectangle(px, py, 4, 22, sky_color);
-
-    if(x > px) {
-        lcd_draw_rectangle(px - 1, py + 6, x - px + 4, 11, sky_color); // TODO Could have width be 8 instead of 9
-        lcd_draw_rectangle(px - 1, py - 6, x - px + 4, 11, sky_color); // TODO Could have width be 8 instead of 9
-        lcd_draw_rectangle(px - 11, py, x - px + 4, 6, sky_color);
-    } else {
-        lcd_draw_rectangle(px + 1, py + 6, px - x + 4, 11, sky_color); // TODO Could have width be 8 instead of 9
-        lcd_draw_rectangle(x + 1, py - 6, px - x + 4, 11, sky_color); // TODO Could have width be 8 instead of 9
-        lcd_draw_rectangle(px + 10, py, px - x + 4, 6, sky_color);
-    }
-
-    if(y > py) {
-        lcd_draw_rectangle(px - 6, py - 1, 11, y - py + 4, sky_color);
-        lcd_draw_rectangle(px + 6, py - 1, 11, y - py + 4, sky_color); // TODO Could have width be 9 instead of 10
-        lcd_draw_rectangle(px, py - 11, 6, y - py + 4, sky_color);
-    } else {
-        lcd_draw_rectangle(px - 6, py + 1, 11, py - y + 4, sky_color);
-        lcd_draw_rectangle(px + 6, py + 1, 11, py - y + 4, sky_color); // TODO Could have width be 9 instead of 10
-        lcd_draw_rectangle(px, py + 10, 6, py - y + 4, sky_color);
-    }
-
-
-    lcd_draw_rectangle(x + 10, y, 1, 4, 0x0000);
-    lcd_draw_rectangle(x - 11, y, 1, 4, 0x0000);
-    lcd_draw_rectangle(x, y - 11, 4, 1, 0x0000);
-    lcd_draw_rectangle(x, y + 10, 4, 1, 0x0000);
-    lcd_draw_rectangle(x + 5, y - 2, 9, 1, 0x0000);
-    lcd_draw_rectangle(x + 5, y + 1, 9, 1, 0x0000);
-    lcd_draw_rectangle(x - 6, y - 2, 9, 1, 0x0000);
-    lcd_draw_rectangle(x - 6, y + 1, 9, 1, 0x0000);
-    lcd_draw_rectangle(x - 2, y + 6, 1, 8, 0x0000);
-    lcd_draw_rectangle(x + 1, y + 6, 1, 8, 0x0000);
-    lcd_draw_rectangle(x - 2, y - 6, 1, 8, 0x0000);
-    lcd_draw_rectangle(x + 1, y - 6, 1, 8, 0x0000);
-    lcd_draw_rectangle(x,y,20,2,0xFFFF);
-    lcd_draw_rectangle(x,y,2,20,0xFFFF);
-    xSemaphoreGive(Sem_LCD);
-}
 
 inline void init(void)
 {
@@ -102,6 +54,15 @@ inline void init(void)
     i2c_init();
     opt3001_init();
     serial_debug_init();
+}
+
+void Task_drawScreen(void* pvParameters) {
+    while(true) {
+      image* image = NULL;
+      xQueueReceive(Draw_Queue, &image, portMAX_DELAY);
+      if (image) draw(image);
+      vTaskDelay(pdMS_TO_TICKS(30));
+    }
 }
 
 void Task_newFrame(void* pvParameters)
@@ -195,97 +156,30 @@ void Task_newFrame(void* pvParameters)
             erase_image(&background);
             switch (l) {
             case BRIGHT:
-                sky_color = 0x8718;
                 draw_light_background(&background);
                 break;
             case MEDIUM:
-                sky_color = 0x8410;
                 draw_medium_background(&background);
                 break;
             case DARK:
-                sky_color = 0x8;
                 draw_dark_background(&background);
                 break;
             }
-            draw(); // TODO
         }
         pl = l;
-
-
-
-
-        if(show_clay) {
-            xSemaphoreTake(Sem_LCD, portMAX_DELAY);
-            // TODO Account for movement when erasing
-            lcd_draw_rectangle(pcx,pcy,22,4,sky_color);
-            lcd_draw_rectangle(cx,cy,22,4,0x0000);
-            lcd_draw_rectangle(cx,cy,20,2,0xFF0F);
-            xSemaphoreGive(Sem_LCD);
-
-            // Update previous clay x and y
-            pcx = cx;
-            pcy = cy;
-        }
-
-
-
-        if(px != x || py != y) {
-            draw_crosshair_basic(x, y, px, py); // TODO
-        }
-
-        /* TODO
-        if(px != x || py != y) {
-            if(sqrt(pow(x-cx, 2) + pow(y-cy, 2)) >= 40) {
-                draw_crosshair_basic(x, y, px, py);
-            } else {
-                draw_crosshair(&crosshair, x, y);
-            }
-        }*/
-
-        // Update previous x and y
-        px = x;
-        py = y;
-
-
-
-
-
-    // TODO draw();
-    }
-}
-
-void Task_joystick(void* pvParameters)
-{
-    while (true) {
-        if ((PS2_Y_VAL == PS2_DIR_UP) && (y > (CROSSHAIR_HEIGHT / 2) + STEP_VAL + 2))
-            y -= STEP_VAL;
-        else if ((PS2_Y_VAL == PS2_DIR_DOWN) && (y < (SKY_BOTTOM_Y - (CROSSHAIR_HEIGHT / 2) - STEP_VAL - 1)))
-            y += STEP_VAL;
-        if ((PS2_X_VAL == PS2_DIR_LEFT) && (x > (CROSSHAIR_WIDTH / 2) + STEP_VAL + 1))
-            x -= STEP_VAL;
-        else if ((PS2_X_VAL == PS2_DIR_RIGHT) && (x < (LCD_HORIZONTAL_MAX - (CROSSHAIR_WIDTH / 2) - STEP_VAL - 1)))
-            x += STEP_VAL;
-
-
-        /* TODO This worked
-        // Update previous x and y
-        px = x;
-        py = y;*/
-
-        // xSemaphoreTake(Sem_LCD, portMAX_DELAY);
-        // TODO draw_crosshair(&crosshair, x, y);
-        //draw_clay(&pidgeon, x + 15, y - 15);
-        // xSemaphoreGive(Sem_LCD);
-        vTaskDelay(pdMS_TO_TICKS(20));
     }
 }
 
 
-
+// TODO Header ig
 int main(void)
 {
     WDT_A->CTL = WDT_A_CTL_PW | WDT_A_CTL_HOLD; // stop watchdog timer
     init();
+
+    Draw_Queue = xQueueCreate(8,sizeof(image*));
+    Queue_Accelerometer = xQueueCreate(1, sizeof(MOVE_DIR)); // TODO sizeof(LEFT) or sizeof(uint8_t) or 1???
+    Queue_PS2 = xQueueCreate(1, sizeof(MOVE_t)); // TODO size ???
 
     Sem_LCD = xSemaphoreCreateBinary();
     add_image(&crosshair);
@@ -294,15 +188,13 @@ int main(void)
     add_image(&background);
     draw_scoreboard(&score);
 
-    Queue_Accelerometer = xQueueCreate(1, sizeof(MOVE_DIR)); // TODO sizeof(LEFT) or sizeof(uint8_t) or 1???
-    Queue_PS2 = xQueueCreate(1, sizeof(MOVE_t)); // TODO size ???
-
     xSemaphoreGive(Sem_LCD);
     xTaskCreate(Task_clayPigeon, "pullClay", configMINIMAL_STACK_SIZE, NULL, 3, &TaskH_clayPigeon);
     xTaskCreate(TaskBlast, "blast", configMINIMAL_STACK_SIZE, NULL, 4, &TaskH_TaskBlast);
     xTaskCreate(Task_newFrame, "newFrame", configMINIMAL_STACK_SIZE, NULL, 3, &TaskH_newFrame);
-    xTaskCreate(Task_joystick, "joystick", configMINIMAL_STACK_SIZE, NULL, 3, &TaskH_joystick);
-    //xTaskCreate(Task_s2, "s2", configMINIMAL_STACK_SIZE, NULL, 4, &TaskH_s2);
+    xTaskCreate(Task_crosshair, "crosshair", configMINIMAL_STACK_SIZE, NULL, 3, &TaskH_crosshair);
+    xTaskCreate(Task_drawScreen, "drawScreen", configMINIMAL_STACK_SIZE, NULL, 3, &TaskH_drawScreen);
+    // TODO xTaskCreate(Task_s2, "s2", configMINIMAL_STACK_SIZE, NULL, 4, &TaskH_s2);
 
     vTaskStartScheduler();
     while (true);

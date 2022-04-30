@@ -32,7 +32,7 @@ void t32_init(void) {
   // Enable the Timer32 interrupt in NVIC
   __enable_irq();
   NVIC_EnableIRQ(T32_INT1_IRQn);
-  NVIC_SetPriority(T32_INT1_IRQn, 2);
+  NVIC_SetPriority(T32_INT1_IRQn, 3);
 
   // Start Timer32 and enable interrupt
   TIMER32_1->CONTROL = TIMER32_CONTROL_ENABLE |   // turn timer on
