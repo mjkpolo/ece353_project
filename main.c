@@ -65,6 +65,8 @@ void Task_newFrame(void* pvParameters)
             foo };
         if (hits!=phits) {
           erase_image(&score);
+          draw_0xx(&score);
+          draw_x0x(&score);
           switch (hits%10) {
               case 0 : draw_xx0(&score);
                        break;
