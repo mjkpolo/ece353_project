@@ -18,6 +18,8 @@
 #include <stdint.h>
 #include <stdio.h>
 
+#define STEP_VAL 5
+
 SemaphoreHandle_t Sem_LCD = NULL;
 TaskHandle_t TaskH_joystick = NULL;
 TaskHandle_t TaskH_newFrame = NULL;
@@ -25,11 +27,8 @@ TaskHandle_t TaskH_s2 = NULL;
 extern image background;
 extern image crosshair;
 extern image crosshair2;
-extern image crosshair3;
+extern image pidgeon;
 static short x = 64, y = 64;
-
-TaskHandle_t TaskH_newFrame = NULL;
-SemaphoreHandle_t Sem_LCD;
 
 
 inline void init(void)
@@ -115,41 +114,45 @@ void Task_joystick(void* pvParameters)
         // xSemaphoreTake(Sem_LCD, portMAX_DELAY);
         draw_crosshair(&crosshair, x, y);
         draw_clay(&crosshair2, x - 15, y + 15);
-        draw_clay(&crosshair3, x + 15, y - 15);
+        draw_clay(&pidgeon, x + 15, y - 15);
         // xSemaphoreGive(Sem_LCD);
         vTaskDelay(pdMS_TO_TICKS(15));
+    }
+}
 
 // TODO Header and move to its own file
 void Task_clayPigeon(void *pvParameters)
 {
     // Boolean used to track whether the clay pigeon should move up or down
     bool move_up;
+    short crosshair_height = crosshair.y1 - crosshair.y0+1;
+    short crosshair_width = crosshair.x1 - crosshair.x0+1;
 
     while(true) {
         ulTaskNotifyTake(pdTRUE, portMAX_DELAY); // Wait until task is notified to start
 
         move_up = true; // The clay pigeon should initially be moving up
         // TODO Use different x and y variables
-        y = SKY_BOTTOM_Y - (CROSSHAIR_HEIGHT / 2) - 1; // TODO Replace CROSSHAIR_HEIGHT with clay pigeon height
-        x = LCD_HORIZONTAL_MAX / 2; // TODO Randomize initial x position
+        y = 131 - (crosshair_height / 2) - 1; // todo replace crosshair_height with clay pigeon height
+        x = 131 / 2; // todo randomize initial x position
 
-        while(y < SKY_BOTTOM_Y - (CROSSHAIR_HEIGHT / 2)) { // TODO Replace CROSSHAIR_HEIGHT with clay pigeon height
-            if(move_up) y--; // TODO y -= level #
-            else y++; // TODO y += level #
+        while(y < 131 - (crosshair_height / 2)) { // todo replace crosshair_height with clay pigeon height
+            if(move_up) y--; // todo y -= level #
+            else y++; // todo y += level #
 
-            if(y <= (CROSSHAIR_HEIGHT / 2)) move_up = false;
+            if(y <= (crosshair_height / 2)) move_up = false;
 
             if(ACCEL_X == ACCEL_DIR_LEFT) {
-                // Move to the left unless the clay pigeon is already at the left boundary. In which case, stay at the boundary
-                if(x > (CROSSHAIR_WIDTH / 2) + STEP_VAL) x -= STEP_VAL; // TODO Replace CROSSHAIR_WIDTH with clay pigeon width
-                else x = 1 + CROSSHAIR_WIDTH / 2; // TODO Replace CROSSHAIR_WIDTH with clay pigeon width
+                // move to the left unless the clay pigeon is already at the left boundary. in which case, stay at the boundary
+                if(x > (crosshair_width / 2) + STEP_VAL) x -= STEP_VAL; // TODO replace crosshair_width with clay pigeon width
+                else x = 1 + crosshair_width / 2; // todo replace crosshair_width with clay pigeon width
             } else if (ACCEL_X == ACCEL_DIR_RIGHT) {
-                // Move to the right unless the clay pigeon is already at the right boundary. In which case, stay at the boundary
-                if(x < LCD_HORIZONTAL_MAX - (CROSSHAIR_WIDTH / 2) - STEP_VAL) x += STEP_VAL; // TODO Replace CROSSHAIR_WIDTH with clay pigeon width
-                else x = LCD_HORIZONTAL_MAX - (CROSSHAIR_WIDTH / 2); // TODO Replace CROSSHAIR_WIDTH with clay pigeon width
+                // move to the right unless the clay pigeon is already at the right boundary. in which case, stay at the boundary
+                if(x < 131 - (crosshair_width / 2) - STEP_VAL) x += STEP_VAL; // todo replace crosshair_width with clay pigeon width
+                else x = 131 - (crosshair_width / 2); // todo replace crosshair_width with clay pigeon width
             }
 
-            draw_crosshair(x,y); // TODO Replace with draw clay pigeon
+            draw_clay(&pidgeon,x,y); // todo replace with draw clay pigeon
 
             vTaskDelay(pdMS_TO_TICKS(20)); // TODO Could slow down the delay when the clay pigeon gets closer to the top of the screen/peak of its arc
         }
@@ -169,7 +172,7 @@ int main(void)
     Sem_LCD = xSemaphoreCreateBinary();
     add_image(&crosshair);
     add_image(&crosshair2);
-    add_image(&crosshair3);
+    add_image(&pidgeon);
     add_image(&background);
 
     xSemaphoreGive(Sem_LCD);
