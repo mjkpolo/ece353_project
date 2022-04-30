@@ -135,7 +135,7 @@ void Task_newFrame(void* pvParameters)
           phits = hits;
         }
         static enum light l, pl = foo; // so pl != l
-        vTaskDelay(pdMS_TO_TICKS(15));
+        vTaskDelay(pdMS_TO_TICKS(30));
         float lux = opt3001_read_lux();
         if (lux < 20)
             l = DARK;
@@ -219,7 +219,7 @@ void Task_clayPigeon(void *pvParameters)
             }
 
             draw_clay(&pidgeon,x,y); // todo replace with draw clay pigeon
-            vTaskDelay(pdMS_TO_TICKS(10)); // TODO Could slow down the delay when the clay pigeon gets closer to the top of the screen/peak of its arc
+            vTaskDelay(pdMS_TO_TICKS(30)); // TODO Could slow down the delay when the clay pigeon gets closer to the top of the screen/peak of its arc
         }
 
         // Clear task notification's value so that the task cannot be notified while it is running (e.g. if the inner while loop is running and the
@@ -243,8 +243,8 @@ int main(void)
 
     xSemaphoreGive(Sem_LCD);
     xTaskCreate(Task_clayPigeon, "pullClay", configMINIMAL_STACK_SIZE, NULL, 3, &TaskH_clayPigeon);
-    xTaskCreate(TaskBlast, "blast", configMINIMAL_STACK_SIZE, NULL, 3, &TaskH_TaskBlast);
-    xTaskCreate(Task_newFrame, "newFrame", configMINIMAL_STACK_SIZE, NULL, 2, &TaskH_newFrame);
+    xTaskCreate(TaskBlast, "blast", configMINIMAL_STACK_SIZE, NULL, 4, &TaskH_TaskBlast);
+    xTaskCreate(Task_newFrame, "newFrame", configMINIMAL_STACK_SIZE, NULL, 3, &TaskH_newFrame);
     xTaskCreate(Task_joystick, "joystick", configMINIMAL_STACK_SIZE, NULL, 3, &TaskH_joystick);
     xTaskCreate(Task_s2, "s2", configMINIMAL_STACK_SIZE, NULL, 4, &TaskH_s2);
 
