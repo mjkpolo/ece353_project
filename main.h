@@ -8,14 +8,12 @@
 #ifndef MAIN_H_
 #define MAIN_H_
 
-
 /* RTOS header files */
-#include <FreeRTOS.h>
-#include <task.h>
-#include <semphr.h>
-#include <stdint.h>
-#include <stdbool.h>
 #include "msp.h"
-
+#include <FreeRTOS.h>
+#include <semphr.h>
+#include <stdbool.h>
+#include <stdint.h>
+#include <task.h>
 
 #endif /* MAIN_H_ */

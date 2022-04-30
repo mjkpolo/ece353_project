@@ -10,7 +10,7 @@
 
 #include "i2c.h"
 
-// 
+//
 #define OPT3001_SLAVE_ADDRESS 0x44
 
 #define OPT_INTERRUPT_PIN 11

@@ -9,7 +9,6 @@
 #define PS2_H_
 #include "main.h"
 
-
 void adc14_init(void);
 #define VOLT_0P6 744
 #define VOLT_2P70 3351
@@ -24,6 +23,5 @@ extern volatile uint32_t PS2_X_VAL;
 extern volatile uint32_t PS2_Y_VAL;
 
 void adc14_init(void);
-
 
 #endif /* PS2_H_ */

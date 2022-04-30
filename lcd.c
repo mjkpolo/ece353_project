@@ -9,7 +9,6 @@
 
 extern SemaphoreHandle_t Sem_LCD;
 
-
 /* ****************************************************************************
  * Used to configure the 5 pins that control the LCD interface on the MKII.
  *
@@ -19,8 +18,8 @@ extern SemaphoreHandle_t Sem_LCD;
  ******************************************************************************/
 void HAL_LCD_PortInit(void)
 {
-    // ADD CODE 
-    
+    // ADD CODE
+
     // LCD_SCK
     LCD_SCK_PORT->SEL0 |= LCD_SCK_PIN;
     LCD_SCK_PORT->SEL1 &= ~LCD_SCK_PIN;
@@ -45,34 +44,33 @@ void HAL_LCD_PortInit(void)
  ******************************************************************************/
 void HAL_LCD_SpiInit(void)
 {
-    EUSCI_B0->CTLW0 =  EUSCI_B_CTLW0_SWRST;            // Put eUSCI state machine in reset
+    EUSCI_B0->CTLW0 = EUSCI_B_CTLW0_SWRST; // Put eUSCI state machine in reset
 
     // ADD CODE to define the behavior of the eUSCI_B0 as a SPI interface
     EUSCI_B0->CTLW0 = EUSCI_B_CTLW0_CKPH | // Phase 1
-                      EUSCI_B_CTLW0_MSB | // Msb first
-                      EUSCI_B_CTLW0_MST | // Set as SPI master
-                      EUSCI_B_CTLW0_MODE_0 | // 3 pin spi mode
-                      EUSCI_B_CTLW0_SYNC | // async
-                      EUSCI_B_CTLW0_SSEL__SMCLK | //smclk
-                      //EUSCI_B_CTLW0_STEM | //UCxSTE digital output
-                      EUSCI_B_CTLW0_SWRST; // remain in eusci mode
+        EUSCI_B_CTLW0_MSB | // Msb first
+        EUSCI_B_CTLW0_MST | // Set as SPI master
+        EUSCI_B_CTLW0_MODE_0 | // 3 pin spi mode
+        EUSCI_B_CTLW0_SYNC | // async
+        EUSCI_B_CTLW0_SSEL__SMCLK | // smclk
+        // EUSCI_B_CTLW0_STEM | //UCxSTE digital output
+        EUSCI_B_CTLW0_SWRST; // remain in eusci mode
 
     // ADD CODE to set the SPI Clock to 12MHz.
     //
     // Divide clock speed by 2 (24MHz/2) = 12 MHz
-    //fBitClock = fBRCLK/(UCBRx+1).
+    // fBitClock = fBRCLK/(UCBRx+1).
     EUSCI_B0->BRW = 1;
 
-    EUSCI_B0->CTLW0 &= ~EUSCI_B_CTLW0_SWRST;// Initialize USCI state machine
+    EUSCI_B0->CTLW0 &= ~EUSCI_B_CTLW0_SWRST; // Initialize USCI state machine
 
     // set the chip select low
-    // The chip select will be held low forever!  There is only 1 device (LCD) 
+    // The chip select will be held low forever!  There is only 1 device (LCD)
     // connected to the SPI device, so we will leave it activated all the time.
     LCD_CS_PORT->OUT &= ~LCD_CS_PIN;
 
     // Set the DC pin high (put it in data mode)
     LCD_DC_PORT->OUT |= LCD_DC_PIN;
-
 }
 
 //*****************************************************************************
@@ -88,19 +86,20 @@ void HAL_LCD_writeCommand(uint8_t command)
     // Set to command mode -- DC PIN Set to 0
     LCD_DC_PORT->OUT &= ~LCD_DC_PIN;
 
-    // Busy wait while the data is being transmitted. Check the STATW register and see if it is busy 
-    while(EUSCI_B0->STATW & UCBUSY);
+    // Busy wait while the data is being transmitted. Check the STATW register and see if it is busy
+    while (EUSCI_B0->STATW & UCBUSY)
+        ;
 
     // Transmit data
     EUSCI_B0->TXBUF = command;
 
-    // Busy wait while the data is being transmitted. Check the STATW register and see if it is busy 
-    while(EUSCI_B0->STATW & UCBUSY);
+    // Busy wait while the data is being transmitted. Check the STATW register and see if it is busy
+    while (EUSCI_B0->STATW & UCBUSY)
+        ;
 
     // Set back to data mode, set the DC pin high
     LCD_DC_PORT->OUT |= LCD_DC_PIN;
 }
-
 
 //*****************************************************************************
 //
@@ -110,9 +109,11 @@ void HAL_LCD_writeCommand(uint8_t command)
 //*****************************************************************************
 void HAL_LCD_writeData(uint8_t data)
 {
-    while(EUSCI_B0->STATW & UCBUSY);
+    while (EUSCI_B0->STATW & UCBUSY)
+        ;
     EUSCI_B0->TXBUF = data;
-    while(EUSCI_B0->STATW & UCBUSY);
+    while (EUSCI_B0->STATW & UCBUSY)
+        ;
 }
 
 //*****************************************************************************
@@ -140,7 +141,6 @@ void Crystalfontz128x128_SetDrawFrame(uint16_t x0, uint16_t y0, uint16_t x1, uin
     HAL_LCD_writeData(y1);
 }
 
-
 //*****************************************************************************
 // Code adapted from TI LCD driver library
 //
@@ -156,12 +156,11 @@ void Crystalfontz128x128_Init(void)
 {
     int i;
     int j;
-    uint8_t upper8  = 0x00;
-    uint8_t lower8  = 0x00;
+    uint8_t upper8 = 0x00;
+    uint8_t lower8 = 0x00;
 
     HAL_LCD_PortInit();
     HAL_LCD_SpiInit();
-
 
     LCD_RST_PORT->OUT &= ~LCD_RST_PIN;
     HAL_LCD_delay(50);
@@ -192,15 +191,12 @@ void Crystalfontz128x128_Init(void)
 
     HAL_LCD_writeCommand(CM_NORON);
 
-
     Crystalfontz128x128_SetDrawFrame(0, 0, LCD_HORIZONTAL_MAX, LCD_VERTICAL_MAX);
     HAL_LCD_writeCommand(CM_RAMWR);
 
-    for (i = 0; i < LCD_VERTICAL_MAX; i++)
-    {
+    for (i = 0; i < LCD_VERTICAL_MAX; i++) {
 
-        for(j=0; j < LCD_HORIZONTAL_MAX; j++)
-        {
+        for (j = 0; j < LCD_HORIZONTAL_MAX; j++) {
             HAL_LCD_writeData(upper8);
             HAL_LCD_writeData(lower8);
         }
@@ -214,7 +210,7 @@ void Crystalfontz128x128_Init(void)
     HAL_LCD_writeData(CM_MADCTL_MX | CM_MADCTL_MY | CM_MADCTL_BGR);
 }
 
-image crosshair3,crosshair2,crosshair,background;
+image crosshair3, crosshair2, crosshair, background;
 static image** images = NULL;
 static size_t numImages = 0;
 static short first_col = 132;
@@ -226,103 +222,104 @@ static short last_row = 0;
 static short plast_col = 0;
 static short plast_row = 0;
 
-void add_image(image* i) {
-  images = realloc(images,(numImages+1)*sizeof(image*));
-  images[numImages++] = i;
+void add_image(image* i)
+{
+    images = realloc(images, (numImages + 1) * sizeof(image*));
+    images[numImages++] = i;
 }
 
-
-void erase_image(image* image) {
-  image->numLayers = 0;
-  free(image->layers);
-  image->layers = NULL;
-  image->x0 = 132;
-  image->y0 = 132;
-  image->x1 = 0;
-  image->y1 = 0;
+void erase_image(image* image)
+{
+    image->numLayers = 0;
+    free(image->layers);
+    image->layers = NULL;
+    image->x0 = 132;
+    image->y0 = 132;
+    image->x1 = 0;
+    image->y1 = 0;
 }
 
-void fill_image(image* image, layer* layers, size_t numLayers) {
-  image->layers = (layer*) realloc(image->layers, (image->numLayers+numLayers)*sizeof(layer));
-  memcpy(&image->layers[image->numLayers],layers,sizeof(layer)*numLayers);
-  image->numLayers += numLayers;
-  int i;
-  for (i=0; i<numLayers; i++) {
-    image->x0 = image->x0 < layers[i].x0 ? image->x0 : layers[i].x0;
-    image->y0 = image->y0 < layers[i].y0 ? image->y0 : layers[i].y0;
-    image->x1 = image->x1 > layers[i].x1 ? image->x1 : layers[i].x1;
-    image->y1 = image->y1 > layers[i].y1 ? image->y1 : layers[i].y1;
-  }
-  first_col = image->x0 < first_col ? image->x0 : first_col;
-  first_row = image->y0 < first_row ? image->y0 : first_row;
-  last_row = image->y1 > last_row ? image->y1 : last_row;
-  last_col = image->x1 > last_col ? image->x1 : last_col;
-}
-
-
-bool draw_pixel(image* image, short i, short j) {
-  int k;
-  for (k=0; k<image->numLayers; k++) {
-    short image_width = image->layers[k].x1-image->layers[k].x0+1;
-    short image_height = image->layers[k].y1-image->layers[k].y0+1;
-    short bytes_per_row = image_width / 8;
-    bytes_per_row += image_width % 8 ? 1 : 0;
-    short relx = j-image->layers[k].x0;
-    short rely = i-image->layers[k].y0;
-    short byte_index = (rely*bytes_per_row) + relx/8;
-    bool inbounds = relx >= 0 ? (relx < image_width ? (rely >= 0 ? rely < image_height : false) : false) : false;
-    if (inbounds) {
-      if (image->layers[k].bitmap[byte_index] & (1 << (7-(relx%8)))) {
-        HAL_LCD_writeData(image->layers[k].color >> 8);
-        HAL_LCD_writeData(image->layers[k].color);
-        return true;
-      }
+void fill_image(image* image, layer* layers, size_t numLayers)
+{
+    image->layers = (layer*)realloc(image->layers, (image->numLayers + numLayers) * sizeof(layer));
+    memcpy(&image->layers[image->numLayers], layers, sizeof(layer) * numLayers);
+    image->numLayers += numLayers;
+    int i;
+    for (i = 0; i < numLayers; i++) {
+        image->x0 = image->x0 < layers[i].x0 ? image->x0 : layers[i].x0;
+        image->y0 = image->y0 < layers[i].y0 ? image->y0 : layers[i].y0;
+        image->x1 = image->x1 > layers[i].x1 ? image->x1 : layers[i].x1;
+        image->y1 = image->y1 > layers[i].y1 ? image->y1 : layers[i].y1;
     }
-  }
-  return false;
+    first_col = image->x0 < first_col ? image->x0 : first_col;
+    first_row = image->y0 < first_row ? image->y0 : first_row;
+    last_row = image->y1 > last_row ? image->y1 : last_row;
+    last_col = image->x1 > last_col ? image->x1 : last_col;
 }
 
-
-void draw(void) {
-
-  short i,j,k,x0,x1,y0,y1;
-
-  y0 = first_row < pfirst_row ? first_row : pfirst_row;
-  x0 = first_col < pfirst_col ? first_col : pfirst_col;
-  y1 = last_row > plast_row ? last_row : plast_row;
-  x1 = last_col > plast_col ? last_col : plast_col;
-
-  x0 = (x0>131 ? 131 : (x0<0 ? 0 : x0));
-  y0 = (y0>131 ? 131 : (y0<0 ? 0 : y0));
-  x1 = (x1>131 ? 131 : (x1<0 ? 0 : x1));
-  y1 = (y1>131 ? 131 : (y1<0 ? 0 : y1));
-
-
-  pfirst_col = first_col;
-  pfirst_row = first_row;
-  plast_col = last_col;
-  plast_row = last_row;
-  
-  
-  Crystalfontz128x128_SetDrawFrame(x0,y0,x1,y1);
-  HAL_LCD_writeCommand(CM_RAMWR);
-  
-  for (i=y0; i<=y1; i++) {
-    for (j=x0; j<=x1; j++) {
-  //xSemaphoreTake(Sem_LCD, portMAX_DELAY);
-      for (k=0; k<numImages; k++) {
-        if (draw_pixel(images[k],i,j)) break;
-      }
-      if (k==numImages) { // just draw white if no pixel found
-        HAL_LCD_writeData(0xFF);
-        HAL_LCD_writeData(0xFF);
-      }
-  //xSemaphoreGive(Sem_LCD);
+bool draw_pixel(image* image, short i, short j)
+{
+    int k;
+    for (k = 0; k < image->numLayers; k++) {
+        short image_width = image->layers[k].x1 - image->layers[k].x0 + 1;
+        short image_height = image->layers[k].y1 - image->layers[k].y0 + 1;
+        short bytes_per_row = image_width / 8;
+        bytes_per_row += image_width % 8 ? 1 : 0;
+        short relx = j - image->layers[k].x0;
+        short rely = i - image->layers[k].y0;
+        short byte_index = (rely * bytes_per_row) + relx / 8;
+        bool inbounds = relx >= 0 ? (relx < image_width ? (rely >= 0 ? rely < image_height : false) : false) : false;
+        if (inbounds) {
+            if (image->layers[k].bitmap[byte_index] & (1 << (7 - (relx % 8)))) {
+                HAL_LCD_writeData(image->layers[k].color >> 8);
+                HAL_LCD_writeData(image->layers[k].color);
+                return true;
+            }
+        }
     }
-  }
+    return false;
+}
 
-  first_col = 132;
-  first_row = 132;
-  last_col = 0;
-  last_row = 0;
+void draw(void)
+{
+
+    short i, j, k, x0, x1, y0, y1;
+
+    y0 = first_row < pfirst_row ? first_row : pfirst_row;
+    x0 = first_col < pfirst_col ? first_col : pfirst_col;
+    y1 = last_row > plast_row ? last_row : plast_row;
+    x1 = last_col > plast_col ? last_col : plast_col;
+
+    x0 = (x0 > 131 ? 131 : (x0 < 0 ? 0 : x0));
+    y0 = (y0 > 131 ? 131 : (y0 < 0 ? 0 : y0));
+    x1 = (x1 > 131 ? 131 : (x1 < 0 ? 0 : x1));
+    y1 = (y1 > 131 ? 131 : (y1 < 0 ? 0 : y1));
+
+    pfirst_col = first_col;
+    pfirst_row = first_row;
+    plast_col = last_col;
+    plast_row = last_row;
+
+    Crystalfontz128x128_SetDrawFrame(x0, y0, x1, y1);
+    HAL_LCD_writeCommand(CM_RAMWR);
+
+    for (i = y0; i <= y1; i++) {
+        for (j = x0; j <= x1; j++) {
+            // xSemaphoreTake(Sem_LCD, portMAX_DELAY);
+            for (k = 0; k < numImages; k++) {
+                if (draw_pixel(images[k], i, j))
+                    break;
+            }
+            if (k == numImages) { // just draw white if no pixel found
+                HAL_LCD_writeData(0xFF);
+                HAL_LCD_writeData(0xFF);
+            }
+            // xSemaphoreGive(Sem_LCD);
+        }
+    }
+
+    first_col = 132;
+    first_row = 132;
+    last_col = 0;
+    last_row = 0;
 }
