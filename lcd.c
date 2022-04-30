@@ -309,6 +309,7 @@ void draw(void) {
   
   for (i=y0; i<=y1; i++) {
     for (j=x0; j<=x1; j++) {
+  //xSemaphoreTake(Sem_LCD, portMAX_DELAY);
       for (k=0; k<numImages; k++) {
         if (draw_pixel(images[k],i,j)) break;
       }
@@ -316,6 +317,7 @@ void draw(void) {
         HAL_LCD_writeData(0xFF);
         HAL_LCD_writeData(0xFF);
       }
+  //xSemaphoreGive(Sem_LCD);
     }
   }
 
