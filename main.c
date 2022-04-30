@@ -194,6 +194,7 @@ void Task_clayPigeon(void *pvParameters)
     short crosshair_width = crosshair.x1 - crosshair.x0+1;
 
     while(true) {
+        short x,y;
         ulTaskNotifyTake(pdTRUE, portMAX_DELAY); // Wait until task is notified to start
 
         move_up = true; // The clay pigeon should initially be moving up
