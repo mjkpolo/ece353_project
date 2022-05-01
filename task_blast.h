@@ -21,6 +21,7 @@ void play_note(uint32_t period, uint16_t ms_time);
 void TaskBlast(void *pvParameters);
 
 extern QueueHandle_t Queue_Score;
+extern QueueHandle_t Queue_Hit;
 
 
 #endif /* TASK_BLAST_H_ */

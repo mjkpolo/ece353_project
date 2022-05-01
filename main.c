@@ -66,8 +66,14 @@ void Task_drawScreen(void* pvParameters) {
 void Task_background(void* pvParameters)
 {
     BaseType_t received_points;
-    uint8_t points;
-    uint8_t score_val = 0;
+    uint16_t points;
+    uint16_t score_val = 0;
+
+    // Draw the score board initially
+    draw_xx0(&score);
+    draw_x0x(&score);
+    draw_0xx(&score);
+    draw_scoreboard(&score);
 
     while (true) {
         enum light { DARK,
@@ -75,8 +81,8 @@ void Task_background(void* pvParameters)
             BRIGHT,
             foo };
 
-        // Check if there is a  (including no move) is received from Queue_Accelerometer
-        received_points = xQueueReceive(Queue_Score, &points, pdMS_TO_TICKS(1));
+        // Check if any points have been received (don't wait if the queue is empty)
+        received_points = xQueueReceive(Queue_Score, &points, 0);
 
         if(received_points == pdPASS) {
             // Increase the score by the number of points received
@@ -200,7 +206,8 @@ int main(void)
     Draw_Queue = xQueueCreate(numImages,sizeof(image*));
     Queue_Accelerometer = xQueueCreate(1, sizeof(MOVE_DIR)); // TODO sizeof(LEFT) or sizeof(uint8_t) or 1???
     Queue_PS2 = xQueueCreate(1, sizeof(MOVE_t)); // TODO size ???
-    Queue_Score = xQueueCreate(1, sizeof(uint8_t));
+    Queue_Score = xQueueCreate(1, sizeof(uint16_t));
+    Queue_Hit = xQueueCreate(1, sizeof(uint8_t));
 
     xSemaphoreGive(Sem_Background);
 

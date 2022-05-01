@@ -11,6 +11,7 @@
 TaskHandle_t TaskH_TaskBlast; // TODO Is this necessary/useful??
 
 QueueHandle_t Queue_Score;
+QueueHandle_t Queue_Hit;
 
 // TODO Remove? Play a note for the given duration
 void play_note(uint32_t period, uint16_t ms_time)
@@ -168,7 +169,8 @@ void TaskBlast(void *pvParameters)
     int i = 0;
     int max = (int)(NOTE_C * pow(2, 3.25)); // TODO Replace with constant value
 
-    uint8_t points = 1; // TODO Set points to whatever level we're on
+    uint16_t points = 1; // TODO Set points to whatever level we're on
+    uint8_t hit = 1;
     BaseType_t status;
 
     while(1)
@@ -182,6 +184,8 @@ void TaskBlast(void *pvParameters)
 
             // Add the points for hitting the target to Queue_Score so that the scoreboard can be updated
             status = xQueueSendToBack(Queue_Score, &points, portMAX_DELAY);
+            // Send that the clay was hit
+            status = xQueueSendToBack(Queue_Hit, &hit, portMAX_DELAY);
 
             // Play target hit sound
             for(i=0; i < hit_sound_size; i++) {

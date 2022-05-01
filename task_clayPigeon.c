@@ -12,6 +12,7 @@
 
 TaskHandle_t TaskH_clayPigeon;
 QueueHandle_t Queue_Accelerometer;
+QueueHandle_t Queue_Hit;
 
 //image pidgeon; // TODO
 
@@ -23,6 +24,7 @@ void Task_clayPigeon(void *pvParameters)
     short CLAY_WIDTH = pidgeon.x1 - pidgeon.x0 + 1; // Width of the clay pigeon image TODO Make constant. If not constant, change to lower case
     BaseType_t status;
     MOVE_DIR clay_x_move;
+    uint8_t clay_hit;
     uint8_t x, y; // x and y positions of the clay pigeon
 
 
@@ -39,6 +41,18 @@ void Task_clayPigeon(void *pvParameters)
 
 
         while(y < SKY_BOTTOM_Y - (CLAY_HEIGHT / 2) - STEP_VAL) { // todo replace crosshair_height with clay pigeon height
+
+            // TODO Is it worth having a queue if I'm not actually passing a useful value????
+
+            // Check if the clay has been hit (don't wait for new elements)
+            status = xQueueReceive(Queue_Hit, &clay_hit, 0);
+
+            // If the clay has been hit, erase the clay pigeon image (so it can't be hit again before it's launched again) and break from the loop
+            if(status == pdPASS) {
+                erase_image(&pidgeon); // TODO For Marco: Is this safe/the correct way to remove the clay pigeon from the screen, or is there a better way? Sometimes, the clay pigeon isn't removed from the screen automatically
+                break;
+            }
+
             if(y <= (CLAY_HEIGHT / 2) + STEP_VAL + 1)
                 move_up = false;
 
