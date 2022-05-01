@@ -26,7 +26,7 @@ void Task_clayPigeon(void *pvParameters)
     short CLAY_WIDTH = pidgeon.x1 - pidgeon.x0 + 1; // Width of the clay pigeon image TODO Make constant. If not constant, change to lower case
     BaseType_t status;
     MOVE_DIR clay_x_move;
-    uint8_t clay_hit, ammo;
+    uint8_t clays_hit, ammo, y_step = 1;
     uint8_t x, y; // x and y positions of the clay pigeon
 
 
@@ -45,26 +45,28 @@ void Task_clayPigeon(void *pvParameters)
 
         move_up = true; // The clay pigeon should initially be moving up
         x = LCD_HORIZONTAL_MAX / 2; // todo randomize initial x position
-        y = SKY_BOTTOM_Y - (CLAY_HEIGHT / 2) - CLAY_STEP - 1; // todo replace crosshair_height with clay pigeon height
+        y = SKY_BOTTOM_Y - (CLAY_HEIGHT / 2) - 1;
 
 
-        while(y < SKY_BOTTOM_Y - (CLAY_HEIGHT / 2) - CLAY_STEP) { // todo replace crosshair_height with clay pigeon height
+        while(y < SKY_BOTTOM_Y - (CLAY_HEIGHT / 2)) {
 
             // TODO Is it worth having a queue if I'm not actually passing a useful value????
 
             // Check if the clay has been hit (don't wait for new elements)
-            status = xQueueReceive(Queue_Hit, &clay_hit, 0);
+            // If it has been hit, the total number of clays hit up to this point will be received
+            status = xQueueReceive(Queue_Hit, &clays_hit, 0);
 
-            // If the clay has been hit, break from the loop
+            // If the clay has been hit, check to see if the next level has been reached and break from the loop
             if(status == pdPASS) {
+                // Increment the speed/step size of future clays if the user has hit enough clays to move on to the next level
+                if(clays_hit % CLAYS_PER_LEVEL == 0) y_step++;
                 break;
             }
 
-            if(y <= (CLAY_HEIGHT / 2) + CLAY_STEP + 1)
-                move_up = false;
+            if(y <= (CLAY_HEIGHT / 2) + y_step + 2) move_up = false;
 
-            if(move_up) y -= CLAY_STEP; // todo y -= level #
-            else y += CLAY_STEP; // todo y += level #
+            if(move_up) y -= y_step; // todo y -= level #
+            else y += y_step; // todo y += level #
 
             // Wait until a new x move (including no move) is received from Queue_Accelerometer
             status = xQueueReceive(Queue_Accelerometer, &clay_x_move, portMAX_DELAY);
@@ -72,13 +74,13 @@ void Task_clayPigeon(void *pvParameters)
             switch(clay_x_move) {
                 case LEFT:
                     // Move to the left unless the clay pigeon is already at the LCD left boundary; in which case, stay at the boundary
-                    if(x > (CLAY_WIDTH / 2) + CLAY_STEP)
-                        x -= CLAY_STEP;
+                    if(x > (CLAY_WIDTH / 2) + CLAY_X_STEP)
+                        x -= CLAY_X_STEP;
                     break;
                 case RIGHT:
                     // Move to the right unless the clay pigeon is already at the LCD right boundary; in which case, stay at the boundary
-                    if(x < LCD_HORIZONTAL_MAX - (CLAY_WIDTH / 2) - CLAY_STEP)
-                        x += CLAY_STEP;
+                    if(x < LCD_HORIZONTAL_MAX - (CLAY_WIDTH / 2) - CLAY_X_STEP)
+                        x += CLAY_X_STEP;
                     break;
             }
 

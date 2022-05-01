@@ -10,7 +10,7 @@
 
 #include "main.h"
 
-#define CLAY_STEP 1
+#define CLAY_X_STEP 1
 
 // TODO header
 void Task_clayPigeon(void *pvParameters);

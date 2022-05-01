@@ -66,7 +66,7 @@ void Task_drawScreen(void* pvParameters) {
 void Task_background(void* pvParameters)
 {
     BaseType_t received_points;
-    uint16_t points;
+    uint8_t points;
     uint16_t score_val = 0;
 
     // Draw the score board initially
@@ -208,7 +208,7 @@ int main(void)
     Draw_Queue = xQueueCreate(numImages,sizeof(image*));
     Queue_Accelerometer = xQueueCreate(1, sizeof(MOVE_DIR)); // TODO sizeof(LEFT) or sizeof(uint8_t) or 1???
     Queue_PS2 = xQueueCreate(1, sizeof(MOVE_t)); // TODO size ???
-    Queue_Score = xQueueCreate(1, sizeof(uint16_t));
+    Queue_Score = xQueueCreate(1, sizeof(uint8_t));
     Queue_Hit = xQueueCreate(1, sizeof(uint8_t));
     Queue_Ammo = xQueueCreate(1, sizeof(uint8_t));
 

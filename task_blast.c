@@ -170,7 +170,9 @@ void TaskBlast(void *pvParameters)
     int i = 0;
     int max = (int)(NOTE_C * pow(2, 3.25)); // TODO Replace with constant value
 
-    uint16_t points = 1; // TODO Set points to whatever level we're on
+    // TODO Put these on one line
+    uint8_t clays_hit = 0;
+    uint8_t points = 1;
     uint8_t hit;
     uint8_t ammo;
     BaseType_t status;
@@ -187,40 +189,46 @@ void TaskBlast(void *pvParameters)
             // Check if the clay pigeon and crosshair images are overlapping; if they are, the clay pigeon is hit
             if((crosshair.x0 <= pidgeon.x1) && (crosshair.x1 >= pidgeon.x0) &&
                (crosshair.y0 <= pidgeon.y1) && (crosshair.y1 >= pidgeon.y0)) {
+                // Increment the number of clays hit
+                clays_hit++;
+
+
+                // TODO Does the order of these two affect anything (like drawing one image before the other) ????
 
                 // Add the points for hitting the target to Queue_Score so that the scoreboard can be updated
                 status = xQueueSendToBack(Queue_Score, &points, portMAX_DELAY);
                 // Send that the clay was hit
-                status = xQueueSendToBack(Queue_Hit, &hit, portMAX_DELAY);
+                status = xQueueSendToBack(Queue_Hit, &clays_hit, portMAX_DELAY);
 
                 // Play target hit sound
                 for(i=0; i < hit_sound_size; i++) {
 
                     // TODO Either use play_note() here or remove play_note() entirely
-                    // TODO Use SystemClock instead of 24000000.0
 
                     // Configure TimerA0 with the specified period of the PWM pulse
-                    MKII_Buzzer_Init((uint32_t)floor(24000000.0/(hit_sound[i].note * pow(2, hit_sound[i].octave))));
+                    MKII_Buzzer_Init((uint32_t)floor(SystemCoreClock / (hit_sound[i].note * pow(2, hit_sound[i].octave))));
                     // Turn the buzzer on (start playing note)
                     MKII_Buzzer_On();
                     // Wait while buzzer plays the note
-                    vTaskDelay(pdMS_TO_TICKS(hit_sound[i].time));
+                    vTaskDelay(pdMS_TO_TICKS(hit_sound[i].time * SystemCoreClock / 24000000)); // TODO Remove or set to constant 2 multiplier
                     // Turn the buzzer off (stop playing note)
                     MKII_Buzzer_Off();
                 }
+
+                // Increment the points for future clays if the user has hit enough clays to move on to the next level
+                if(clays_hit % CLAYS_PER_LEVEL == 0) points++;
             } else {
                 // Play target missed sound (upside-down exponential curve to create a decreasing tone, sampled at intervals to allow each sampled frequency to be played longer without extending the time for which the sound is played)
                 for(i=0; i < max; i+=7) {
 
                     // TODO Either use play_note() here or remove play_note() entirely
-                    // TODO Use SystemClock instead of 24000000.0
 
                     // Configure TimerA0 with the specified period of the PWM pulse
-                    MKII_Buzzer_Init((uint32_t) floor(24000000.0 / (max - max*pow(2.71828, (i - max)/((double)max)))));
+                    MKII_Buzzer_Init((uint32_t) floor(SystemCoreClock / (max - max*pow(2.71828, (i - max)/((double)max)))));
                     // Turn the buzzer on (start playing note)
                     MKII_Buzzer_On();
                     // Wait while buzzer plays the note
-                    vTaskDelay(pdMS_TO_TICKS(5));
+                    vTaskDelay(pdMS_TO_TICKS(5 * SystemCoreClock / 24000000)); // TODO Remove or set to constant 2 multiplier
                     // Turn the buzzer off (stop playing note)
                     MKII_Buzzer_Off();
                 }
