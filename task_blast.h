@@ -22,6 +22,7 @@ void TaskBlast(void *pvParameters);
 
 extern QueueHandle_t Queue_Score;
 extern QueueHandle_t Queue_Hit;
+extern QueueHandle_t Queue_Ammo;
 
 
 #endif /* TASK_BLAST_H_ */

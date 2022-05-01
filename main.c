@@ -197,6 +197,8 @@ int main(void)
     init();
     size_t numImages;
 
+    Sem_ClayLaunched = xSemaphoreCreateBinary();
+
     Sem_Background = xSemaphoreCreateBinary();
     add_image(&crosshair);
     add_image(&pidgeon);
@@ -208,8 +210,10 @@ int main(void)
     Queue_PS2 = xQueueCreate(1, sizeof(MOVE_t)); // TODO size ???
     Queue_Score = xQueueCreate(1, sizeof(uint16_t));
     Queue_Hit = xQueueCreate(1, sizeof(uint8_t));
+    Queue_Ammo = xQueueCreate(1, sizeof(uint8_t));
 
     xSemaphoreGive(Sem_Background);
+    xSemaphoreGive(Sem_ClayLaunched);
 
     // TODO Remove: Draw_Queue = xQueueCreate(8,sizeof(image*));
 

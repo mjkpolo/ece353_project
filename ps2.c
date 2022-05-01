@@ -14,6 +14,10 @@ volatile uint32_t ACCEL_Y = 0;
 
 TaskHandle_t TaskH_crosshair; // TODO
 TaskHandle_t TaskH_clayPigeon; // TODO
+SemaphoreHandle_t Sem_ClayLaunched;
+QueueHandle_t Queue_Ammo;
+QueueHandle_t Queue_PS2;
+QueueHandle_t Queue_Accelerometer;
 
 void adc14_init(void) {
     // Configure the X direction of the joystick as an analog input pin.
@@ -62,6 +66,7 @@ void ADC14_IRQHandler(void) {
     BaseType_t status;
     MOVE_t ps2_move;
     MOVE_DIR accelerometer_x;
+    uint8_t ammo;
 
     static uint8_t x_tilt_l_state = 0;
     static uint8_t x_tilt_r_state = 0;
@@ -158,7 +163,13 @@ void ADC14_IRQHandler(void) {
         // Only reload once when the user tilts the board backward
         // TODO Add something so it doesn't reload when ammo supply is full
         else if(y_tilt_b_state == 0x7F) {
-            // TODO Reload cartridge
+            // Try to take Sem_ClayLaunched to check if the clay is currently in the air
+            status = xSemaphoreTakeFromISR(Sem_ClayLaunched, &xHigherPriorityTaskWoken);
+
+            if(status == pdPASS) // The clay is not in the air (status == pdPASS), so just give the semaphore back and don't reload
+                xSemaphoreGiveFromISR(Sem_ClayLaunched, &xHigherPriorityTaskWoken);
+            else // The clay is in the air, so reload
+                xQueueSendToBackFromISR(Queue_Ammo, &ammo, 0); // Reload ammo
         }
 
     //}

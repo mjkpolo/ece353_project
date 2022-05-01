@@ -10,10 +10,13 @@
 
 #include "main.h"
 
+#define CLAY_STEP 1
+
 // TODO header
 void Task_clayPigeon(void *pvParameters);
 
 extern TaskHandle_t TaskH_clayPigeon;
+extern SemaphoreHandle_t Sem_ClayLaunched;
 extern QueueHandle_t Queue_Accelerometer;
 
 

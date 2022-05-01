@@ -12,6 +12,7 @@ TaskHandle_t TaskH_TaskBlast; // TODO Is this necessary/useful??
 
 QueueHandle_t Queue_Score;
 QueueHandle_t Queue_Hit;
+QueueHandle_t Queue_Ammo;
 
 // TODO Remove? Play a note for the given duration
 void play_note(uint32_t period, uint16_t ms_time)
@@ -170,7 +171,8 @@ void TaskBlast(void *pvParameters)
     int max = (int)(NOTE_C * pow(2, 3.25)); // TODO Replace with constant value
 
     uint16_t points = 1; // TODO Set points to whatever level we're on
-    uint8_t hit = 1;
+    uint8_t hit;
+    uint8_t ammo;
     BaseType_t status;
 
     while(1)
@@ -178,45 +180,50 @@ void TaskBlast(void *pvParameters)
         // Wait for ISR to let us know that the button has been pressed
         ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
 
-        // Check if the clay pigeon and crosshair images are overlapping; if they are, the clay pigeon is hit
-        if((crosshair.x0 <= pidgeon.x1) && (crosshair.x1 >= pidgeon.x0) &&
-           (crosshair.y0 <= pidgeon.y1) && (crosshair.y1 >= pidgeon.y0)) {
+        // Only fire if there is ammo available in Queue_Ammo (filled in task_clayPigeon.c when the clay pigeon is thrown)
+        status = xQueueReceive(Queue_Ammo, &ammo, 0);
 
-            // Add the points for hitting the target to Queue_Score so that the scoreboard can be updated
-            status = xQueueSendToBack(Queue_Score, &points, portMAX_DELAY);
-            // Send that the clay was hit
-            status = xQueueSendToBack(Queue_Hit, &hit, portMAX_DELAY);
+        if(status == pdPASS) {
+            // Check if the clay pigeon and crosshair images are overlapping; if they are, the clay pigeon is hit
+            if((crosshair.x0 <= pidgeon.x1) && (crosshair.x1 >= pidgeon.x0) &&
+               (crosshair.y0 <= pidgeon.y1) && (crosshair.y1 >= pidgeon.y0)) {
 
-            // Play target hit sound
-            for(i=0; i < hit_sound_size; i++) {
+                // Add the points for hitting the target to Queue_Score so that the scoreboard can be updated
+                status = xQueueSendToBack(Queue_Score, &points, portMAX_DELAY);
+                // Send that the clay was hit
+                status = xQueueSendToBack(Queue_Hit, &hit, portMAX_DELAY);
 
-                // TODO Either use play_note() here or remove play_note() entirely
-                // TODO Use SystemClock instead of 24000000.0
+                // Play target hit sound
+                for(i=0; i < hit_sound_size; i++) {
 
-                // Configure TimerA0 with the specified period of the PWM pulse
-                MKII_Buzzer_Init((uint32_t)floor(24000000.0/(hit_sound[i].note * pow(2, hit_sound[i].octave))));
-                // Turn the buzzer on (start playing note)
-                MKII_Buzzer_On();
-                // Wait while buzzer plays the note
-                vTaskDelay(pdMS_TO_TICKS(hit_sound[i].time));
-                // Turn the buzzer off (stop playing note)
-                MKII_Buzzer_Off();
-            }
-        } else {
-            // Play target missed sound (upside-down exponential curve to create a decreasing tone, sampled at intervals to allow each sampled frequency to be played longer without extending the time for which the sound is played)
-            for(i=0; i < max; i+=7) {
+                    // TODO Either use play_note() here or remove play_note() entirely
+                    // TODO Use SystemClock instead of 24000000.0
 
-                // TODO Either use play_note() here or remove play_note() entirely
-                // TODO Use SystemClock instead of 24000000.0
+                    // Configure TimerA0 with the specified period of the PWM pulse
+                    MKII_Buzzer_Init((uint32_t)floor(24000000.0/(hit_sound[i].note * pow(2, hit_sound[i].octave))));
+                    // Turn the buzzer on (start playing note)
+                    MKII_Buzzer_On();
+                    // Wait while buzzer plays the note
+                    vTaskDelay(pdMS_TO_TICKS(hit_sound[i].time));
+                    // Turn the buzzer off (stop playing note)
+                    MKII_Buzzer_Off();
+                }
+            } else {
+                // Play target missed sound (upside-down exponential curve to create a decreasing tone, sampled at intervals to allow each sampled frequency to be played longer without extending the time for which the sound is played)
+                for(i=0; i < max; i+=7) {
 
-                // Configure TimerA0 with the specified period of the PWM pulse
-                MKII_Buzzer_Init((uint32_t) floor(24000000.0 / (max - max*pow(2.71828, (i - max)/((double)max)))));
-                // Turn the buzzer on (start playing note)
-                MKII_Buzzer_On();
-                // Wait while buzzer plays the note
-                vTaskDelay(pdMS_TO_TICKS(5));
-                // Turn the buzzer off (stop playing note)
-                MKII_Buzzer_Off();
+                    // TODO Either use play_note() here or remove play_note() entirely
+                    // TODO Use SystemClock instead of 24000000.0
+
+                    // Configure TimerA0 with the specified period of the PWM pulse
+                    MKII_Buzzer_Init((uint32_t) floor(24000000.0 / (max - max*pow(2.71828, (i - max)/((double)max)))));
+                    // Turn the buzzer on (start playing note)
+                    MKII_Buzzer_On();
+                    // Wait while buzzer plays the note
+                    vTaskDelay(pdMS_TO_TICKS(5));
+                    // Turn the buzzer off (stop playing note)
+                    MKII_Buzzer_Off();
+                }
             }
         }
     }

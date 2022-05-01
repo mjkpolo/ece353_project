@@ -9,8 +9,9 @@
 #define PS2_H_
 
 #include "main.h"
-#include "task_clayPigeon.h"
-#include "task_crosshair.h"
+//#include "task_clayPigeon.h"
+//#include "task_crosshair.h"
+//#include "task_blast.h"
 
 void adc14_init(void);
 
