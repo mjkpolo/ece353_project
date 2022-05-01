@@ -26,7 +26,7 @@ void adc14_init(void);
 */
 #define VOLT_TILT_L  1750
 #define VOLT_TILT_R  2250
-#define VOLT_TILT_F  2250 //TODO 2000
+#define VOLT_TILT_F  2100 //TODO 2000
 #define VOLT_TILT_B  1500
 /* TODO
 #define ACCEL_DIR_NONE 0 // TODO combine this with PS2_DIR_NONE to just have one DIR_NONE constant
