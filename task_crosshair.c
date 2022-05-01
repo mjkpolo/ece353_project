@@ -12,7 +12,7 @@
 TaskHandle_t TaskH_crosshair;
 QueueHandle_t Queue_PS2;
 
-image crosshair; // TODO
+//image crosshair; // TODO
 
 // TODO header
 void Task_crosshair(void* pvParameters)

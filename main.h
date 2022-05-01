@@ -19,10 +19,13 @@
 #define STEP_VAL 1
 #define SKY_BOTTOM_Y 95
 
-extern SemaphoreHandle_t Sem_LCD;
+extern SemaphoreHandle_t Sem_LCD; // TODO Is this still needed???
+extern SemaphoreHandle_t Sem_Background; // TODO
 
 extern TaskHandle_t TaskH_TaskBlast;
-extern TaskHandle_t TaskH_updateBackground;
+// TODO Remove: extern TaskHandle_t TaskH_updateBackground;
+extern TaskHandle_t TaskH_background;
+
 
 /******************************************************************************
 * Prints a message to the Console TODO Update header and move to a new file

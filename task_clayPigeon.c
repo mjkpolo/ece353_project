@@ -13,7 +13,7 @@
 TaskHandle_t TaskH_clayPigeon;
 QueueHandle_t Queue_Accelerometer;
 
-image pidgeon; // TODO
+//image pidgeon; // TODO
 
 // TODO Header
 void Task_clayPigeon(void *pvParameters)
@@ -29,6 +29,9 @@ void Task_clayPigeon(void *pvParameters)
     while(true) {
 
         ulTaskNotifyTake(pdTRUE, portMAX_DELAY); // Wait until task is notified to start
+
+        // Don't allow the background to redraw while the clay pigeon is on the screen
+        xSemaphoreTake(Sem_Background, portMAX_DELAY);
 
         move_up = true; // The clay pigeon should initially be moving up
         x = LCD_HORIZONTAL_MAX / 2; // todo randomize initial x position
@@ -74,6 +77,8 @@ void Task_clayPigeon(void *pvParameters)
 
             vTaskDelay(pdMS_TO_TICKS(30)); // TODO Could slow down the delay when the clay pigeon gets closer to the top of the screen/peak of its arc
         }
+        // Allow the background to redraw now that the clay pigeon is done
+        xSemaphoreGive(Sem_Background);
 
         // Clear task notification's value so that the task cannot be notified while it is running (e.g. if the inner while loop is running and the
         // user tilts forward/notifies the task again, this will make sure any such notification attempts are not seen/processed at the next iteration

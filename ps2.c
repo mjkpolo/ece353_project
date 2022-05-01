@@ -94,6 +94,8 @@ void ADC14_IRQHandler(void) {
       // Add joystick's x and y positions to queue for crosshair task
       // TODO Remove: status = xQueueSendToBack(Queue_LED, &msg, portMAX_DELAY);
       // TODO status = xQueueOverwriteFromISR(Queue_PS2, &ps2_move, &xHigherPriorityTaskWoken);
+
+      // TODO Queue send to front ??? Use send to back instead of just send???
       status = xQueueSendFromISR(Queue_PS2, &ps2_move, &xHigherPriorityTaskWoken); // TODO
       //status = xQueueSendToBack(Queue_PS2, &ps2_move, portMAX_DELAY); // TODO
 
@@ -142,6 +144,8 @@ void ADC14_IRQHandler(void) {
         // Add accelerometer's x position (left/right/middle) to queue for clay pigeon task
         // TODO Remove: status = xQueueSendToBack(Queue_LED, &msg, portMAX_DELAY);
         // TODO status = xQueueOverwriteFromISR(Queue_Accelerometer, &accelerometer_x, &xHigherPriorityTaskWoken);
+
+        // TODO Queue send to front ??? Use send to back instead of just send???
         status = xQueueSendFromISR(Queue_Accelerometer, &accelerometer_x, &xHigherPriorityTaskWoken); // TODO
 
         // Launch clay pigeon when the user tilts the board forward

@@ -6,9 +6,11 @@
  */
 
 #include <task_blast.h>
+#include "lcd.h" // TODO
 
 TaskHandle_t TaskH_TaskBlast; // TODO Is this necessary/useful??
-TaskHandle_t TaskH_updateBackground; // TODO Remove once actual implementation is done
+
+QueueHandle_t Queue_Score;
 
 // TODO Remove? Play a note for the given duration
 void play_note(uint32_t period, uint16_t ms_time)
@@ -166,48 +168,53 @@ void TaskBlast(void *pvParameters)
     int i = 0;
     int max = (int)(NOTE_C * pow(2, 3.25)); // TODO Replace with constant value
 
+    uint8_t points = 1; // TODO Set points to whatever level we're on
+    BaseType_t status;
+
     while(1)
     {
         // Wait for ISR to let us know that the button has been pressed
         ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
 
-        // Play target missed sound (upside-down exponential curve to create a decreasing tone, sampled at intervals to allow each sampled frequency to be played longer without extending the time for which the sound is played)
-        for(i=0; i < max; i+=7) {
+        // Check if the clay pigeon and crosshair images are overlapping; if they are, the clay pigeon is hit
+        if((crosshair.x0 <= pidgeon.x1) && (crosshair.x1 >= pidgeon.x0) &&
+           (crosshair.y0 <= pidgeon.y1) && (crosshair.y1 >= pidgeon.y0)) {
 
-            // TODO Either use play_note() here or remove play_note() entirely
-            // TODO Use SystemClock instead of 24000000.0
+            // Add the points for hitting the target to Queue_Score so that the scoreboard can be updated
+            status = xQueueSendToBack(Queue_Score, &points, portMAX_DELAY);
 
-            // Configure TimerA0 with the specified period of the PWM pulse
-            MKII_Buzzer_Init((uint32_t) floor(24000000.0 / (max - max*pow(2.71828, (i - max)/((double)max)))));
-            // Turn the buzzer on (start playing note)
-            MKII_Buzzer_On();
-            // Wait while buzzer plays the note
-            vTaskDelay(pdMS_TO_TICKS(5));
-            // Turn the buzzer off (stop playing note)
-            MKII_Buzzer_Off();
+            // Play target hit sound
+            for(i=0; i < hit_sound_size; i++) {
+
+                // TODO Either use play_note() here or remove play_note() entirely
+                // TODO Use SystemClock instead of 24000000.0
+
+                // Configure TimerA0 with the specified period of the PWM pulse
+                MKII_Buzzer_Init((uint32_t)floor(24000000.0/(hit_sound[i].note * pow(2, hit_sound[i].octave))));
+                // Turn the buzzer on (start playing note)
+                MKII_Buzzer_On();
+                // Wait while buzzer plays the note
+                vTaskDelay(pdMS_TO_TICKS(hit_sound[i].time));
+                // Turn the buzzer off (stop playing note)
+                MKII_Buzzer_Off();
+            }
+        } else {
+            // Play target missed sound (upside-down exponential curve to create a decreasing tone, sampled at intervals to allow each sampled frequency to be played longer without extending the time for which the sound is played)
+            for(i=0; i < max; i+=7) {
+
+                // TODO Either use play_note() here or remove play_note() entirely
+                // TODO Use SystemClock instead of 24000000.0
+
+                // Configure TimerA0 with the specified period of the PWM pulse
+                MKII_Buzzer_Init((uint32_t) floor(24000000.0 / (max - max*pow(2.71828, (i - max)/((double)max)))));
+                // Turn the buzzer on (start playing note)
+                MKII_Buzzer_On();
+                // Wait while buzzer plays the note
+                vTaskDelay(pdMS_TO_TICKS(5));
+                // Turn the buzzer off (stop playing note)
+                MKII_Buzzer_Off();
+            }
         }
-
-        vTaskDelay(pdMS_TO_TICKS(500)); // TODO Wait (just for testing)
-
-        // Play target hit sound
-        for(i=0; i < hit_sound_size; i++) {
-
-            // TODO Either use play_note() here or remove play_note() entirely
-            // TODO Use SystemClock instead of 24000000.0
-
-            // Configure TimerA0 with the specified period of the PWM pulse
-            MKII_Buzzer_Init((uint32_t)floor(24000000.0/(hit_sound[i].note * pow(2, hit_sound[i].octave))));
-            // Turn the buzzer on (start playing note)
-            MKII_Buzzer_On();
-            // Wait while buzzer plays the note
-            vTaskDelay(pdMS_TO_TICKS(hit_sound[i].time));
-            // Turn the buzzer off (stop playing note)
-            MKII_Buzzer_Off();
-        }
-
-        // TODO \/\/ Remove \/\/
-        // TODO Notify blast task to shoot at the crosshairs
-        //xTaskNotifyGive(TaskH_updateBackground);
     }
 }
 
