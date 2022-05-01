@@ -8,7 +8,7 @@
 #include <task_blast.h>
 #include "lcd.h" // TODO
 
-TaskHandle_t TaskH_TaskBlast; // TODO Is this necessary/useful??
+TaskHandle_t TaskH_TaskBlast;
 
 QueueHandle_t Queue_Score;
 QueueHandle_t Queue_Hit;
@@ -173,7 +173,6 @@ void TaskBlast(void *pvParameters)
     // TODO Put these on one line
     uint8_t clays_hit = 0;
     uint8_t points = 1;
-    uint8_t hit;
     uint8_t ammo;
     BaseType_t status;
 

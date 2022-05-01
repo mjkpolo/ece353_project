@@ -11,7 +11,7 @@
 volatile bool S2_P = false;
 // TODO volatile bool NEW_FRAME = false;
 
-TaskHandle_t TaskH_TaskBlast; // TODO
+TaskHandle_t TaskH_TaskBlast; // TODO include task_blast???
 
 bool MKII_S2(void) {
     return (P3->IN & BIT5) == 0;

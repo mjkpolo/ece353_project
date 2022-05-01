@@ -12,11 +12,11 @@
 
 TaskHandle_t TaskH_clayPigeon;
 QueueHandle_t Queue_Accelerometer;
-QueueHandle_t Queue_Hit;
-QueueHandle_t Queue_Ammo;
+QueueHandle_t Queue_Hit; // TODO include task_blast???
+QueueHandle_t Queue_Ammo; // TODO include task_blast???
 SemaphoreHandle_t Sem_ClayLaunched;
+SemaphoreHandle_t Sem_Background; // TODO include task_background???
 
-//image pidgeon; // TODO
 
 // TODO Header
 void Task_clayPigeon(void *pvParameters)
@@ -44,14 +44,12 @@ void Task_clayPigeon(void *pvParameters)
         xQueueSendToBack(Queue_Ammo, &ammo, 0);
 
         move_up = true; // The clay pigeon should initially be moving up
-        x = LCD_HORIZONTAL_MAX / 2; // todo randomize initial x position
+        x = (uint8_t) (LCD_HORIZONTAL_MAX * (rand() / (double) RAND_MAX));
+        // TODO Remove x = LCD_HORIZONTAL_MAX / 2; // todo randomize initial x position
         y = SKY_BOTTOM_Y - (CLAY_HEIGHT / 2) - 1;
 
 
         while(y < SKY_BOTTOM_Y - (CLAY_HEIGHT / 2)) {
-
-            // TODO Is it worth having a queue if I'm not actually passing a useful value????
-
             // Check if the clay has been hit (don't wait for new elements)
             // If it has been hit, the total number of clays hit up to this point will be received
             status = xQueueReceive(Queue_Hit, &clays_hit, 0);
@@ -65,8 +63,8 @@ void Task_clayPigeon(void *pvParameters)
 
             if(y <= (CLAY_HEIGHT / 2) + y_step + 2) move_up = false;
 
-            if(move_up) y -= y_step; // todo y -= level #
-            else y += y_step; // todo y += level #
+            if(move_up) y -= y_step;
+            else y += y_step;
 
             // Wait until a new x move (including no move) is received from Queue_Accelerometer
             status = xQueueReceive(Queue_Accelerometer, &clay_x_move, portMAX_DELAY);
@@ -83,17 +81,6 @@ void Task_clayPigeon(void *pvParameters)
                         x += CLAY_X_STEP;
                     break;
             }
-
-            /* TODO Remove
-            if(clay_x_move == ) {
-                // move to the left unless the clay pigeon is already at the left boundary. in which case, stay at the boundary
-                if(cx > (CLAY_WIDTH / 2) + CLAY_STEP) cx -= CLAY_STEP; // TODO replace crosshair_width with clay pigeon width
-                // TODO else cx = 1 + CLAY_WIDTH / 2; // todo replace crosshair_width with clay pigeon width
-            } else if (ACCEL_X == ACCEL_DIR_RIGHT) {
-                // move to the right unless the clay pigeon is already at the right boundary. in which case, stay at the boundary
-                if(cx < LCD_HORIZONTAL_MAX - (CLAY_WIDTH / 2) - CLAY_STEP) cx += CLAY_STEP; // todo replace crosshair_width with clay pigeon width
-                // TODO else cx = LCD_HORIZONTAL_MAX - (CLAY_WIDTH / 2); // todo replace crosshair_width with clay pigeon width
-            }*/
 
             // Redraw clay pigeon now that it has moved
             draw_clay(&pidgeon,x,y);

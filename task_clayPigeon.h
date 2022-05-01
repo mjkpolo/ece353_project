@@ -9,6 +9,7 @@
 #define TASK_CLAYPIGEON_H_
 
 #include "main.h"
+#include <stdlib.h>
 
 #define CLAY_X_STEP 1
 

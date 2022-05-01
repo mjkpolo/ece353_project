@@ -12,12 +12,12 @@ volatile uint32_t PS2_Y_VAL = 0;
 volatile uint32_t ACCEL_X = 0;
 volatile uint32_t ACCEL_Y = 0;
 
-TaskHandle_t TaskH_crosshair; // TODO
-TaskHandle_t TaskH_clayPigeon; // TODO
-SemaphoreHandle_t Sem_ClayLaunched;
-QueueHandle_t Queue_Ammo;
-QueueHandle_t Queue_PS2;
-QueueHandle_t Queue_Accelerometer;
+TaskHandle_t TaskH_crosshair; // TODO include task_crosshair???
+TaskHandle_t TaskH_clayPigeon; // TODO include task_clayPigeon???
+SemaphoreHandle_t Sem_ClayLaunched; // TODO include task_clayPigeon???
+QueueHandle_t Queue_Ammo; // TODO include task_blast???
+QueueHandle_t Queue_PS2; // TODO include task_crosshair???
+QueueHandle_t Queue_Accelerometer; // TODO include task_clayPigeon???
 
 void adc14_init(void) {
     // Configure the X direction of the joystick as an analog input pin.
