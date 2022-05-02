@@ -83,7 +83,7 @@ void Task_clayPigeon(void *pvParameters)
             }
 
             // Redraw clay pigeon now that it has moved
-            draw_clay(&pidgeon,x,y);
+            draw_clay(&pidgeon,x,y); // TODO Call this asynchronously
 
             vTaskDelay(pdMS_TO_TICKS(30)); // TODO Could slow down the delay when the clay pigeon gets closer to the top of the screen/peak of its arc
         }
@@ -93,7 +93,6 @@ void Task_clayPigeon(void *pvParameters)
 
         // Reset Queue_Ammo so that there is no ammo when the clay pigeon is no longer in the air
         xQueueReset(Queue_Ammo);
-
 
         // The clay is no longer in the air, so erase the clay pigeon image
         erase_image(&pidgeon); // TODO For Marco: Is this safe/the correct way to remove the clay pigeon from the screen, or is there a better way? Sometimes, the clay pigeon isn't removed from the screen automatically

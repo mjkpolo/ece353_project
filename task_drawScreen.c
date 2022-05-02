@@ -15,6 +15,9 @@ QueueHandle_t Draw_Queue;
 void Task_drawScreen(void* pvParameters)
 {
     while(true) {
+
+      // TODO Draw crosshair and clay pigeon here
+
       image* image = NULL;
       xQueueReceive(Draw_Queue, &image, portMAX_DELAY);
       if (image) draw(image);
