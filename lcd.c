@@ -232,6 +232,10 @@ void erase_image(image* image)
     image->y0 = 132;
     image->x1 = 0;
     image->y1 = 0;
+    if (!image->inQueue) {
+        xQueueSendToBack(Draw_Queue,&image,portMAX_DELAY);
+        image->inQueue = true;
+    }
 }
 
 void fill_image(image* image, layer* layers, size_t numLayers)

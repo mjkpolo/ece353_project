@@ -95,7 +95,7 @@ void Task_clayPigeon(void *pvParameters)
         xQueueReset(Queue_Ammo);
 
         // The clay is no longer in the air, so erase the clay pigeon image
-        erase_image(&pidgeon); // TODO For Marco: Is this safe/the correct way to remove the clay pigeon from the screen, or is there a better way? Sometimes, the clay pigeon isn't removed from the screen automatically
+        erase_image(&pidgeon);
 
         // Allow the background to redraw now that the clay pigeon is done
         xSemaphoreGive(Sem_Background);
