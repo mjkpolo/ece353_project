@@ -26,7 +26,7 @@ void Task_crosshair(void* pvParameters)
 
         ulTaskNotifyTake(pdTRUE, portMAX_DELAY); // Wait until task is notified to start
 
-        // Wait until a new x move (including no move) is received from Queue_Accelerometer
+        // Wait until a new x move (including no move) is received from Queue_PS2
         status = xQueueReceive(Queue_PS2, &crosshair_move, portMAX_DELAY);
 
         // TODO Just use if statements
@@ -53,6 +53,6 @@ void Task_crosshair(void* pvParameters)
 
         draw_crosshair(&crosshair, x, y);
 
-        vTaskDelay(pdMS_TO_TICKS(15));
+        vTaskDelay(pdMS_TO_TICKS(7));
     }
 }
