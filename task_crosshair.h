@@ -12,8 +12,10 @@
 
 // TODO Header
 void Task_crosshair(void* pvParameters);
+void Task_drawCrosshair(void* pvParameters);
 
 extern TaskHandle_t TaskH_crosshair;
+extern TaskHandle_t TaskH_drawCrosshair;
 
 extern QueueHandle_t Queue_PS2;
 

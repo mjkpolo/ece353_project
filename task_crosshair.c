@@ -10,18 +10,16 @@
 #include "ps2.h"
 
 TaskHandle_t TaskH_crosshair;
+TaskHandle_t TaskH_drawCrosshair;
 QueueHandle_t Queue_PS2;
-
+short x = 64, y = 64; // x and y positions of the crosshair
+MOVE_t crosshair_move;
 
 // TODO header
 void Task_crosshair(void* pvParameters)
 {
     BaseType_t status;
-    MOVE_t crosshair_move;
-    short CROSSHAIR_HEIGHT = crosshair.y1 - crosshair.y0 + 1; // Height of the crosshair image TODO Make constant. If not constant, change to lower case
-    short CROSSHAIR_WIDTH = crosshair.x1 - crosshair.x0 + 1; // Width of the crosshair image TODO Make constant. If not constant, change to lower case
-    short x = 64, y = 64; // x and y positions of the crosshair
-
+    //short x = 64, y = 64; // x and y positions of the crosshair
     while (true) {
 
         ulTaskNotifyTake(pdTRUE, portMAX_DELAY); // Wait until task is notified to start
@@ -29,7 +27,7 @@ void Task_crosshair(void* pvParameters)
         // Wait until a new x move (including no move) is received from Queue_PS2
         status = xQueueReceive(Queue_PS2, &crosshair_move, portMAX_DELAY);
 
-        // TODO Just use if statements
+        /* TODO Just use if statements
         switch(crosshair_move.y) {
             case UP:
                 if (y > (CROSSHAIR_HEIGHT / 2) + STEP_VAL + 2)
@@ -49,10 +47,46 @@ void Task_crosshair(void* pvParameters)
                 if(x < (LCD_HORIZONTAL_MAX - (CROSSHAIR_WIDTH / 2) - STEP_VAL - 1))
                     x += STEP_VAL;
                 break;
-        }
+        }*/
 
+        //draw_crosshair(&crosshair, x, y);
+
+        // vTaskDelay(pdMS_TO_TICKS(7));
+    }
+}
+
+// TODO header
+void Task_drawCrosshair(void* pvParameters) {
+    short CROSSHAIR_HEIGHT = crosshair.y1 - crosshair.y0 + 1; // Height of the crosshair image TODO Make constant. If not constant, change to lower case
+    short CROSSHAIR_WIDTH = crosshair.x1 - crosshair.x0 + 1; // Width of the crosshair image TODO Make constant. If not constant, change to lower case
+
+
+    crosshair_move.x = NO_MOVE;
+    crosshair_move.y = NO_MOVE;
+
+    while(true) {
+        // TODO Just use if statements
+                switch(crosshair_move.y) {
+                    case UP:
+                        if (y > (CROSSHAIR_HEIGHT / 2) + STEP_VAL + 2)
+                            y -= STEP_VAL;
+                        break;
+                    case DOWN:
+                        if(y < (SKY_BOTTOM_Y - (CROSSHAIR_HEIGHT / 2) - STEP_VAL - 1))
+                            y += STEP_VAL;
+                        break;
+                }
+                switch(crosshair_move.x) {
+                    case LEFT:
+                        if(x > (CROSSHAIR_WIDTH / 2) + STEP_VAL + 1)
+                            x -= STEP_VAL;
+                        break;
+                    case RIGHT:
+                        if(x < (LCD_HORIZONTAL_MAX - (CROSSHAIR_WIDTH / 2) - STEP_VAL - 1))
+                            x += STEP_VAL;
+                        break;
+                }
         draw_crosshair(&crosshair, x, y);
-
-        vTaskDelay(pdMS_TO_TICKS(7));
+        vTaskDelay(pdMS_TO_TICKS(20));
     }
 }
