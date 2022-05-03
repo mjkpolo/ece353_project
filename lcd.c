@@ -8,6 +8,7 @@
 #include "lcd.h"
 
 extern SemaphoreHandle_t Sem_Background;
+SemaphoreHandle_t Sem_Erase;
 extern QueueHandle_t Draw_Queue;
 
 /* ****************************************************************************
@@ -225,6 +226,7 @@ size_t add_image(image* i)
 
 void erase_image(image* image)
 {
+    xSemaphoreTake(Sem_Erase, portMAX_DELAY);
     image->numLayers = 0;
     free(image->layers);
     image->layers = NULL;
@@ -236,6 +238,7 @@ void erase_image(image* image)
         xQueueSendToBack(Draw_Queue,&image,portMAX_DELAY);
         image->inQueue = true;
     }
+    xSemaphoreGive(Sem_Erase);
 }
 
 void fill_image(image* image, layer* layers, size_t numLayers)
@@ -301,6 +304,7 @@ void draw(image* image)
 
     Crystalfontz128x128_SetDrawFrame(x0, y0, x1, y1);
     HAL_LCD_writeCommand(CM_RAMWR);
+    xSemaphoreTake(Sem_Erase, portMAX_DELAY);
 
     for (i = y0; i <= y1; i++) {
         for (j = x0; j <= x1; j++) {
@@ -314,4 +318,5 @@ void draw(image* image)
             }
         }
     }
+    xSemaphoreGive(Sem_Erase);
 }

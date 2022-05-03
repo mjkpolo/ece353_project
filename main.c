@@ -36,6 +36,7 @@ extern image crosshair;
 extern image score;
 extern image pidgeon;*/
 
+extern SemaphoreHandle_t Sem_Erase;
 
 inline void init(void)
 {
@@ -61,6 +62,7 @@ int main(void)
     size_t numImages;
 
     Sem_ClayLaunched = xSemaphoreCreateBinary();
+    Sem_Erase = xSemaphoreCreateBinary();
 
     Sem_Background = xSemaphoreCreateBinary();
     add_image(&crosshair);
@@ -77,6 +79,7 @@ int main(void)
 
     xSemaphoreGive(Sem_Background);
     xSemaphoreGive(Sem_ClayLaunched);
+    xSemaphoreGive(Sem_Erase);
 
     // TODO Remove: Draw_Queue = xQueueCreate(8,sizeof(image*));
 
@@ -90,7 +93,7 @@ int main(void)
     xSemaphoreGive(Sem_LCD);*/
     xTaskCreate(Task_clayPigeon, "drawClay", configMINIMAL_STACK_SIZE, NULL, 3, &TaskH_clayPigeon);
     xTaskCreate(Task_accelerometerXBottomHalf, "updateClayX", configMINIMAL_STACK_SIZE, NULL, 4, &TaskH_accelerometerXBottomHalf);
-    xTaskCreate(Task_background, "background", configMINIMAL_STACK_SIZE, NULL, 4, &TaskH_background);
+    xTaskCreate(Task_background, "background", configMINIMAL_STACK_SIZE, NULL, 3, &TaskH_background);
     xTaskCreate(Task_crosshair, "crosshair", configMINIMAL_STACK_SIZE, NULL, 4, &TaskH_crosshair);
     xTaskCreate(Task_drawCrosshair, "drawCrosshair", configMINIMAL_STACK_SIZE, NULL, 3, &TaskH_drawCrosshair);
     xTaskCreate(Task_drawScreen, "drawScreen", configMINIMAL_STACK_SIZE, NULL, 2, &TaskH_drawScreen);
