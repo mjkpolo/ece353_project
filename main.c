@@ -69,7 +69,7 @@ int main(void)
     numImages = add_image(&background);
 
     Draw_Queue = xQueueCreate(numImages,sizeof(image*));
-    Queue_Accelerometer = xQueueCreate(1, sizeof(MOVE_DIR)); // TODO sizeof(LEFT) or sizeof(uint8_t) or 1???
+    // TODO Queue_Accelerometer = xQueueCreate(1, sizeof(MOVE_DIR)); // TODO sizeof(LEFT) or sizeof(uint8_t) or 1???
     Queue_PS2 = xQueueCreate(1, sizeof(MOVE_t)); // TODO size ???
     Queue_Score = xQueueCreate(1, sizeof(uint8_t));
     Queue_Hit = xQueueCreate(1, sizeof(uint8_t));
@@ -88,10 +88,11 @@ int main(void)
     draw_scoreboard(&score);
 
     xSemaphoreGive(Sem_LCD);*/
-    xTaskCreate(Task_clayPigeon, "pullClay", configMINIMAL_STACK_SIZE, NULL, 3, &TaskH_clayPigeon);
+    xTaskCreate(Task_clayPigeon, "drawClay", configMINIMAL_STACK_SIZE, NULL, 3, &TaskH_clayPigeon);
+    xTaskCreate(Task_accelerometerXBottomHalf, "updateClayX", configMINIMAL_STACK_SIZE, NULL, 4, &TaskH_accelerometerXBottomHalf);
     xTaskCreate(Task_background, "background", configMINIMAL_STACK_SIZE, NULL, 4, &TaskH_background);
-    xTaskCreate(Task_crosshair, "crosshair", configMINIMAL_STACK_SIZE, NULL, 3, &TaskH_crosshair);
-    xTaskCreate(Task_drawCrosshair, "drawCrosshair", configMINIMAL_STACK_SIZE, NULL, 4, &TaskH_drawCrosshair);
+    xTaskCreate(Task_crosshair, "crosshair", configMINIMAL_STACK_SIZE, NULL, 4, &TaskH_crosshair);
+    xTaskCreate(Task_drawCrosshair, "drawCrosshair", configMINIMAL_STACK_SIZE, NULL, 3, &TaskH_drawCrosshair);
     xTaskCreate(Task_drawScreen, "drawScreen", configMINIMAL_STACK_SIZE, NULL, 2, &TaskH_drawScreen);
     xTaskCreate(TaskBlast, "blast", configMINIMAL_STACK_SIZE, NULL, 4, &TaskH_TaskBlast);
     // TODO xTaskCreate(Task_s2, "s2", configMINIMAL_STACK_SIZE, NULL, 4, &TaskH_s2);

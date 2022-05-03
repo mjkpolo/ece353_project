@@ -11,82 +11,74 @@
 
 TaskHandle_t TaskH_crosshair;
 TaskHandle_t TaskH_drawCrosshair;
-QueueHandle_t Queue_PS2;
-short x = 64, y = 64; // x and y positions of the crosshair
+// TODO Remove QueueHandle_t Queue_PS2;
 MOVE_t crosshair_move;
 
-// TODO header
+// TODO header. Also, Task_crosshairBottomHalf
 void Task_crosshair(void* pvParameters)
 {
     BaseType_t status;
-    //short x = 64, y = 64; // x and y positions of the crosshair
+
     while (true) {
+        // Wait until task is notified to start by ADC14 ISR
+        ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
 
-        ulTaskNotifyTake(pdTRUE, portMAX_DELAY); // Wait until task is notified to start
+        // Update the x and y movements of the crosshair
+        if (PS2_X_VAL > VOLT_2P70)
+            crosshair_move.x = RIGHT;
+        else if (PS2_X_VAL < VOLT_0P6)
+            crosshair_move.x = LEFT;
+        else
+            crosshair_move.x = NO_MOVE;
 
-        // Wait until a new x move (including no move) is received from Queue_PS2
-        status = xQueueReceive(Queue_PS2, &crosshair_move, portMAX_DELAY);
-
-        /* TODO Just use if statements
-        switch(crosshair_move.y) {
-            case UP:
-                if (y > (CROSSHAIR_HEIGHT / 2) + STEP_VAL + 2)
-                    y -= STEP_VAL;
-                break;
-            case DOWN:
-                if(y < (SKY_BOTTOM_Y - (CROSSHAIR_HEIGHT / 2) - STEP_VAL - 1))
-                    y += STEP_VAL;
-                break;
-        }
-        switch(crosshair_move.x) {
-            case LEFT:
-                if(x > (CROSSHAIR_WIDTH / 2) + STEP_VAL + 1)
-                    x -= STEP_VAL;
-                break;
-            case RIGHT:
-                if(x < (LCD_HORIZONTAL_MAX - (CROSSHAIR_WIDTH / 2) - STEP_VAL - 1))
-                    x += STEP_VAL;
-                break;
-        }*/
-
-        //draw_crosshair(&crosshair, x, y);
-
-        // vTaskDelay(pdMS_TO_TICKS(7));
+        if (PS2_Y_VAL > VOLT_2P70)
+            crosshair_move.y = UP;
+        else if (PS2_Y_VAL < VOLT_0P6)
+            crosshair_move.y = DOWN;
+        else
+            crosshair_move.y = NO_MOVE;
     }
 }
 
 // TODO header
 void Task_drawCrosshair(void* pvParameters) {
-    short CROSSHAIR_HEIGHT = crosshair.y1 - crosshair.y0 + 1; // Height of the crosshair image TODO Make constant. If not constant, change to lower case
-    short CROSSHAIR_WIDTH = crosshair.x1 - crosshair.x0 + 1; // Width of the crosshair image TODO Make constant. If not constant, change to lower case
-
+    const short CROSSHAIR_HEIGHT = crosshair.y1 - crosshair.y0 + 1; // Height of the crosshair image
+    const short CROSSHAIR_WIDTH = crosshair.x1 - crosshair.x0 + 1; // Width of the crosshair image
+    short x = 64, y = 64; // x and y positions of the crosshair
 
     crosshair_move.x = NO_MOVE;
     crosshair_move.y = NO_MOVE;
 
     while(true) {
         // TODO Just use if statements
-                switch(crosshair_move.y) {
-                    case UP:
-                        if (y > (CROSSHAIR_HEIGHT / 2) + STEP_VAL + 2)
-                            y -= STEP_VAL;
-                        break;
-                    case DOWN:
-                        if(y < (SKY_BOTTOM_Y - (CROSSHAIR_HEIGHT / 2) - STEP_VAL - 1))
-                            y += STEP_VAL;
-                        break;
-                }
-                switch(crosshair_move.x) {
-                    case LEFT:
-                        if(x > (CROSSHAIR_WIDTH / 2) + STEP_VAL + 1)
-                            x -= STEP_VAL;
-                        break;
-                    case RIGHT:
-                        if(x < (LCD_HORIZONTAL_MAX - (CROSSHAIR_WIDTH / 2) - STEP_VAL - 1))
-                            x += STEP_VAL;
-                        break;
-                }
+        switch(crosshair_move.y) {
+            case UP:
+                // Make sure the crosshair doesn't go past the top boundary of the screen
+                if (y > (CROSSHAIR_HEIGHT / 2) + STEP_VAL + 2)
+                    y -= STEP_VAL;
+                break;
+            case DOWN:
+                // Make sure the crosshair doesn't go past the bottom boundary of the screen
+                if(y < (LCD_VERTICAL_MAX - (CROSSHAIR_HEIGHT / 2) - STEP_VAL - 1))
+                    y += STEP_VAL;
+                break;
+        }
+        switch(crosshair_move.x) {
+            case LEFT:
+                // Make sure the crosshair doesn't go past the left boundary of the screen
+                if(x > (CROSSHAIR_WIDTH / 2) + STEP_VAL + 1)
+                    x -= STEP_VAL;
+                break;
+            case RIGHT:
+                // Make sure the crosshair doesn't go past the right boundary of the screen
+                if(x < (LCD_HORIZONTAL_MAX - (CROSSHAIR_WIDTH / 2) - STEP_VAL - 1))
+                    x += STEP_VAL;
+                break;
+        }
+
+        // Redraw the crosshair
         draw_crosshair(&crosshair, x, y);
-        vTaskDelay(pdMS_TO_TICKS(20));
+
+        vTaskDelay(pdMS_TO_TICKS(20)); // TODO Adjust the wait time to adjust the speed of the crosshair
     }
 }

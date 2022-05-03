@@ -33,115 +33,6 @@ void play_note(uint32_t period, uint16_t ms_time)
 ******************************************************************************/
 void TaskBlast(void *pvParameters)
 {
-    // TODO BaseType_t status;
-    BaseType_t xHigherPriorityTaskWoken;
-
-    /*
-    Note_t sound_byte[] =
-    {
-        {NOTE_B, 1, 7},
-        {NOTE_AS, 1, 7},
-        {NOTE_B, 1, 7},
-        {NOTE_A, 1, 7},
-        {NOTE_AS, 1, 7},
-        {NOTE_GS, 1, 7},
-        {NOTE_A, 1, 7},
-        {NOTE_G, 1, 7},
-        {NOTE_GS, 1, 7},
-        {NOTE_F, 1, 7},
-        {NOTE_FS, 1, 7},
-        {NOTE_E, 1, 7},
-        {NOTE_F, 1, 7},
-        {NOTE_DS, 1, 7},
-        {NOTE_E, 1, 7},
-        {NOTE_D, 1, 7},
-        {NOTE_DS, 1, 7},
-        {NOTE_CS, 1, 7},
-        {NOTE_C, 1, 7},
-        {NOTE_B, 0, 7},
-        {NOTE_AS, 0, 7},
-        {NOTE_B, 0, 7},
-        {NOTE_AS, 0, 7},
-        {NOTE_A, 0, 7},
-        {NOTE_AS, 0, 7},
-        {NOTE_A, 0, 7},
-        {NOTE_GS, 0, 7},
-        {NOTE_A, 0, 7},
-        {NOTE_GS, 0, 7},
-        {NOTE_G, 0, 7},
-        {NOTE_GS, 0, 7},
-        {NOTE_G, 0, 7},
-        {NOTE_FS, 0, 7},
-        {NOTE_G, 0, 7},
-    };*/
-
-
-    /*TODO Okay
-    Note_t sound_byte[] =
-    {
-        {NOTE_B, 1, 15},
-        {NOTE_AS, 1, 15},
-        {NOTE_B, 1, 15},
-        {NOTE_F, 1, 15},
-        {NOTE_A, 1, 15},
-        {NOTE_D, 1, 15},
-        {NOTE_A, 0, 15},
-        {NOTE_C, 1, 15},
-        {NOTE_F, 0, 15},
-        {NOTE_D, 0, 15},
-        {NOTE_C, 0, 20},
-    };
-
-    Note_t sound_byte2[] =
-    {
-        {NOTE_B, 3, 15},
-        {NOTE_AS, 3, 15},
-        {NOTE_B, 3, 15},
-        {NOTE_F, 3, 15},
-        {NOTE_A, 3, 15},
-        {NOTE_D, 3, 15},
-        {NOTE_A, 2, 15},
-        {NOTE_C, 3, 15},
-        {NOTE_F, 2, 15},
-        {NOTE_G, 2, 15},
-        {NOTE_D, 2, 15},
-    };*/
-
-    /* TODO Remove: Sound made when a target is missed
-    Note_t sound_byte[] =
-    {
-        {NOTE_B, 1, 10},
-        {NOTE_AS, 1, 10},
-        {NOTE_B, 1, 10},
-        {NOTE_GS, 1, 5},
-        {NOTE_F, 1, 10},
-        {NOTE_G, 1, 5},
-        {NOTE_A, 1, 10},
-        {NOTE_FS, 1, 5},
-        {NOTE_D, 1, 10},
-        {NOTE_B, 0, 5},
-        {NOTE_A, 0, 10},
-        {NOTE_B, 0, 5},
-        {NOTE_C, 1, 10},
-        {NOTE_A, 0, 5},
-        {NOTE_F, 0, 7},
-        {NOTE_DS, 0, 5},
-        {NOTE_D, 0, 7},
-        {NOTE_CS, 0, 10},
-        {NOTE_C, 0, 25},
-    };/*
-    Note_t sound_byte[] =
-    {
-        {NOTE_B, 5, 50},
-        //{NOTE_D, 11, 1},
-        {NOTE_AS, 5, 50},
-        {NOTE_A, 5, 50},
-        //{NOTE_D, 11, 1},
-        //{NOTE_A, 12, 1},
-        //{NOTE_C, 11, 1},
-        {NOTE_C, 0, 25},
-    };*/
-
     // Sound made when a target is hit
     Note_t hit_sound[] =
     {
@@ -169,12 +60,12 @@ void TaskBlast(void *pvParameters)
     int hit_sound_size = sizeof hit_sound / sizeof hit_sound[0];
     int i = 0;
     int max = (int)(NOTE_C * pow(2, 3.25)); // TODO Replace with constant value
-
     // TODO Put these on one line
     uint8_t clays_hit = 0;
     uint8_t points = 1;
     uint8_t ammo;
     BaseType_t status;
+    BaseType_t xHigherPriorityTaskWoken;
 
     while(1)
     {
