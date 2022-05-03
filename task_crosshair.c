@@ -79,6 +79,6 @@ void Task_drawCrosshair(void* pvParameters) {
         // Redraw the crosshair
         draw_crosshair(&crosshair, x, y);
 
-        vTaskDelay(pdMS_TO_TICKS(20)); // TODO Adjust the wait time to adjust the speed of the crosshair
+        vTaskDelay(pdMS_TO_TICKS(10)); // TODO Adjust the wait time to adjust the speed of the crosshair
     }
 }

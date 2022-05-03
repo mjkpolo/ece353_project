@@ -30,7 +30,7 @@ void Task_clayPigeon(void *pvParameters)
     const uint8_t CLAY_WIDTH = pidgeon.x1 - pidgeon.x0 + 1; // Width of the clay pigeon image TODO Make constant. If not constant, change to lower case
     BaseType_t status;
     // TODO MOVE_DIR clay_x_move;
-    uint8_t clays_hit, ammo, y, dt = 0;
+    short clays_hit, ammo, y, dt = 0;
     float x, xf, dx;
 
     while(true) {
@@ -70,7 +70,7 @@ void Task_clayPigeon(void *pvParameters)
                 break;
             }
 
-            if(y <= (CLAY_HEIGHT / 2) + 5) move_up = false; // TODO I don't think CLAY_HEIGHT is properly calculating the height, as removing/adding it has no effect here
+            if(y <= (CLAY_HEIGHT / 2)) move_up = false; // TODO I don't think CLAY_HEIGHT is properly calculating the height, as removing/adding it has no effect here
 
             if(move_up) y--; // TODO -= y_step;
             else y++; // TODO += y_step;
