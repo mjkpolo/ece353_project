@@ -133,7 +133,7 @@ void Task_background(void* pvParameters)
                 draw_dark_background(&background);
                 break;
             }
-          xSemaphoreGive(Sem_Background);
+            xSemaphoreGive(Sem_Background);
         }
         pl=l;
         vTaskDelay(pdMS_TO_TICKS(50));
