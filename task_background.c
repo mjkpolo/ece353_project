@@ -24,6 +24,7 @@ void Task_background(void* pvParameters)
     draw_xx0(&score);
     draw_x0x(&score);
     draw_0xx(&score);
+    draw_end_splash(&score);
     draw_scoreboard(&score);
 
     while (true) {

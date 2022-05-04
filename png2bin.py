@@ -36,10 +36,9 @@ def getBitmaps(img, name, move):
             image_width = last_col-first_col
 
             pixels = pixels[first_row:last_row+1,first_col:last_col+1]
-            bytes_per_row = (image_width + 8-image_width%8)//8
             
             for line in pixels:
-                chunks = np.concatenate((line,np.zeros(8-len(line)%8)),axis=0).reshape((bytes_per_row,8)).astype(bool) # seperate into bytes
+                chunks = np.concatenate((line,np.zeros(8-len(line)%8)),axis=0).reshape(((len(line)+8-(len(line)%8))//8,8)).astype(bool) # seperate into bytes
                 bitmap.append(', '.join(map(bool2byte,(row for row in chunks))))
 
             yield ',\n  '.join(bitmap)
