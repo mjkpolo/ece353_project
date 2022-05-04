@@ -96,7 +96,7 @@ int main(void)
     xTaskCreate(Task_background, "background", configMINIMAL_STACK_SIZE, NULL, 3, &TaskH_background);
     xTaskCreate(Task_crosshair, "crosshair", configMINIMAL_STACK_SIZE, NULL, 4, &TaskH_crosshair);
     xTaskCreate(Task_drawCrosshair, "drawCrosshair", configMINIMAL_STACK_SIZE, NULL, 3, &TaskH_drawCrosshair);
-    xTaskCreate(Task_drawScreen, "drawScreen", configMINIMAL_STACK_SIZE, NULL, 2, &TaskH_drawScreen);
+    xTaskCreate(Task_drawScreen, "drawScreen", configMINIMAL_STACK_SIZE, NULL, 3, &TaskH_drawScreen);
     xTaskCreate(TaskBlast, "blast", configMINIMAL_STACK_SIZE, NULL, 4, &TaskH_TaskBlast);
     // TODO xTaskCreate(Task_s2, "s2", configMINIMAL_STACK_SIZE, NULL, 4, &TaskH_s2);
 
