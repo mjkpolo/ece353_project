@@ -228,7 +228,7 @@ void erase_image(image* image)
 {
     xSemaphoreTake(Sem_Erase, portMAX_DELAY);
     image->numLayers = 0;
-    free(image->layers);
+    image->layers = (layer*)realloc(image->layers, 0);
     image->layers = NULL;
     image->x0 = 132;
     image->y0 = 132;

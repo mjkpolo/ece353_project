@@ -32,9 +32,6 @@ def getBitmaps(img, name, move):
             first_col = min(p[1])
             first_row = min(p[0])
 
-            image_height = last_row-first_row
-            image_width = last_col-first_col
-
             pixels = pixels[first_row:last_row+1,first_col:last_col+1]
             
             for line in pixels:
@@ -82,6 +79,8 @@ def main(names, move):
             return 420
     
         img = cv2.cvtColor(cv2.imread(name, cv2.IMREAD_UNCHANGED), cv2.COLOR_BGRA2RGBA).astype(np.uint16)
+        cv2.imshow('poopoo',cv2.imread(name, cv2.IMREAD_UNCHANGED))
+        cv2.waitKey(0)
         
         '''
         CONVERT TO 16 BIT
