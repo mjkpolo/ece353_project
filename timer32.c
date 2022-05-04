@@ -9,9 +9,9 @@
 // TODO #include "main.h"
 
 volatile bool S2_P = false;
-volatile bool NEW_FRAME = false;
+// TODO volatile bool NEW_FRAME = false;
 
-TaskHandle_t TaskH_TaskBlast; // TODO
+TaskHandle_t TaskH_TaskBlast; // TODO include task_blast???
 
 bool MKII_S2(void) {
     return (P3->IN & BIT5) == 0;
@@ -32,7 +32,7 @@ void t32_init(void) {
   // Enable the Timer32 interrupt in NVIC
   __enable_irq();
   NVIC_EnableIRQ(T32_INT1_IRQn);
-  NVIC_SetPriority(T32_INT1_IRQn, 2);
+  NVIC_SetPriority(T32_INT1_IRQn, 3);
 
   // Start Timer32 and enable interrupt
   TIMER32_1->CONTROL = TIMER32_CONTROL_ENABLE |   // turn timer on

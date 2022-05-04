@@ -12,7 +12,14 @@ volatile uint32_t PS2_Y_VAL = 0;
 volatile uint32_t ACCEL_X = 0;
 volatile uint32_t ACCEL_Y = 0;
 
-TaskHandle_t TaskH_clayPigeon; // TODO
+TaskHandle_t TaskH_crosshair; // TODO include task_crosshair???
+TaskHandle_t TaskH_clayPigeon; // TODO include task_clayPigeon???
+TaskHandle_t TaskH_accelerometerXBottomHalf;
+
+SemaphoreHandle_t Sem_ClayLaunched; // TODO include task_clayPigeon???
+QueueHandle_t Queue_Ammo; // TODO include task_blast???
+QueueHandle_t Queue_PS2; // TODO include task_crosshair???
+QueueHandle_t Queue_Accelerometer; // TODO include task_clayPigeon???
 
 void adc14_init(void) {
     // Configure the X direction of the joystick as an analog input pin.
@@ -51,72 +58,122 @@ void adc14_init(void) {
     // Enable ADC Interrupt in the NVIC
     NVIC_EnableIRQ(ADC14_IRQn);
     // Set ADC Interrupt priority. Priority is greater than 2 to ensure it doesn't interrupt the FreeRTOS scheduler
-    NVIC_SetPriority(ADC14_IRQn, 3);
+    NVIC_SetPriority(ADC14_IRQn, 4);
     // Turn ADC ON
     ADC14->CTL0 |= ADC14_CTL0_ON;
 }
 
 void ADC14_IRQHandler(void) {
     BaseType_t xHigherPriorityTaskWoken;
-    static uint8_t x_tilt_l_state = 0;
-    static uint8_t x_tilt_r_state = 0;
+    BaseType_t status;
+    // TODO MOVE_t ps2_move;
+    // TODO MOVE_DIR accelerometer_x;
+    uint8_t ammo;
+
+    // TODO static uint8_t x_tilt_l_state = 0;
+    // TODO static uint8_t x_tilt_r_state = 0;
     static uint8_t y_tilt_f_state = 0;
     static uint8_t y_tilt_b_state = 0;
 
-    // TODO Add ADC14_IER0_IE1 | Above again????
-    // TODO if ((ADC14->IFGR0 & ADC14_IFGR0_IFG1) != 0) {
+    // TODO Maybe use a window comparator and notify the newFrame task, or maybe keep it like it is but add the new x/y values to length 1 queues and notify the newFrame task
 
-      // TODO Maybe use a window comparator and notify the newFrame task, or maybe keep it like it is but add the new x/y values to length 1 queues and notify the newFrame task
+    // Get x position of joystick and set ps2_move.x accordingly
+    PS2_X_VAL = ADC14->MEM[0];
+    /*if (PS2_X_VAL > VOLT_2P70)
+        ps2_move.x = RIGHT;
+    else if (PS2_X_VAL < VOLT_0P6)
+        ps2_move.x = LEFT;
+    else
+        ps2_move.x = NO_MOVE;*/
 
-      PS2_X_VAL = ADC14->MEM[0];
-      if (PS2_X_VAL > VOLT_2P70) PS2_X_VAL=PS2_DIR_RIGHT;
-      else if (PS2_X_VAL < VOLT_0P6) PS2_X_VAL=PS2_DIR_LEFT;
-      else PS2_X_VAL=PS2_DIR_NONE;
+    // Get y position of joystick and set ps2_move.y accordingly
+    PS2_Y_VAL = ADC14->MEM[1];
+    /*if (PS2_Y_VAL > VOLT_2P70)
+        ps2_move.y = UP;
+    else if (PS2_Y_VAL < VOLT_0P6)
+        ps2_move.y = DOWN;
+    else
+        ps2_move.y = NO_MOVE;*/
 
-      PS2_Y_VAL = ADC14->MEM[1];
-      if (PS2_Y_VAL > VOLT_2P70) PS2_Y_VAL=PS2_DIR_UP;
-      else if (PS2_Y_VAL < VOLT_0P6) PS2_Y_VAL=PS2_DIR_DOWN;
-      else PS2_Y_VAL=PS2_DIR_NONE;
-    //}
+    // Add joystick's x and y positions to queue for crosshair task
+    // TODO Remove: status = xQueueSendToBack(Queue_LED, &msg, portMAX_DELAY);
+    // TODO status = xQueueOverwriteFromISR(Queue_PS2, &ps2_move, &xHigherPriorityTaskWoken);
 
-    // TODO if((ADC14->IFGR0 & ADC14_IFGR0_IFG3) != 0) {
-        ACCEL_X = ADC14->MEM[2];
+    // TODO Queue send to front ??? Use send to back instead of just send???
+    //status = xQueueSendFromISR(Queue_PS2, &ps2_move, &xHigherPriorityTaskWoken); // TODO
 
-        // TODO Make this the same as tilting forward/backward (or make those the same as this)???
-        x_tilt_r_state = x_tilt_r_state << 1; //| (PS2_X_VAL > VOLT_TILT_HI);
-        if(ACCEL_X > VOLT_TILT_R) {
-            x_tilt_r_state |= 0x0F;
-        }
-        x_tilt_l_state = x_tilt_l_state << 1; //| (PS2_X_VAL < VOLT_TILT_LO);
-        if(ACCEL_X < VOLT_TILT_L) {
-            x_tilt_l_state |= 0x0F;
-        }
+    // TODO Is this necessary to follow the project specifications??????????
+    vTaskNotifyGiveFromISR(TaskH_crosshair, &xHigherPriorityTaskWoken);
 
-        ACCEL_Y = ADC14->MEM[3];
+    portYIELD_FROM_ISR( xHigherPriorityTaskWoken );
 
-        y_tilt_f_state = y_tilt_f_state << 1 | (ACCEL_Y > VOLT_TILT_F);
-        y_tilt_b_state = y_tilt_b_state << 1 | (ACCEL_Y < VOLT_TILT_B);
 
-        if(x_tilt_r_state == 0xFF) {
-            ACCEL_X = ACCEL_DIR_RIGHT;
-        } else if(x_tilt_l_state == 0xFF) {
-            ACCEL_X = ACCEL_DIR_LEFT;
-        } else {
-            ACCEL_X = ACCEL_DIR_NONE;
-        }
 
-        // Only launch one clay pigeon when the user tilts the board forward
-        if(y_tilt_f_state == 0x7F) {
-            // Notify clay pigeon task to pull clay pigeon
-            vTaskNotifyGiveFromISR(TaskH_clayPigeon, &xHigherPriorityTaskWoken);
+    // TODO Remove: Debounce accelerometer x value to filter out readings from shaking the board
+    ACCEL_X = ADC14->MEM[2];
 
-            portYIELD_FROM_ISR( xHigherPriorityTaskWoken );
-        }
-        // Only reload once when the user tilts the board backward
-        // TODO Add something so it doesn't reload when ammo supply is full
-        else if(y_tilt_b_state == 0x7F) {
-            // TODO Reload cartridge
-        }
+    // TODO move this to the bottom of the ISR and rework the logic so that the tasks are only notified at appropriate times (when the clay is either in the air or not yet launched)
 
-    //}
+    // Notify bottom half task to update the clay pigeon's x movement direction
+    vTaskNotifyGiveFromISR(TaskH_accelerometerXBottomHalf, &xHigherPriorityTaskWoken);
+
+    portYIELD_FROM_ISR( xHigherPriorityTaskWoken );
+
+    /* TODO
+    // TODO Make this the same as tilting forward/backward (or make those the same as this)???
+    // TODO Instead of having two separate values that go from 0x0F to 0xFF, have one value that goes from 0x0F to 0xFF (left) or 0x00 (right)
+    x_tilt_r_state = x_tilt_r_state << 1; //| (PS2_X_VAL > VOLT_TILT_HI);
+    if(ACCEL_X > VOLT_TILT_R) {
+        x_tilt_r_state |= 0x0F;
+    }
+    x_tilt_l_state = x_tilt_l_state << 1; //| (PS2_X_VAL < VOLT_TILT_LO);
+    if(ACCEL_X < VOLT_TILT_L) {
+        x_tilt_l_state |= 0x0F;
+    }*/
+
+    // Debounce accelerometer y value to filter out readings from shaking the board
+    ACCEL_Y = ADC14->MEM[3];
+
+    y_tilt_f_state = y_tilt_f_state << 1 | (ACCEL_Y > VOLT_TILT_F);
+    y_tilt_b_state = y_tilt_b_state << 1 | (ACCEL_Y < VOLT_TILT_B);
+
+    /* TODO
+    // Set accelerometer_x according to the x orientation of the accelerometer
+    if(x_tilt_r_state == 0xFF) {
+        accelerometer_x = RIGHT;
+        // TODO Remove: ACCEL_X = ACCEL_DIR_RIGHT;
+    } else if(x_tilt_l_state == 0xFF) {
+        // TODO Remove: ACCEL_X = ACCEL_DIR_LEFT;
+        accelerometer_x = LEFT;
+    } else {
+        // TODO Remove: ACCEL_X = ACCEL_DIR_NONE;
+        accelerometer_x = NO_MOVE;
+    }*/
+
+    // Add accelerometer's x position (left/right/middle) to queue for clay pigeon task
+    // TODO Remove: status = xQueueSendToBack(Queue_LED, &msg, portMAX_DELAY);
+    // TODO status = xQueueOverwriteFromISR(Queue_Accelerometer, &accelerometer_x, &xHigherPriorityTaskWoken);
+
+    // TODO Queue send to front ??? Use send to back instead of just send???
+    // TODO status = xQueueSendFromISR(Queue_Accelerometer, &accelerometer_x, &xHigherPriorityTaskWoken); // TODO
+
+    // Launch clay pigeon when the user tilts the board forward
+    if(y_tilt_f_state == 0x7F) {
+        // Notify clay pigeon task to pull clay pigeon
+        vTaskNotifyGiveFromISR(TaskH_clayPigeon, &xHigherPriorityTaskWoken);
+
+        portYIELD_FROM_ISR( xHigherPriorityTaskWoken );
+    }
+    // Only reload once when the user tilts the board backward
+    // TODO Add something so it doesn't reload when ammo supply is full
+    else if(y_tilt_b_state == 0x7F) {
+        // Try to take Sem_ClayLaunched to check if the clay is currently in the air
+        status = xSemaphoreTakeFromISR(Sem_ClayLaunched, &xHigherPriorityTaskWoken);
+
+        if(status == pdPASS) // The clay is not in the air (status == pdPASS), so just give the semaphore back and don't reload
+            xSemaphoreGiveFromISR(Sem_ClayLaunched, &xHigherPriorityTaskWoken);
+        else // The clay is in the air, so reload
+            xQueueSendToBackFromISR(Queue_Ammo, &ammo, 0); // Reload ammo
+    }
+
 }

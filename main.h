@@ -16,24 +16,13 @@
 #include <stdint.h>
 #include <task.h>
 
-extern SemaphoreHandle_t Sem_LCD;
+#define STEP_VAL 1
+#define SKY_BOTTOM_Y 95
+#define CLAYS_PER_LEVEL 5
 
-extern TaskHandle_t TaskH_TaskBlast;
-extern TaskHandle_t TaskH_updateBackground;
-extern TaskHandle_t TaskH_clayPigeon;
+extern SemaphoreHandle_t Sem_LCD; // TODO Is this still needed???
 
-/******************************************************************************
-* Prints a message to the Console TODO Update header and move to a new file
-******************************************************************************/
-void Task_newFrame(void *pvParameters);
-/******************************************************************************
-* Prints a message to the Console TODO Update header and move to a new file
-******************************************************************************/
-void Task_updateBackground(void *pvParameters);
-/******************************************************************************
-* Prints a message to the Console TODO Update header and move to a new file
-******************************************************************************/
-void Task_clayPigeon(void *pvParameters);
+// TODO Remove: extern TaskHandle_t TaskH_updateBackground;
 
 
 #endif /* MAIN_H_ */

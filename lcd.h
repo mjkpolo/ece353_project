@@ -101,6 +101,9 @@ typedef struct {
     bool inQueue;
 } image;
 
+extern image pidgeon, score, crosshair, background; // TODO
+
+
 void draw(image* image);
 
 size_t add_image(image* image);

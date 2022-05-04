@@ -1,3 +1,6 @@
+#ifndef IMAGES_H_
+#define IMAGES_H_
+
 #include "crosshair.h"
 #include "scoreboard.h"
 #include "clay.h"
@@ -34,3 +37,5 @@
 #include "7xx.h"
 #include "8xx.h"
 #include "9xx.h"
+
+#endif /* IMAGES_H_ */
