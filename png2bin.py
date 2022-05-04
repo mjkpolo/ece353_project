@@ -8,7 +8,7 @@ import os
 import argparse
 
 def getBitmaps(img, name, move):
-        sections = sorted(((key,np.where(img == key,True,False)) for key in set(img[~img.mask])),key=lambda n : np.count_nonzero(n[1]), reverse=True) # search high pixel count bitmaps first
+        sections = sorted(((key,img == key) for key in set(img[~img.mask])),key=lambda n : np.count_nonzero(n[1]), reverse=True) # search high pixel count bitmaps first
         bool2byte = lambda c : hex((c[7] << 0) |
                                    (c[6] << 1) |
                                    (c[5] << 2) |
@@ -32,7 +32,7 @@ def getBitmaps(img, name, move):
             first_col = min(p[1])
             first_row = min(p[0])
 
-            pixels = pixels[first_row:last_row+1,first_col:last_col+1]
+            pixels = pixels[first_row:(last_row+1),first_col:(last_col+1)]
             
             for line in pixels:
                 chunks = np.concatenate((line,np.zeros(8-len(line)%8)),axis=0).reshape(((len(line)+8-(len(line)%8))//8,8)).astype(bool) # seperate into bytes
@@ -79,8 +79,6 @@ def main(names, move):
             return 420
     
         img = cv2.cvtColor(cv2.imread(name, cv2.IMREAD_UNCHANGED), cv2.COLOR_BGRA2RGBA).astype(np.uint16)
-        cv2.imshow('poopoo',cv2.imread(name, cv2.IMREAD_UNCHANGED))
-        cv2.waitKey(0)
         
         '''
         CONVERT TO 16 BIT
