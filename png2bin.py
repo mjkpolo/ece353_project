@@ -28,7 +28,7 @@ def getBitmaps(img, name, move):
 
             ''' reconstruct image '''
 
-            hex2b = lambda h : (h&0x001F)<<2
+            hex2b = lambda h : (h&0x001F)<<3
             hex2g = lambda h : (h&0x07E0)>>3
             hex2r = lambda h : (h&0xF800)>>8
 
