@@ -22,7 +22,17 @@ def getBitmaps(img, name, move):
         yield '#include "lcd.h"\n\n'
 
 
+        tmp = np.zeros((132,132,4)).astype(np.uint8)
+        tmp [:,:,0:4] = 255
         for key,pixels in sections:
+
+            ''' reconstruct image '''
+
+            hex2b = lambda h : (h&0x001F)<<2
+            hex2g = lambda h : (h&0x07E0)>>3
+            hex2r = lambda h : (h&0xF800)>>8
+
+
             bitmap = []
             yield f'static const uint8_t _{name}_bm_{hex(key)}[] = ' + '{\n  '
 
@@ -32,7 +42,12 @@ def getBitmaps(img, name, move):
             first_col = min(p[1])
             first_row = min(p[0])
 
-            pixels = pixels[first_row:(last_row+1),first_col:(last_col+1)]
+            pixels = pixels[first_row:last_row+1,first_col:last_col+1]
+
+            tmp[first_row:last_row+1,first_col:last_col+1,0][pixels] = hex2b(key)
+            tmp[first_row:last_row+1,first_col:last_col+1,1][pixels] = hex2g(key)
+            tmp[first_row:last_row+1,first_col:last_col+1,2][pixels] = hex2r(key)
+
             
             for line in pixels:
                 chunks = np.concatenate((line,np.zeros(8-len(line)%8)),axis=0).reshape(((len(line)+8-(len(line)%8))//8,8)).astype(bool) # seperate into bytes
@@ -47,6 +62,9 @@ def getBitmaps(img, name, move):
         yield f'static layer _layers_{name}[] = '+'{\n  '
         yield ',\n  '.join(structs)
         yield '\n};\n\n'
+        print('Put window focus on image and press any key to continue')
+        cv2.imshow('Reconstructed Image for a check',tmp)
+        cv2.waitKey(0)
 
         yield(
             f'void draw_{name}(image* image) ' + '{\n'
