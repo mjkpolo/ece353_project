@@ -241,14 +241,14 @@ static const uint8_t _dark_background_bm_0x4308[] = {
 };
 
 static layer _layers_dark_background[] = {
-  {0,131,0,94,0x8,_dark_background_bm_0x8},
-  {0,131,93,119,0x4410,_dark_background_bm_0x4410},
-  {0,131,118,131,0x4110,_dark_background_bm_0x4110},
-  {0,131,92,122,0x4310,_dark_background_bm_0x4310},
-  {0,131,95,131,0x4210,_dark_background_bm_0x4210},
-  {0,130,91,96,0x4208,_dark_background_bm_0x4208},
-  {1,131,91,95,0x4108,_dark_background_bm_0x4108},
-  {21,21,94,94,0x4308,_dark_background_bm_0x4308}
+  {0,135,0,94,0x8,_dark_background_bm_0x8},
+  {0,135,93,119,0x4410,_dark_background_bm_0x4410},
+  {0,135,118,131,0x4110,_dark_background_bm_0x4110},
+  {0,135,92,122,0x4310,_dark_background_bm_0x4310},
+  {0,135,95,131,0x4210,_dark_background_bm_0x4210},
+  {0,135,91,96,0x4208,_dark_background_bm_0x4208},
+  {1,136,91,95,0x4108,_dark_background_bm_0x4108},
+  {21,28,94,94,0x4308,_dark_background_bm_0x4308}
 };
 
 void draw_dark_background(image* image) {

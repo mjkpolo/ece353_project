@@ -597,20 +597,20 @@ static const uint8_t _end_splash_bm_0x4000[] = {
 };
 
 static layer _layers_end_splash[] = {
-  {0,131,40,91,0x0,_end_splash_bm_0x0},
-  {3,128,47,88,0x4100,_end_splash_bm_0x4100},
-  {1,130,41,90,0xc600,_end_splash_bm_0xc600},
-  {3,128,44,87,0xc400,_end_splash_bm_0xc400},
-  {2,129,42,89,0xc500,_end_splash_bm_0xc500},
-  {6,125,47,84,0x4200,_end_splash_bm_0x4200},
-  {8,121,51,82,0x8200,_end_splash_bm_0x8200},
-  {5,126,46,85,0x8300,_end_splash_bm_0x8300},
-  {5,124,46,88,0x100,_end_splash_bm_0x100},
-  {4,127,45,86,0x8400,_end_splash_bm_0x8400},
-  {3,128,44,87,0xc710,_end_splash_bm_0xc710},
-  {4,127,45,86,0xc708,_end_splash_bm_0xc708},
-  {7,124,48,83,0xc700,_end_splash_bm_0xc700},
-  {115,115,50,50,0x4000,_end_splash_bm_0x4000}
+  {0,135,40,91,0x0,_end_splash_bm_0x0},
+  {3,130,47,88,0x4100,_end_splash_bm_0x4100},
+  {1,136,41,90,0xc600,_end_splash_bm_0xc600},
+  {3,130,44,87,0xc400,_end_splash_bm_0xc400},
+  {2,137,42,89,0xc500,_end_splash_bm_0xc500},
+  {6,133,47,84,0x4200,_end_splash_bm_0x4200},
+  {8,127,51,82,0x8200,_end_splash_bm_0x8200},
+  {5,132,46,85,0x8300,_end_splash_bm_0x8300},
+  {5,132,46,88,0x100,_end_splash_bm_0x100},
+  {4,131,45,86,0x8400,_end_splash_bm_0x8400},
+  {3,130,44,87,0xc710,_end_splash_bm_0xc710},
+  {4,131,45,86,0xc708,_end_splash_bm_0xc708},
+  {7,126,48,83,0xc700,_end_splash_bm_0xc700},
+  {115,122,50,50,0x4000,_end_splash_bm_0x4000}
 };
 
 void draw_end_splash(image* image) {

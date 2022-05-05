@@ -56,15 +56,15 @@ def getBitmaps(img, name, move):
             yield ',\n  '.join(bitmap)
             yield '\n};\n\n'
 
-            structs.append('{'+f'{first_col},{last_col},{first_row},{last_row},{hex(key)},_{name}_bm_{hex(key)}'+'}')
+            structs.append('{'+f'{first_col},{last_col+8-(last_col-first_col+1)%8},{first_row},{last_row},{hex(key)},_{name}_bm_{hex(key)}'+'}')
 
 
         yield f'static layer _layers_{name}[] = '+'{\n  '
         yield ',\n  '.join(structs)
         yield '\n};\n\n'
-        print('Put window focus on image and press any key to continue')
-        cv2.imshow('Reconstructed Image for a check',tmp)
-        cv2.waitKey(0)
+        #print('Put window focus on image and press any key to continue')
+        #cv2.imshow('Reconstructed Image for a check',tmp)
+        #cv2.waitKey(0)
 
         yield(
             f'void draw_{name}(image* image) ' + '{\n'

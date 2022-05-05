@@ -39,8 +39,8 @@ static const uint8_t _scoreboard_bm_0x8000[] = {
 };
 
 static layer _layers_scoreboard[] = {
-  {69,121,112,126,0xc718,_scoreboard_bm_0xc718},
-  {68,122,111,127,0x8000,_scoreboard_bm_0x8000}
+  {69,124,112,126,0xc718,_scoreboard_bm_0xc718},
+  {68,123,111,127,0x8000,_scoreboard_bm_0x8000}
 };
 
 void draw_scoreboard(image* image) {
