@@ -11,13 +11,15 @@
 #include "task_crosshair.h"
 #include "task_background.h"
 #include "task_drawScreen.h"
+#include "task_timer.h" // TODO
+#include "task_endGame.h" // TODO
 // Non-FreeRTOS
 #include "images.h"
 #include "lcd.h" // TODO Move hardware-related/non-FreeRTOS headers into main.h
 #include "opt3001.h"
 #include "ps2.h"
 //#include "serial_debug.h"
-#include "timer32.h"
+// TODO Remove #include "timer32.h"
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdio.h>
@@ -46,7 +48,7 @@ inline void init(void)
 
     Crystalfontz128x128_Init();
 
-    t32_init();
+    // TODO Remove t32_init();
     adc14_init();
     i2c_init();
     opt3001_init();
@@ -62,11 +64,18 @@ int main(void)
 
     Sem_ClayLaunched = xSemaphoreCreateBinary();
     Sem_Erase = xSemaphoreCreateBinary();
-
     Sem_Background = xSemaphoreCreateBinary();
+    Sem_Timer = xSemaphoreCreateBinary();
+
+    xSemaphoreGive(Sem_Background);
+    xSemaphoreGive(Sem_ClayLaunched);
+    xSemaphoreGive(Sem_Erase);
+    xSemaphoreGive(Sem_Timer);
+
     add_image(&crosshair);
     add_image(&pidgeon);
     add_image(&score);
+    add_image(&end_splash);
     numImages = add_image(&background);
 
     Draw_Queue = xQueueCreate(numImages,sizeof(image*));
@@ -75,10 +84,6 @@ int main(void)
     Queue_Score = xQueueCreate(1, sizeof(uint8_t));
     Queue_Hit = xQueueCreate(1, sizeof(uint8_t));
     Queue_Ammo = xQueueCreate(1, sizeof(uint8_t));
-
-    xSemaphoreGive(Sem_Background);
-    xSemaphoreGive(Sem_ClayLaunched);
-    xSemaphoreGive(Sem_Erase);
 
     // TODO Remove: Draw_Queue = xQueueCreate(8,sizeof(image*));
 
@@ -90,13 +95,15 @@ int main(void)
     Draw_Queue = xQueueCreate(numImages,sizeof(image*));
 
     xSemaphoreGive(Sem_LCD);*/
-    xTaskCreate(Task_clayPigeon, "drawClay", configMINIMAL_STACK_SIZE, NULL, 3, &TaskH_clayPigeon);
+    xTaskCreate(Task_clayPigeon, "drawClay", configMINIMAL_STACK_SIZE, NULL, 2, &TaskH_clayPigeon);
     xTaskCreate(Task_accelerometerXBottomHalf, "updateClayX", configMINIMAL_STACK_SIZE, NULL, 4, &TaskH_accelerometerXBottomHalf);
-    xTaskCreate(Task_background, "background", configMINIMAL_STACK_SIZE, NULL, 3, &TaskH_background);
+    xTaskCreate(Task_background, "background", configMINIMAL_STACK_SIZE, NULL, 2, &TaskH_background);
     xTaskCreate(Task_crosshair, "crosshair", configMINIMAL_STACK_SIZE, NULL, 4, &TaskH_crosshair);
-    xTaskCreate(Task_drawCrosshair, "drawCrosshair", configMINIMAL_STACK_SIZE, NULL, 3, &TaskH_drawCrosshair);
-    xTaskCreate(Task_drawScreen, "drawScreen", configMINIMAL_STACK_SIZE, NULL, 3, &TaskH_drawScreen);
+    xTaskCreate(Task_drawCrosshair, "drawCrosshair", configMINIMAL_STACK_SIZE, NULL, 2, &TaskH_drawCrosshair);
+    xTaskCreate(Task_drawScreen, "drawScreen", configMINIMAL_STACK_SIZE, NULL, 2, &TaskH_drawScreen);
     xTaskCreate(TaskBlast, "blast", configMINIMAL_STACK_SIZE, NULL, 4, &TaskH_TaskBlast);
+    xTaskCreate(Task_timer, "buttonADCTimer", configMINIMAL_STACK_SIZE, NULL, 3, &TaskH_timer); // TODO
+    xTaskCreate(Task_endGame, "endGame", configMINIMAL_STACK_SIZE, NULL, 5, &TaskH_endGame); // TODO
     // TODO xTaskCreate(Task_s2, "s2", configMINIMAL_STACK_SIZE, NULL, 4, &TaskH_s2);
 
     vTaskStartScheduler();

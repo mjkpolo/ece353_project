@@ -10,6 +10,7 @@
 #include "opt3001.h"
 
 TaskHandle_t TaskH_background;
+TaskHandle_t TaskH_endGame;
 SemaphoreHandle_t Sem_Background;
 QueueHandle_t Queue_Score; // TODO include task_blast???
 
@@ -32,16 +33,23 @@ void Task_background(void* pvParameters)
             BRIGHT,
             foo };
 
+
+        // TODO Make draw_score its own task and use a queue with portMAX_DELAY for changing the score
+
         // Check if any points have been received (don't wait if the queue is empty)
         received_points = xQueueReceive(Queue_Score, &points, 0);
 
         if(received_points == pdPASS) {
-            // Increase the score by the number of points received
-            score_val += points;
+            if(points == 0xFF) {
+                // A point value of 255 triggers a score reset
+                score_val = 0;
+            } else {
+                // Increase the score by the number of points received
+                score_val += points;
+            }
 
         // TODO Remove: if (score_val!=phits) {
             erase_image(&score);
-            draw_end_splash(&score,64,64);
 
             switch (score_val%10) {
                 case 0 : draw_xx0(&score);
@@ -111,9 +119,17 @@ void Task_background(void* pvParameters)
             }
 
             draw_scoreboard(&score);
+
+
+            // TODO replace with actual end score. Maybe move this somewhere better too (check other places)
+            if(score_val > 1) {
+                xTaskNotifyGive(TaskH_endGame);
+            }
+
+
         }
         static enum light l, pl = foo; // so pl != l
-        float lux = opt3001_read_lux();
+        float lux = opt3001_read_lux(); // TODO Maybe move this into task_timer and then notify this task (/ use a queue with portMAX_DELAY) if the lighting changed
         if (lux < 20)
             l = DARK;
         else if (lux < 75)

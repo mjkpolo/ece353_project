@@ -58,7 +58,7 @@ void adc14_init(void) {
     // Enable ADC Interrupt in the NVIC
     NVIC_EnableIRQ(ADC14_IRQn);
     // Set ADC Interrupt priority. Priority is greater than 2 to ensure it doesn't interrupt the FreeRTOS scheduler
-    NVIC_SetPriority(ADC14_IRQn, 4);
+    NVIC_SetPriority(ADC14_IRQn, 4); // TODO Change to 3 since t32 is removed
     // Turn ADC ON
     ADC14->CTL0 |= ADC14_CTL0_ON;
 }

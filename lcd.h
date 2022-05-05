@@ -101,7 +101,7 @@ typedef struct {
     bool inQueue;
 } image;
 
-extern image pidgeon, score, crosshair, background; // TODO
+extern image pidgeon, score, crosshair, background, end_splash; // TODO
 
 
 void draw(image* image);

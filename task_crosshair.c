@@ -44,12 +44,15 @@ void Task_crosshair(void* pvParameters)
 void Task_drawCrosshair(void* pvParameters) {
     const short CROSSHAIR_HEIGHT = crosshair.y1 - crosshair.y0 + 1; // Height of the crosshair image
     const short CROSSHAIR_WIDTH = crosshair.x1 - crosshair.x0 + 1; // Width of the crosshair image
-    short x = 64, y = 64; // x and y positions of the crosshair
+    short x = 64, y = 64, px, py; // x and y positions of the crosshair
 
     crosshair_move.x = NO_MOVE;
     crosshair_move.y = NO_MOVE;
 
     while(true) {
+        px = x;
+        py = y;
+
         // TODO Just use if statements
         switch(crosshair_move.y) {
             case UP:
@@ -76,8 +79,10 @@ void Task_drawCrosshair(void* pvParameters) {
                 break;
         }
 
-        // Redraw the crosshair
-        draw_crosshair(&crosshair, x, y);
+        if(x != px || y != py) {
+            // Redraw the crosshair
+            draw_crosshair(&crosshair, x, y);
+        }
 
         vTaskDelay(pdMS_TO_TICKS(10)); // TODO Adjust the wait time to adjust the speed of the crosshair
     }
