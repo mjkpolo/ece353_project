@@ -20,10 +20,9 @@ def getBitmaps(img, name, move):
         structs = []
 
         yield '#include "lcd.h"\n\n'
-
-
         tmp = np.zeros((132,132,4)).astype(np.uint8)
-        tmp [:,:,0:4] = 255
+        tmp[:,:,:] = 255
+
         for key,pixels in sections:
 
             ''' reconstruct image '''
@@ -42,27 +41,31 @@ def getBitmaps(img, name, move):
             first_col = min(p[1])
             first_row = min(p[0])
 
-            pixels = pixels[first_row:last_row+1,first_col:last_col+1]
+            width = last_col - first_col + 1
+            if (width%8): width += 8-width%8
+            print(width)
 
+            pixels = pixels[first_row:last_row+1,first_col:last_col+1]
             tmp[first_row:last_row+1,first_col:last_col+1,0][pixels] = hex2b(key)
             tmp[first_row:last_row+1,first_col:last_col+1,1][pixels] = hex2g(key)
             tmp[first_row:last_row+1,first_col:last_col+1,2][pixels] = hex2r(key)
+            tmp[first_row:last_row+1,first_col:last_col+1,3][pixels] = 255
+
 
             
             for line in pixels:
-                chunks = np.concatenate((line,np.zeros(8-len(line)%8)),axis=0).reshape(((len(line)+8-(len(line)%8))//8,8)).astype(bool) # seperate into bytes
+                chunks = np.concatenate((line,np.zeros(width-len(line))),axis=0).reshape(width//8,8).astype(bool) # seperate into bytes
                 bitmap.append(', '.join(map(bool2byte,(row for row in chunks))))
 
             yield ',\n  '.join(bitmap)
             yield '\n};\n\n'
 
-            structs.append('{'+f'{first_col},{last_col+8-(last_col-first_col+1)%8},{first_row},{last_row},{hex(key)},_{name}_bm_{hex(key)}'+'}')
+            structs.append('{'+f'{first_col},{last_col},{first_row},{last_row},{hex(key)},_{name}_bm_{hex(key)}'+'}')
 
 
         yield f'static layer _layers_{name}[] = '+'{\n  '
         yield ',\n  '.join(structs)
         yield '\n};\n\n'
-        #print('Put window focus on image and press any key to continue')
         #cv2.imshow('Reconstructed Image for a check',tmp)
         #cv2.waitKey(0)
 
@@ -75,7 +78,7 @@ def getBitmaps(img, name, move):
             f'  fill_image(image,_layers_{name},{len(structs)});\n'
             if not move else
             '  int i;\n' \
-            '  erase_image(image);\n' \
+            '  if (image->layers) erase_image(image);\n' \
             f'  for (i=0; i<{len(structs)}; i++) '+'{\n' \
             f'    short image_width = _layers_{name}[i].x1-_layers_{name}[i].x0;\n' \
             f'    short image_height = _layers_{name}[i].y1-_layers_{name}[i].y0;\n' \

@@ -336,23 +336,23 @@ static const uint8_t _light_background_bm_0x4408[] = {
 };
 
 static layer _layers_light_background[] = {
-  {0,135,0,96,0x8718,_light_background_bm_0x8718},
-  {0,135,117,131,0x200,_light_background_bm_0x200},
-  {0,135,97,118,0x4600,_light_background_bm_0x4600},
-  {0,135,95,120,0x4500,_light_background_bm_0x4500},
-  {0,135,97,117,0x500,_light_background_bm_0x500},
-  {0,135,97,122,0x400,_light_background_bm_0x400},
-  {0,135,116,122,0x300,_light_background_bm_0x300},
-  {0,135,94,99,0x4508,_light_background_bm_0x4508},
-  {0,135,93,98,0x4610,_light_background_bm_0x4610},
-  {4,131,98,121,0x4400,_light_background_bm_0x4400},
-  {0,135,98,112,0x600,_light_background_bm_0x600},
-  {10,129,96,99,0x4608,_light_background_bm_0x4608},
-  {1,136,92,97,0x4718,_light_background_bm_0x4718},
-  {11,114,95,96,0x4710,_light_background_bm_0x4710},
-  {1,88,93,96,0x4510,_light_background_bm_0x4510},
-  {6,53,97,97,0x508,_light_background_bm_0x508},
-  {39,78,98,99,0x4408,_light_background_bm_0x4408}
+  {0,131,0,96,0x8718,_light_background_bm_0x8718},
+  {0,131,117,131,0x200,_light_background_bm_0x200},
+  {0,131,97,118,0x4600,_light_background_bm_0x4600},
+  {0,131,95,120,0x4500,_light_background_bm_0x4500},
+  {0,131,97,117,0x500,_light_background_bm_0x500},
+  {0,131,97,122,0x400,_light_background_bm_0x400},
+  {0,131,116,122,0x300,_light_background_bm_0x300},
+  {0,131,94,99,0x4508,_light_background_bm_0x4508},
+  {0,131,93,98,0x4610,_light_background_bm_0x4610},
+  {4,130,98,121,0x4400,_light_background_bm_0x4400},
+  {0,131,98,112,0x600,_light_background_bm_0x600},
+  {10,125,96,99,0x4608,_light_background_bm_0x4608},
+  {1,129,92,97,0x4718,_light_background_bm_0x4718},
+  {11,108,95,96,0x4710,_light_background_bm_0x4710},
+  {1,81,93,96,0x4510,_light_background_bm_0x4510},
+  {6,52,97,97,0x508,_light_background_bm_0x508},
+  {39,76,98,99,0x4408,_light_background_bm_0x4408}
 };
 
 void draw_light_background(image* image) {

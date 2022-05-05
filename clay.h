@@ -41,15 +41,15 @@ static const uint8_t _clay_bm_0x8200[] = {
 };
 
 static layer _layers_clay[] = {
-  {30,61,47,53,0xc400,_clay_bm_0xc400},
-  {30,61,47,53,0x100,_clay_bm_0x100},
-  {30,61,47,53,0xc600,_clay_bm_0xc600},
-  {30,61,47,53,0x8200,_clay_bm_0x8200}
+  {30,54,47,53,0xc400,_clay_bm_0xc400},
+  {30,54,47,53,0x100,_clay_bm_0x100},
+  {30,54,47,53,0xc600,_clay_bm_0xc600},
+  {30,54,47,53,0x8200,_clay_bm_0x8200}
 };
 
 void draw_clay(image* image, short x, short y) {
   int i;
-  erase_image(image);
+  if (image->layers) erase_image(image);
   for (i=0; i<4; i++) {
     short image_width = _layers_clay[i].x1-_layers_clay[i].x0;
     short image_height = _layers_clay[i].y1-_layers_clay[i].y0;

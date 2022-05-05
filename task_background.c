@@ -41,7 +41,7 @@ void Task_background(void* pvParameters)
 
         // TODO Remove: if (score_val!=phits) {
             erase_image(&score);
-            draw_end_splash(&score);
+            draw_end_splash(&score, 64, 64);
 
             switch (score_val%10) {
                 case 0 : draw_xx0(&score);

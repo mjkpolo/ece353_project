@@ -234,14 +234,14 @@ static const uint8_t _medium_background_bm_0x8608[] = {
 };
 
 static layer _layers_medium_background[] = {
-  {0,135,0,95,0x8410,_medium_background_bm_0x8410},
-  {0,135,94,120,0x4508,_medium_background_bm_0x4508},
-  {0,135,116,131,0x4308,_medium_background_bm_0x4308},
-  {0,135,95,131,0x4408,_medium_background_bm_0x4408},
-  {0,135,92,98,0x8510,_medium_background_bm_0x8510},
-  {1,128,100,112,0x4608,_medium_background_bm_0x4608},
-  {1,128,94,105,0x8508,_medium_background_bm_0x8508},
-  {90,97,103,103,0x8608,_medium_background_bm_0x8608}
+  {0,131,0,95,0x8410,_medium_background_bm_0x8410},
+  {0,131,94,120,0x4508,_medium_background_bm_0x4508},
+  {0,131,116,131,0x4308,_medium_background_bm_0x4308},
+  {0,131,95,131,0x4408,_medium_background_bm_0x4408},
+  {0,131,92,98,0x8510,_medium_background_bm_0x8510},
+  {1,123,100,112,0x4608,_medium_background_bm_0x4608},
+  {1,125,94,105,0x8508,_medium_background_bm_0x8508},
+  {90,91,103,103,0x8608,_medium_background_bm_0x8608}
 };
 
 void draw_medium_background(image* image) {

@@ -37,13 +37,13 @@ static const uint8_t _crosshair_bm_0xc718[] = {
 };
 
 static layer _layers_crosshair[] = {
-  {58,73,52,66,0x0,_crosshair_bm_0x0},
-  {58,73,52,66,0xc718,_crosshair_bm_0xc718}
+  {58,72,52,66,0x0,_crosshair_bm_0x0},
+  {58,72,52,66,0xc718,_crosshair_bm_0xc718}
 };
 
 void draw_crosshair(image* image, short x, short y) {
   int i;
-  erase_image(image);
+  if (image->layers) erase_image(image);
   for (i=0; i<2; i++) {
     short image_width = _layers_crosshair[i].x1-_layers_crosshair[i].x0;
     short image_height = _layers_crosshair[i].y1-_layers_crosshair[i].y0;

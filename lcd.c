@@ -221,14 +221,14 @@ size_t add_image(image* i)
     i->inQueue = false;
     images = realloc(images, (numImages + 1) * sizeof(image*));
     images[numImages++] = i;
+    i->layers = NULL;
     return numImages;
 }
 
 void erase_image(image* image)
 {
-    xSemaphoreTake(Sem_Erase, portMAX_DELAY);
     image->numLayers = 0;
-    image->layers = (layer*)realloc(image->layers, 0);
+    if (image->layers) free(image->layers);
     image->layers = NULL;
     image->x0 = 132;
     image->y0 = 132;
@@ -238,7 +238,6 @@ void erase_image(image* image)
         xQueueSendToBack(Draw_Queue,&image,portMAX_DELAY);
         image->inQueue = true;
     }
-    xSemaphoreGive(Sem_Erase);
 }
 
 void fill_image(image* image, layer* layers, size_t numLayers)
@@ -271,12 +270,10 @@ inline bool draw_pixel(image* image, short i, short j)
         short rely = i - image->layers[k].y0;
         short byte_index = (rely * bytes_per_row) + relx / 8;
         bool inbounds = relx >= 0 ? (relx < image_width ? (rely >= 0 ? rely < image_height : false) : false) : false;
-        if (inbounds) {
-            if (image->layers[k].bitmap[byte_index] & (1 << (7 - (relx % 8)))) {
-                HAL_LCD_writeData(image->layers[k].color >> 8);
-                HAL_LCD_writeData(image->layers[k].color);
-                return true;
-            }
+        if (inbounds ? image->layers[k].bitmap[byte_index] & (1 << (7 - (relx % 8))) : false) {
+            HAL_LCD_writeData(image->layers[k].color >> 8);
+            HAL_LCD_writeData(image->layers[k].color);
+            return true;
         }
     }
     return false;
@@ -302,21 +299,21 @@ void draw(image* image)
     image->px1 = image->x1;
     image->py1 = image->y1;
 
-    Crystalfontz128x128_SetDrawFrame(x0, y0, x1, y1);
-    HAL_LCD_writeCommand(CM_RAMWR);
-    xSemaphoreTake(Sem_Erase, portMAX_DELAY);
+    if (x0<=x1 ? (y0<=y1 ? true : false) : false) {
+      Crystalfontz128x128_SetDrawFrame(x0, y0, x1, y1);
+      HAL_LCD_writeCommand(CM_RAMWR);
 
-    for (i = y0; i <= y1; i++) {
-        for (j = x0; j <= x1; j++) {
-            for (k = 0; k < numImages; k++) {
-                if (draw_pixel(images[k], i, j))
-                    break;
-            }
-            if (k == numImages) { // just draw white if no pixel found
-                HAL_LCD_writeData(0xFF);
-                HAL_LCD_writeData(0xFF);
-            }
-        }
+      for (i = y0; i <= y1; i++) {
+          for (j = x0; j <= x1; j++) {
+              for (k = 0; k < numImages; k++) {
+                  if (draw_pixel(images[k], i, j))
+                      break;
+              }
+              if (k == numImages) { // just draw black if no pixel found
+                  HAL_LCD_writeData(0x0);
+                  HAL_LCD_writeData(0x0);
+              }
+          }
+      }
     }
-    xSemaphoreGive(Sem_Erase);
 }

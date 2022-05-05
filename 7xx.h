@@ -13,7 +13,7 @@ static const uint8_t _7xx_bm_0x8000[] = {
 };
 
 static layer _layers_7xx[] = {
-  {96,103,116,124,0x8000,_7xx_bm_0x8000}
+  {96,100,116,124,0x8000,_7xx_bm_0x8000}
 };
 
 void draw_7xx(image* image) {
