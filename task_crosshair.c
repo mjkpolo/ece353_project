@@ -49,6 +49,9 @@ void Task_drawCrosshair(void* pvParameters) {
     crosshair_move.x = NO_MOVE;
     crosshair_move.y = NO_MOVE;
 
+    // Draw crosshair for the first time
+    draw_crosshair(&crosshair, x, y);
+
     while(true) {
         px = x;
         py = y;
