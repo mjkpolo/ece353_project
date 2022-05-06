@@ -72,19 +72,3 @@ void MKII_Buzzer_Off(void)
     // Turn off the timer
     TIMER_A0->CTL &= ~TIMER_A_CTL_MC_MASK;
 }
-
-// TODO ??? \/\/\/ Remove \/\/\/ ???
-/********************************************************
- * Check Buzzer Run Status
- *
- * Parameters
- *      None
- * Returns
- *      true  if TimerA0 is on
- *      false if TimerA0 is off
- *******************************************************/
-bool MKII_Buzzer_Run_Status(void)
-{
-    // Return whether TimerA0 is on or off (true/false, respectively)
-    return ((TIMER_A0->CTL & TIMER_A_CTL_MC_MASK) != TIMER_A_CTL_MC__STOP);
-}

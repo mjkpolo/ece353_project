@@ -9,10 +9,7 @@
 #include "lcd.h" // TODO
 
 TaskHandle_t TaskH_TaskBlast;
-
-QueueHandle_t Queue_Score;
-QueueHandle_t Queue_Hit;
-QueueHandle_t Queue_Ammo;
+TaskHandle_t TaskH_score;
 
 // TODO Remove? Play a note for the given duration
 void play_note(uint32_t period, uint16_t ms_time)
@@ -60,35 +57,29 @@ void TaskBlast(void *pvParameters)
     int hit_sound_size = sizeof hit_sound / sizeof hit_sound[0];
     int i = 0;
     int max = (int)(NOTE_C * pow(2, 3.25)); // TODO Replace with constant value
-    // TODO Put these on one line
-    uint8_t clays_hit = 0;
-    uint8_t points = 1;
-    uint8_t ammo;
-    BaseType_t status;
-    BaseType_t xHigherPriorityTaskWoken;
 
     while(1)
     {
         // Wait for ISR to let us know that the button has been pressed
         ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
 
-        // Only fire if there is ammo available in Queue_Ammo (filled in task_clayPigeon.c when the clay pigeon is thrown)
-        status = xQueueReceive(Queue_Ammo, &ammo, 0);
+        // Only fire if there is ammo available
+        if(AMMO) {
+            // Empty ammo
+            AMMO = false;
 
-        if(status == pdPASS) {
             // Check if the clay pigeon and crosshair images are overlapping; if they are, the clay pigeon is hit
             if((crosshair.x0 <= pidgeon.x1) && (crosshair.x1 >= pidgeon.x0) &&
                (crosshair.y0 <= pidgeon.y1) && (crosshair.y1 >= pidgeon.y0)) {
+
+                // TODO Does the changing order of these two change much???
+
+                // Increase/Update the score by the current point value of each clay
+                SCORE += CLAYS_HIT / CLAYS_PER_LEVEL + 1;
+                xTaskNotifyGive(TaskH_score);
+
                 // Increment the number of clays hit
-                clays_hit++;
-
-
-                // TODO Does the order of these two affect anything (like drawing one image before the other) ????
-
-                // Add the points for hitting the target to Queue_Score so that the scoreboard can be updated
-                status = xQueueSendToBack(Queue_Score, &points, portMAX_DELAY);
-                // Send that the clay was hit
-                status = xQueueSendToBack(Queue_Hit, &clays_hit, portMAX_DELAY);
+                CLAYS_HIT++;
 
                 // Play target hit sound
                 for(i=0; i < hit_sound_size; i++) {
@@ -96,7 +87,7 @@ void TaskBlast(void *pvParameters)
                     // TODO Either use play_note() here or remove play_note() entirely
 
                     // Configure TimerA0 with the specified period of the PWM pulse
-                    MKII_Buzzer_Init((uint32_t)floor(SystemCoreClock / (hit_sound[i].note * pow(2, hit_sound[i].octave))));
+                    MKII_Buzzer_Init((uint32_t)floor(SystemCoreClock / (hit_sound[i].note * pow(2, hit_sound[i].octave)))); // TODO Change SystemCoreClock to 24000000
                     // Turn the buzzer on (start playing note)
                     MKII_Buzzer_On();
                     // Wait while buzzer plays the note
@@ -104,10 +95,18 @@ void TaskBlast(void *pvParameters)
                     // Turn the buzzer off (stop playing note)
                     MKII_Buzzer_Off();
                 }
-
-                // Increment the points for future clays if the user has hit enough clays to move on to the next level
-                if(clays_hit % CLAYS_PER_LEVEL == 0) points++;
             } else {
+                // If lowering the score by the current point value of each clay won't make it negative, decrease/update the score
+                if((SCORE - (CLAYS_HIT/CLAYS_PER_LEVEL + 1)) >= 0) {
+                    SCORE -= CLAYS_HIT / CLAYS_PER_LEVEL + 1;
+                    xTaskNotifyGive(TaskH_score);
+                }
+                // Otherwise, if the score is not 0, set it to 0
+                else if(SCORE != 0) {
+                    SCORE = 0;
+                    xTaskNotifyGive(TaskH_score);
+                }
+
                 // Play target missed sound (upside-down exponential curve to create a decreasing tone, sampled at intervals to allow each sampled frequency to be played longer without extending the time for which the sound is played)
                 for(i=0; i < max; i+=7) {
 

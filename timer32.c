@@ -4,11 +4,11 @@
  *  Created on: Oct 5, 2020
  *      Author: YOUR NAME
  */
-
+/* TODO
 #include "timer32.h"
 // TODO #include "main.h"
 
-volatile bool S2_P = false;
+volatile bool S2_P = false; // TODO Remove
 // TODO volatile bool NEW_FRAME = false;
 
 TaskHandle_t TaskH_TaskBlast; // TODO include task_blast???
@@ -20,7 +20,7 @@ bool MKII_S2(void) {
 void t32_init(void) {
   /*
   10ms interrupt for t32_1
-  */
+  *//* TODO
   uint32_t ticks = (SystemCoreClock/100) - 1;
 
   // Stop the timer
@@ -56,4 +56,4 @@ void T32_INT1_IRQHandler() {
     }
     ADC14->CTL0 |= ADC14_CTL0_SC | ADC14_CTL0_ENC;
     TIMER32_1->INTCLR = BIT0;
-}
+}*/
