@@ -22,9 +22,9 @@
 
 extern SemaphoreHandle_t Sem_LCD; // TODO Is this still needed???
 
-extern volatile uint8_t CLAYS_HIT;
-extern volatile bool AMMO;
-extern volatile uint16_t SCORE;
-
+extern volatile uint8_t CLAYS_HIT; // TODO Remove volatile if it's not used in an ISR
+extern volatile bool AMMO; // TODO Remove volatile if it's not used in an ISR
+extern volatile uint16_t SCORE; // TODO Remove volatile if it's not used in an ISR
+extern short crosshair_x, crosshair_y;
 
 #endif /* MAIN_H_ */

@@ -22,6 +22,7 @@ void Task_background(void* pvParameters)
             BRIGHT,
             foo };
         static enum light l, pl = foo; // so pl != l
+        ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
         float lux = opt3001_read_lux(); // TODO Maybe move this into task_timer and then notify this task (/ use a queue with portMAX_DELAY) if the lighting changed
         if (lux < 20)
             l = DARK;
