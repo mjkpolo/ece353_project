@@ -43,47 +43,47 @@ void Task_crosshair(void* pvParameters)
 void Task_drawCrosshair(void* pvParameters) {
     const short CROSSHAIR_HEIGHT = crosshair.y1 - crosshair.y0 + 1; // Height of the crosshair image
     const short CROSSHAIR_WIDTH = crosshair.x1 - crosshair.x0 + 1; // Width of the crosshair image
-    short x = 64, y = 64, px, py; // x and y positions of the crosshair
+    short px, py; // x and y positions of the crosshair
 
     crosshair_move.x = NO_MOVE;
     crosshair_move.y = NO_MOVE;
 
     // Draw crosshair for the first time
-    draw_crosshair(&crosshair, x, y);
+    draw_crosshair(&crosshair, crosshair_x, crosshair_y);
 
     while(true) {
-        px = x;
-        py = y;
+        px = crosshair_x;
+        py = crosshair_y;
 
         // TODO Just use if statements
         switch(crosshair_move.y) {
             case UP:
                 // Make sure the crosshair doesn't go past the top boundary of the screen
-                if (y > (CROSSHAIR_HEIGHT / 2) + STEP_VAL + 2)
-                    y -= STEP_VAL;
+                if (crosshair_y > (CROSSHAIR_HEIGHT / 2) + STEP_VAL + 2)
+                    crosshair_y -= STEP_VAL;
                 break;
             case DOWN:
                 // Make sure the crosshair doesn't go past the bottom boundary of the screen
-                if(y < (LCD_VERTICAL_MAX - (CROSSHAIR_HEIGHT / 2) - STEP_VAL - 1))
-                    y += STEP_VAL;
+                if(crosshair_y < (LCD_VERTICAL_MAX - (CROSSHAIR_HEIGHT / 2) - STEP_VAL - 1))
+                    crosshair_y += STEP_VAL;
                 break;
         }
         switch(crosshair_move.x) {
             case LEFT:
                 // Make sure the crosshair doesn't go past the left boundary of the screen
-                if(x > (CROSSHAIR_WIDTH / 2) + STEP_VAL + 1)
-                    x -= STEP_VAL;
+                if(crosshair_x > (CROSSHAIR_WIDTH / 2) + STEP_VAL + 1)
+                    crosshair_x -= STEP_VAL;
                 break;
             case RIGHT:
                 // Make sure the crosshair doesn't go past the right boundary of the screen
-                if(x < (LCD_HORIZONTAL_MAX - (CROSSHAIR_WIDTH / 2) - STEP_VAL - 1))
-                    x += STEP_VAL;
+                if(crosshair_x < (LCD_HORIZONTAL_MAX - (CROSSHAIR_WIDTH / 2) - STEP_VAL - 1))
+                    crosshair_x += STEP_VAL;
                 break;
         }
 
-        if(x != px || y != py) {
+        if(crosshair_x != px || crosshair_y != py) {
             // Redraw the crosshair
-            draw_crosshair(&crosshair, x, y);
+            draw_crosshair(&crosshair, crosshair_x, crosshair_y);
         }
 
         vTaskDelay(pdMS_TO_TICKS(20)); // TODO Adjust the wait time to adjust the speed of the crosshair

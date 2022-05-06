@@ -12,6 +12,7 @@
 
 TaskHandle_t TaskH_clayPigeon;
 TaskHandle_t TaskH_accelerometerXBottomHalf;
+TaskHandle_t TaskH_background; // TODO
 
 SemaphoreHandle_t Sem_ClayLaunched;
 SemaphoreHandle_t Sem_Background;
@@ -99,6 +100,8 @@ void Task_clayPigeon(void *pvParameters)
 
         // Allow the background to redraw now that the clay pigeon is done
         xSemaphoreGive(Sem_Background);
+
+        xTaskNotifyGive(TaskH_background); // TODO
 
         // Clear task notification's value so that the task cannot be notified while it is running (e.g. if the inner while loop is running and the
         // user tilts forward/notifies the task again, this will make sure any such notification attempts are not seen/processed at the next iteration

@@ -12,6 +12,7 @@
 TaskHandle_t TaskH_endGame;
 TaskHandle_t TaskH_crosshair;
 TaskHandle_t TaskH_score;
+TaskHandle_t TaskH_background; // TODO
 SemaphoreHandle_t Sem_Timer;
 
 // TODO Header
@@ -51,6 +52,8 @@ void Task_endGame(void* pvParameters) {
             // Debounce S1 on MKII
             buttonState = buttonState << 1 | MKII_S1();
 
+            xTaskNotifyGive(TaskH_background); // TODO
+
             vTaskDelay(pdMS_TO_TICKS(10));
         }
 
@@ -63,7 +66,9 @@ void Task_endGame(void* pvParameters) {
         xTaskNotifyGive(TaskH_score);
 
         // TODO Only do this if I make the crosshair's x and y globals: Redraw the crosshair
-        // TODO draw_crosshair(&crosshair, );
+        crosshair_x = 64;
+        crosshair_y = 64;
+        draw_crosshair(&crosshair, crosshair_x, crosshair_y);
 
         // Reset buttonState
         buttonState = 0;
