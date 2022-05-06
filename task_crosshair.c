@@ -7,7 +7,7 @@
 
 #include "task_crosshair.h"
 #include "lcd.h"
-#include "ps2.h"
+#include "adc14.h"
 
 TaskHandle_t TaskH_crosshairBottomHalf;
 TaskHandle_t TaskH_drawCrosshair;
@@ -86,6 +86,6 @@ void Task_drawCrosshair(void* pvParameters) {
             draw_crosshair(&crosshair, crosshair_x, crosshair_y);
         }
 
-        vTaskDelay(pdMS_TO_TICKS(20)); // TODO Adjust the wait time to adjust the speed of the crosshair
+        vTaskDelay(pdMS_TO_TICKS(10)); // TODO Adjust the wait time to adjust the speed of the crosshair
     }
 }

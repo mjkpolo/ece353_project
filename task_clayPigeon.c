@@ -7,7 +7,7 @@
 
 #include "task_clayPigeon.h"
 #include "lcd.h"
-#include "ps2.h"
+#include "adc14.h"
 
 
 TaskHandle_t TaskH_clayPigeon;
@@ -46,7 +46,7 @@ void Task_clayPigeon(void *pvParameters)
         y = SKY_BOTTOM_Y - (CLAY_HEIGHT / 2) - 1;
         // Determine the starting x position (left or right border or the LCD) and the x step needed to get from there
         // to the horizontal center of the screen +/- a random number between 0 and 30 when the clay pigeon lands
-        xf = (LCD_HORIZONTAL_MAX / 2) + ((rand() % 2 == 0) ? -(ACCEL_Y % 31) : (ACCEL_Y % 31));
+        xf = (LCD_HORIZONTAL_MAX / 2) + ((rand() % 2 == 0) ? -(ACCEL_Y % 61) : (ACCEL_Y % 61));
         dx = (float) (xf - ((x == CLAY_WIDTH / 2) ? 0 : LCD_HORIZONTAL_MAX)) / (2.0 * (float) (SKY_BOTTOM_Y - CLAY_HEIGHT / 2)); // TODO Check which cast(s) (if either) is/are needed
 
         // Update the previous number of clays hit
@@ -71,11 +71,11 @@ void Task_clayPigeon(void *pvParameters)
             switch(clay_x_move) {
                 case LEFT: // Tilting left
                     // Increase the clay's movement to the left (or decrease its movement to the right)
-                    x -= dx / (dx < 0 ? -1.5 : 1.5);
+                    x -= dx / (dx < 0 ? -3 : 3);
                     break;
                 case RIGHT: // Tilting right
                     // Increase the clay's movement to the right (or decrease its movement to the left)
-                    x += dx / (dx < 0 ? -1.5 : 1.5);
+                    x += dx / (dx < 0 ? -3 : 3);
                     break;
             }
 
@@ -84,7 +84,7 @@ void Task_clayPigeon(void *pvParameters)
 
             // Wait for a certain amount of time (no less than 10ms) according to the number of clays hit
             // As more clays are hit, the wait time will decrease
-            vTaskDelay(pdMS_TO_TICKS((dt > 20) ? 10 : (30 - dt)));
+            vTaskDelay(pdMS_TO_TICKS((dt < 5) ? 5 : (10 - dt)));
         }
 
         // Give semaphore to indicate that the clay is no longer in the air

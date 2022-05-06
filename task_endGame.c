@@ -7,7 +7,7 @@
 
 #include "task_endGame.h"
 #include "lcd.h"
-#include "ps2.h"
+#include "adc14.h"
 
 TaskHandle_t TaskH_endGame;
 TaskHandle_t TaskH_crosshairBottomHalf;

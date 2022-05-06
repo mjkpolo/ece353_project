@@ -5,7 +5,7 @@
  *      Author: Marco Kurzynski
  */
 
-#include "ps2.h"
+#include "adc14.h"
 
 // TODO Remove any unnecessary values
 volatile uint32_t PS2_X_VAL = 0;

@@ -20,7 +20,7 @@ TaskHandle_t TaskH_score;
 void TaskBlast(void *pvParameters)
 {
     // Sound made when a target is hit
-    Note_t hit_sound[] =
+    static Note_t hit_sound[] =
     {
         {NOTE_B, 3, 10},
         {NOTE_AS, 3, 10},

@@ -227,6 +227,7 @@ size_t add_image(image* i)
 
 void erase_image(image* image)
 {
+    xSemaphoreTake(Sem_Erase, portMAX_DELAY);
     image->numLayers = 0;
     if (image->layers) free(image->layers);
     image->layers = NULL;
@@ -234,6 +235,8 @@ void erase_image(image* image)
     image->y0 = 132;
     image->x1 = 0;
     image->y1 = 0;
+    xSemaphoreGive(Sem_Erase);
+
     if (!image->inQueue) {
         xQueueSendToBack(Draw_Queue,&image,portMAX_DELAY);
         image->inQueue = true;
@@ -258,7 +261,7 @@ void fill_image(image* image, layer* layers, size_t numLayers)
     }
 }
 
-inline bool draw_pixel(image* image, short i, short j)
+bool draw_pixel(image* image, short i, short j)
 {
     int k;
     for (k = 0; k < image->numLayers; k++) {
@@ -281,38 +284,41 @@ inline bool draw_pixel(image* image, short i, short j)
 
 void draw(image* image)
 {
-    image->inQueue = false;
-    short i, j, k;
+  image->inQueue = false;
+  short i, j, k;
 
-    short y0 = image->y0 < image->py0 ? image->y0 : image->py0;
-    short x0 = image->x0 < image->px0 ? image->x0 : image->px0;
-    short y1 = image->y1 > image->py1 ? image->y1 : image->py1;
-    short x1 = image->x1 > image->px1 ? image->x1 : image->px1;
+  short y0 = image->y0 < image->py0 ? image->y0 : image->py0;
+  short x0 = image->x0 < image->px0 ? image->x0 : image->px0;
+  short y1 = image->y1 > image->py1 ? image->y1 : image->py1;
+  short x1 = image->x1 > image->px1 ? image->x1 : image->px1;
 
-    x0 = (x0 > 131 ? 131 : (x0 < 0 ? 0 : x0));
-    y0 = (y0 > 131 ? 131 : (y0 < 0 ? 0 : y0));
-    x1 = (x1 > 131 ? 131 : (x1 < 0 ? 0 : x1));
-    y1 = (y1 > 131 ? 131 : (y1 < 0 ? 0 : y1));
+  x0 = (x0 > 131 ? 131 : (x0 < 0 ? 0 : x0));
+  y0 = (y0 > 131 ? 131 : (y0 < 0 ? 0 : y0));
+  x1 = (x1 > 131 ? 131 : (x1 < 0 ? 0 : x1));
+  y1 = (y1 > 131 ? 131 : (y1 < 0 ? 0 : y1));
 
-    image->px0 = image->x0;
-    image->py0 = image->y0;
-    image->px1 = image->x1;
-    image->py1 = image->y1;
+  image->px0 = image->x0;
+  image->py0 = image->y0;
+  image->px1 = image->x1;
+  image->py1 = image->y1;
 
-    if (x0<=x1 ? (y0<=y1 ? true : false) : false) {
-      Crystalfontz128x128_SetDrawFrame(x0, y0, x1, y1);
-      HAL_LCD_writeCommand(CM_RAMWR);
+  if (x0<=x1 ? (y0<=y1 ? true : false) : false) {
+    Crystalfontz128x128_SetDrawFrame(x0, y0, x1, y1);
+    HAL_LCD_writeCommand(CM_RAMWR);
+    xSemaphoreTake(Sem_Erase, portMAX_DELAY);
 
-      for (i = y0; i <= y1; i++) {
-        for (j = x0; j <= x1; j++) {
-          for (k=0; k<numImages; k++) {
-            if (draw_pixel(images[k],i,j)) break;
-          }
-          if (k==numImages) {
-            HAL_LCD_writeData(0x0);
-            HAL_LCD_writeData(0x0);
-          }
+    for (i = y0; i <= y1; i++) {
+      for (j = x0; j <= x1; j++) {
+        for (k=0; k<numImages; k++) {
+          if (draw_pixel(images[k],i,j)) break;
+        }
+        if (k==numImages) {
+          HAL_LCD_writeData(0x0);
+          HAL_LCD_writeData(0x0);
         }
       }
     }
+
+    xSemaphoreGive(Sem_Erase);
+  }
 }

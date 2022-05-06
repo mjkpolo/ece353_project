@@ -1,17 +1,7 @@
-/*
- * ps2.h
- *
- *  Created on: Oct 5, 2020
- *      Author: YOUR NAME
- */
-
-#ifndef PS2_H_
-#define PS2_H_
+#ifndef ADC14_H_
+#define ADC14_H_
 
 #include "main.h"
-//#include "task_clayPigeon.h"
-//#include "task_crosshair.h"
-//#include "task_blast.h"
 
 void adc14_init(void);
 
@@ -38,4 +28,4 @@ extern volatile uint32_t ACCEL_Y;
 extern volatile uint32_t PS2_X_VAL;
 extern volatile uint32_t PS2_Y_VAL;
 
-#endif /* PS2_H_ */
+#endif
