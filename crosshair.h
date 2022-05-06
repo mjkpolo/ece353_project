@@ -52,5 +52,5 @@ void draw_crosshair(image* image, short x, short y) {
     _layers_crosshair[i].y0 = y-(image_height/2+image_height%2);
     _layers_crosshair[i].y1 = y+(image_height/2);
   }
-  fill_image(image,_layers_crosshair,2);
+  fill_image(image,_layers_crosshair,2,true);
 };

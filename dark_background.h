@@ -252,5 +252,5 @@ static layer _layers_dark_background[] = {
 };
 
 void draw_dark_background(image* image) {
-  fill_image(image,_layers_dark_background,8);
+  fill_image(image,_layers_dark_background,8,false);
 };

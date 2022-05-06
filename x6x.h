@@ -17,5 +17,5 @@ static layer _layers_x6x[] = {
 };
 
 void draw_x6x(image* image) {
-  fill_image(image,_layers_x6x,1);
+  fill_image(image,_layers_x6x,1,false);
 };

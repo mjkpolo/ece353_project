@@ -27,7 +27,7 @@ void Task_clayPigeon(void *pvParameters)
     const short CLAY_WIDTH = pidgeon.x1 - pidgeon.x0 + 1; // Width of the clay pigeon image
     BaseType_t status;
     short y, dt = 0;
-    uint8_t prev_clays_hit;
+    short prev_clays_hit;
     float x, xf, dx;
 
     while(true) {
@@ -84,7 +84,7 @@ void Task_clayPigeon(void *pvParameters)
 
             // Wait for a certain amount of time (no less than 10ms) according to the number of clays hit
             // As more clays are hit, the wait time will decrease
-            vTaskDelay(pdMS_TO_TICKS((dt < 5) ? 5 : (10 - dt)));
+            vTaskDelay(pdMS_TO_TICKS((dt > 15) ? 5 : (20 - dt)));
         }
 
         // Give semaphore to indicate that the clay is no longer in the air

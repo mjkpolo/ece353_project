@@ -356,5 +356,5 @@ static layer _layers_light_background[] = {
 };
 
 void draw_light_background(image* image) {
-  fill_image(image,_layers_light_background,17);
+  fill_image(image,_layers_light_background,17,false);
 };

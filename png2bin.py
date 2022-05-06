@@ -74,7 +74,7 @@ def getBitmaps(img, name, move):
             f'void draw_{name}(image* image, short x, short y) ' + '{\n'
         )
         yield(
-            f'  fill_image(image,_layers_{name},{len(structs)});\n'
+            f'  fill_image(image,_layers_{name},{len(structs)},false);\n'
             if not move else
             '  int i;\n' \
             '  if (image->layers) erase_image(image);\n' \
@@ -86,7 +86,7 @@ def getBitmaps(img, name, move):
             f'    _layers_{name}[i].y0 = y-(image_height/2+image_height%2);\n' \
             f'    _layers_{name}[i].y1 = y+(image_height/2);\n' \
             '  }\n' \
-            f'  fill_image(image,_layers_{name},{len(structs)});\n'
+            f'  fill_image(image,_layers_{name},{len(structs)},true);\n'
         )
         yield '};\n'
 

@@ -245,5 +245,5 @@ static layer _layers_medium_background[] = {
 };
 
 void draw_medium_background(image* image) {
-  fill_image(image,_layers_medium_background,8);
+  fill_image(image,_layers_medium_background,8,false);
 };

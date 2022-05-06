@@ -17,5 +17,5 @@ static layer _layers_xx3[] = {
 };
 
 void draw_xx3(image* image) {
-  fill_image(image,_layers_xx3,1);
+  fill_image(image,_layers_xx3,1,false);
 };

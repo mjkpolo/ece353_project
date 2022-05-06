@@ -237,17 +237,18 @@ void erase_image(image* image)
     image->y1 = 0;
     xSemaphoreGive(Sem_Erase);
 
-    if (!image->inQueue) {
+    if (image->inQueue ? false : image->moving) {
         xQueueSendToBack(Draw_Queue,&image,portMAX_DELAY);
         image->inQueue = true;
     }
 }
 
-void fill_image(image* image, layer* layers, size_t numLayers)
+void fill_image(image* image, layer* layers, size_t numLayers, bool moving)
 {
     image->layers = (layer*)realloc(image->layers, (image->numLayers + numLayers) * sizeof(layer));
     memcpy(&image->layers[image->numLayers], layers, sizeof(layer) * numLayers);
     image->numLayers += numLayers;
+    image->moving = moving;
     int i;
     for (i = 0; i < numLayers; i++) {
         image->x0 = image->x0 < layers[i].x0 ? image->x0 : layers[i].x0;
@@ -303,14 +304,14 @@ void draw(image* image)
   image->py1 = image->y1;
 
   if (x0<=x1 ? (y0<=y1 ? true : false) : false) {
+    xSemaphoreTake(Sem_Erase, portMAX_DELAY);
     Crystalfontz128x128_SetDrawFrame(x0, y0, x1, y1);
     HAL_LCD_writeCommand(CM_RAMWR);
-    xSemaphoreTake(Sem_Erase, portMAX_DELAY);
 
     for (i = y0; i <= y1; i++) {
       for (j = x0; j <= x1; j++) {
         for (k=0; k<numImages; k++) {
-          if (draw_pixel(images[k],i,j)) break;
+          if (((images[k]->inQueue & images[k]->moving) & !image->moving) ? false : draw_pixel(images[k],i,j)) break;
         }
         if (k==numImages) {
           HAL_LCD_writeData(0x0);
@@ -318,7 +319,6 @@ void draw(image* image)
         }
       }
     }
-
     xSemaphoreGive(Sem_Erase);
   }
 }

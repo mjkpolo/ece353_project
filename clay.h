@@ -58,5 +58,5 @@ void draw_clay(image* image, short x, short y) {
     _layers_clay[i].y0 = y-(image_height/2+image_height%2);
     _layers_clay[i].y1 = y+(image_height/2);
   }
-  fill_image(image,_layers_clay,4);
+  fill_image(image,_layers_clay,4,true);
 };

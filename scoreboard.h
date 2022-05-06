@@ -53,5 +53,5 @@ static layer _layers_scoreboard[] = {
 };
 
 void draw_scoreboard(image* image) {
-  fill_image(image,_layers_scoreboard,3);
+  fill_image(image,_layers_scoreboard,3,false);
 };

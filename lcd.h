@@ -99,6 +99,7 @@ typedef struct {
     layer* layers;
     size_t numLayers;
     bool inQueue;
+    bool moving;
 } image;
 
 extern image pidgeon, score, crosshair, background, end_splash; // TODO
@@ -108,6 +109,6 @@ void draw(image* image);
 
 size_t add_image(image* image);
 void erase_image(image* image);
-void fill_image(image* image, layer* layers, size_t numLayers);
+void fill_image(image* image, layer* layers, size_t numLayers, bool moving);
 
 #endif /* LCD_H_ */

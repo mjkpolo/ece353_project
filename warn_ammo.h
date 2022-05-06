@@ -1,9 +1,9 @@
 #include "lcd.h"
 
 static const uint8_t _warn_ammo_bm_0xc000[] = {
-  0xf, 0xe0,
+  0x7, 0xe0,
   0x8, 0x30,
-  0x18, 0x8,
+  0x10, 0x8,
   0x30, 0x4,
   0x30, 0x4,
   0x48, 0x2,
@@ -26,6 +26,7 @@ static const uint8_t _warn_ammo_bm_0xc000[] = {
 };
 
 static const uint8_t _warn_ammo_bm_0x4000[] = {
+  0x4, 0x0,
   0xb, 0xe0,
   0x10, 0x18,
   0x20, 0x4,
@@ -106,7 +107,7 @@ static const uint8_t _warn_ammo_bm_0x4100[] = {
 
 static layer _layers_warn_ammo[] = {
   {3,18,103,124,0xc000,_warn_ammo_bm_0xc000},
-  {2,17,104,125,0x4000,_warn_ammo_bm_0x4000},
+  {2,17,103,125,0x4000,_warn_ammo_bm_0x4000},
   {9,13,112,120,0x8300,_warn_ammo_bm_0x8300},
   {9,13,108,111,0x8200,_warn_ammo_bm_0x8200},
   {7,7,112,120,0x4200,_warn_ammo_bm_0x4200},
@@ -117,5 +118,5 @@ static layer _layers_warn_ammo[] = {
 };
 
 void draw_warn_ammo(image* image) {
-  fill_image(image,_layers_warn_ammo,9);
+  fill_image(image,_layers_warn_ammo,9,false);
 };
