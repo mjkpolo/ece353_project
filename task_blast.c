@@ -74,7 +74,7 @@ void TaskBlast(void *pvParameters)
 
                 // TODO Does the changing order of these two change much???
 
-                // Update the score
+                // Increase/Update the score by the current point value of each clay
                 SCORE += CLAYS_HIT / CLAYS_PER_LEVEL + 1;
                 xTaskNotifyGive(TaskH_score);
 
@@ -96,6 +96,17 @@ void TaskBlast(void *pvParameters)
                     MKII_Buzzer_Off();
                 }
             } else {
+                // If lowering the score by the current point value of each clay won't make it negative, decrease/update the score
+                if((SCORE - (CLAYS_HIT/CLAYS_PER_LEVEL + 1)) >= 0) {
+                    SCORE -= CLAYS_HIT / CLAYS_PER_LEVEL + 1;
+                    xTaskNotifyGive(TaskH_score);
+                }
+                // Otherwise, if the score is not 0, set it to 0
+                else if(SCORE != 0) {
+                    SCORE = 0;
+                    xTaskNotifyGive(TaskH_score);
+                }
+
                 // Play target missed sound (upside-down exponential curve to create a decreasing tone, sampled at intervals to allow each sampled frequency to be played longer without extending the time for which the sound is played)
                 for(i=0; i < max; i+=7) {
 
