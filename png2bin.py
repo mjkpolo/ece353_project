@@ -103,9 +103,9 @@ def main(names, move):
         '''
         CONVERT TO 16 BIT
         '''
-        R = (img[:,:,0] >> 3 & 0x1C)
+        R = (img[:,:,0] >> 3 & 0x18)
         G = (img[:,:,1] >> 2 & 0x38)
-        B = (img[:,:,2] >> 3 & 0x1C)
+        B = (img[:,:,2] >> 3 & 0x18)
         A = (img[:,:,3] > (1 << 7)).astype(bool) # consider alpha < 128 (max val 255) clear
 
         np.place(layer, A ,((R << 11) | (G << 5) | B)[A])
