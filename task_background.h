@@ -14,6 +14,5 @@
 void Task_background(void* pvParameters);
 
 extern TaskHandle_t TaskH_background;
-extern SemaphoreHandle_t Sem_Background;
 
 #endif

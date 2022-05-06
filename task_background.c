@@ -10,7 +10,6 @@
 #include "opt3001.h"
 
 TaskHandle_t TaskH_background;
-SemaphoreHandle_t Sem_Background;
 
 // TODO Header
 void Task_background(void* pvParameters)
@@ -22,16 +21,20 @@ void Task_background(void* pvParameters)
             BRIGHT,
             foo };
         static enum light l, pl = foo; // so pl != l
+
+        // Wait for task to be notified
         ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
-        float lux = opt3001_read_lux(); // TODO Maybe move this into task_timer and then notify this task (/ use a queue with portMAX_DELAY) if the lighting changed
+
+        float lux = opt3001_read_lux();
+
         if (lux < 20)
             l = DARK;
         else if (lux < 75)
             l = MEDIUM;
         else
             l = BRIGHT;
+
         if (pl != l) {
-            xSemaphoreTake(Sem_Background, portMAX_DELAY);
             erase_image(&background);
             switch (l) {
             case BRIGHT:
@@ -44,9 +47,10 @@ void Task_background(void* pvParameters)
                 draw_dark_background(&background);
                 break;
             }
-            xSemaphoreGive(Sem_Background);
         }
+
         pl=l;
+
         vTaskDelay(pdMS_TO_TICKS(50));
     }
 }

@@ -15,7 +15,6 @@ TaskHandle_t TaskH_accelerometerXBottomHalf;
 TaskHandle_t TaskH_background; // TODO
 
 SemaphoreHandle_t Sem_ClayLaunched;
-SemaphoreHandle_t Sem_Background;
 
 MOVE_DIR clay_x_move;
 
@@ -37,9 +36,6 @@ void Task_clayPigeon(void *pvParameters)
 
         // Take semaphore to indicate that the clay has been launched
         xSemaphoreTake(Sem_ClayLaunched, portMAX_DELAY);
-
-        // Don't allow the background to redraw while the clay pigeon is on the screen
-        xSemaphoreTake(Sem_Background, portMAX_DELAY);
 
         // Fill ammo initially
         AMMO = true;
@@ -86,7 +82,9 @@ void Task_clayPigeon(void *pvParameters)
             // Redraw clay pigeon now that it has moved
             draw_clay(&pidgeon, (uint8_t) x, y);
 
-            vTaskDelay(pdMS_TO_TICKS((dt > 20) ? 10 : (30 - dt))); // TODO Could slow down the delay when the clay pigeon gets closer to the top of the screen/peak of its arc
+            // Wait for a certain amount of time (no less than 10ms) according to the number of clays hit
+            // As more clays are hit, the wait time will decrease
+            vTaskDelay(pdMS_TO_TICKS((dt > 20) ? 10 : (30 - dt)));
         }
 
         // Give semaphore to indicate that the clay is no longer in the air
@@ -98,10 +96,12 @@ void Task_clayPigeon(void *pvParameters)
         // The clay is no longer in the air, so erase the clay pigeon image
         erase_image(&pidgeon);
 
-        // Allow the background to redraw now that the clay pigeon is done
-        xSemaphoreGive(Sem_Background);
+        // Possibly change the background for the next clay pigeon
+        // Notify the background to change if the lighting has changed
+        xTaskNotifyGive(TaskH_background);
 
-        xTaskNotifyGive(TaskH_background); // TODO
+
+        // TODO \/\/ Remove if the logic in ps2.c is reworked \/\/
 
         // Clear task notification's value so that the task cannot be notified while it is running (e.g. if the inner while loop is running and the
         // user tilts forward/notifies the task again, this will make sure any such notification attempts are not seen/processed at the next iteration
@@ -121,10 +121,7 @@ void Task_accelerometerXBottomHalf(void* pvParameters)
         // Wait until task is notified to start by ADC14 ISR
         ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
 
-        // Debounce accelerometer x value to filter out readings from shaking the board
-
-        // TODO Make this the same as tilting forward/backward (or make those the same as this)???
-        // TODO Instead of having two separate values that go from 0x0F to 0xFF, have one value that goes from 0x0F to 0xFF (left) or 0x00 (right)
+        // "Debounce" accelerometer x value to filter out readings from shaking the board
         x_tilt_r_state = x_tilt_r_state << 1;
         if(ACCEL_X > VOLT_TILT_R) {
             x_tilt_r_state |= 0x0F;

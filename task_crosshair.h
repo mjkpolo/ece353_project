@@ -11,11 +11,11 @@
 #include "main.h"
 
 // TODO Header
-void Task_crosshair(void* pvParameters);
+void Task_crosshairBottomHalf(void* pvParameters);
 // TODO Header
 void Task_drawCrosshair(void* pvParameters);
 
-extern TaskHandle_t TaskH_crosshair;
+extern TaskHandle_t TaskH_crosshairBottomHalf;
 extern TaskHandle_t TaskH_drawCrosshair;
 
 #endif /* TASK_CROSSHAIR_H_ */

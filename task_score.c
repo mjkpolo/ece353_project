@@ -98,7 +98,7 @@ void Task_score(void* pvParameters) {
         draw_scoreboard(&score);
 
         // TODO replace with actual number of clays (due to the order of updating the score and clays hit in task_blast, this should be 1 less than the number of clays that have to be hit)
-        if(CLAYS_HIT > 10) {
+        if(CLAYS_HIT > 1) {
             xTaskNotifyGive(TaskH_endGame);
         }
     }

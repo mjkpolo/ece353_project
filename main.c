@@ -7,7 +7,7 @@
 #include "task_crosshair.h"
 #include "task_background.h"
 #include "task_drawScreen.h"
-#include "task_timer.h" // TODO
+#include "task_timer.h"
 #include "task_endGame.h"
 #include "task_score.h"
 // Non-FreeRTOS
@@ -24,11 +24,10 @@
 
 extern SemaphoreHandle_t Sem_Erase; // TODO
 
-// TODO Remove volatile if it's not used in an ISR
-volatile uint8_t CLAYS_HIT = 0; // Number of clays hit
-volatile bool AMMO = false; // true if there is ammo; false otherwise
-volatile uint16_t SCORE = 0; // Score
+uint8_t CLAYS_HIT = 0; // Number of clays hit
+uint16_t SCORE = 0; // Score
 short crosshair_x = 64, crosshair_y = 64;
+volatile bool AMMO = false; // true if there is ammo; false otherwise
 
 // TODO Header
 inline void init(void)
@@ -54,10 +53,8 @@ int main(void)
 
     Sem_ClayLaunched = xSemaphoreCreateBinary();
     Sem_Erase = xSemaphoreCreateBinary();
-    Sem_Background = xSemaphoreCreateBinary();
     Sem_Timer = xSemaphoreCreateBinary();
 
-    xSemaphoreGive(Sem_Background);
     xSemaphoreGive(Sem_ClayLaunched);
     xSemaphoreGive(Sem_Erase);
     xSemaphoreGive(Sem_Timer);
@@ -74,7 +71,7 @@ int main(void)
     xTaskCreate(Task_accelerometerXBottomHalf, "updateClayX", configMINIMAL_STACK_SIZE, NULL, 4, &TaskH_accelerometerXBottomHalf);
     xTaskCreate(Task_background, "background", configMINIMAL_STACK_SIZE, NULL, 2, &TaskH_background);
     xTaskCreate(Task_score, "score", configMINIMAL_STACK_SIZE, NULL, 2, &TaskH_score);
-    xTaskCreate(Task_crosshair, "crosshair", configMINIMAL_STACK_SIZE, NULL, 4, &TaskH_crosshair);
+    xTaskCreate(Task_crosshairBottomHalf, "updateCrosshairMovement", configMINIMAL_STACK_SIZE, NULL, 4, &TaskH_crosshairBottomHalf);
     xTaskCreate(Task_drawCrosshair, "drawCrosshair", configMINIMAL_STACK_SIZE, NULL, 2, &TaskH_drawCrosshair);
 
     //xTaskCreate(Task_clayPigeon, "drawClay", configMINIMAL_STACK_SIZE, NULL, 4, &TaskH_clayPigeon);
@@ -87,7 +84,7 @@ int main(void)
 
     xTaskCreate(Task_drawScreen, "drawScreen", configMINIMAL_STACK_SIZE, NULL, 2, &TaskH_drawScreen);
     xTaskCreate(TaskBlast, "blast", configMINIMAL_STACK_SIZE, NULL, 4, &TaskH_TaskBlast);
-    xTaskCreate(Task_timer, "buttonADCTimer", configMINIMAL_STACK_SIZE, NULL, 3, &TaskH_timer); // TODO
+    xTaskCreate(Task_timer, "buttonADCTimer", configMINIMAL_STACK_SIZE, NULL, 3, &TaskH_timer);
     xTaskCreate(Task_endGame, "endGame", configMINIMAL_STACK_SIZE, NULL, 4, &TaskH_endGame);
 
     xTaskNotifyGive(TaskH_background); //TODO

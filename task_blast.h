@@ -12,11 +12,12 @@
 #include "buzzer.h"
 
 
-// TODO Play a note for the given duration
-// TODO Remove???
-void play_note(uint32_t period, uint16_t ms_time);
-
-// TODO Header
+/******************************************************************************
+* This task is notified when S2 on MKII is pressed while the clay is in the
+* air. It fires at the location of the crosshair, updates the score and number
+* of clays hit, and plays one of two sounds on the MKII buzzer depending on
+* whether or not the clay was hit (if the crosshair and clay images overlap).
+******************************************************************************/
 void TaskBlast(void *pvParameters);
 
 extern TaskHandle_t TaskH_TaskBlast;

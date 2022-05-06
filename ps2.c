@@ -13,7 +13,7 @@ volatile uint32_t PS2_Y_VAL = 0;
 volatile uint32_t ACCEL_X = 0;
 volatile uint32_t ACCEL_Y = 0;
 
-TaskHandle_t TaskH_crosshair;
+TaskHandle_t TaskH_crosshairBottomHalf;
 TaskHandle_t TaskH_clayPigeon;
 TaskHandle_t TaskH_accelerometerXBottomHalf;
 
@@ -42,21 +42,20 @@ void adc14_init(void) {
     // Associate the X direction analog signal with MEM[0]
     ADC14->MCTL[0] = ADC14_MCTLN_INCH_15;
     // Associate the Y direction analog signal with MEM[1]
-    // TODO Remove: This is the end of a sequence.
-    ADC14->MCTL[1] = ADC14_MCTLN_INCH_9;// | ADC14_MCTLN_EOS; // TODO NO: Keep EOS from before ????
+    ADC14->MCTL[1] = ADC14_MCTLN_INCH_9;
     // Associate the accelerometer X direction analog signal with MEM[2]
     ADC14->MCTL[2] = ADC14_MCTLN_INCH_14;
     // Associate the accelerometer X direction analog signal with MEM[2]
     // This is the end of a sequence.
-    ADC14->MCTL[3] = ADC14_MCTLN_INCH_13 | ADC14_MCTLN_EOS; // TODO EOS ????
+    ADC14->MCTL[3] = ADC14_MCTLN_INCH_13 | ADC14_MCTLN_EOS;
 
     // Enable interrupts in the ADC AFTER a value is written into MEM[1] or MEM[3].
-    ADC14->IER0 = ADC14_IER0_IE3; // TODO Remove: ADC14_IER0_IE1 | ADC14_IER0_IE3;
+    ADC14->IER0 = ADC14_IER0_IE3;
 
     // Enable ADC Interrupt in the NVIC
     NVIC_EnableIRQ(ADC14_IRQn);
     // Set ADC Interrupt priority. Priority is greater than 2 to ensure it doesn't interrupt the FreeRTOS scheduler
-    NVIC_SetPriority(ADC14_IRQn, 4); // TODO Change to 3 since t32 is removed
+    NVIC_SetPriority(ADC14_IRQn, 3); // TODO Change to 3 since t32 is removed
     // Turn ADC ON
     ADC14->CTL0 |= ADC14_CTL0_ON;
 }
@@ -74,7 +73,7 @@ void ADC14_IRQHandler(void) {
     PS2_Y_VAL = ADC14->MEM[1];
 
     // Notify the crosshair task to update the crosshair's movement based on the joystick values
-    vTaskNotifyGiveFromISR(TaskH_crosshair, &xHigherPriorityTaskWoken);
+    vTaskNotifyGiveFromISR(TaskH_crosshairBottomHalf, &xHigherPriorityTaskWoken);
 
     portYIELD_FROM_ISR( xHigherPriorityTaskWoken );
 
@@ -87,9 +86,10 @@ void ADC14_IRQHandler(void) {
 
     portYIELD_FROM_ISR( xHigherPriorityTaskWoken );
 
-    // Debounce accelerometer y value to filter out readings from shaking the board
+    // Get accelerometer y value
     ACCEL_Y = ADC14->MEM[3];
 
+    // "Debounce" accelerometer y value to filter out readings from shaking the board
     y_tilt_f_state = y_tilt_f_state << 1 | (ACCEL_Y > VOLT_TILT_F);
     y_tilt_b_state = y_tilt_b_state << 1 | (ACCEL_Y < VOLT_TILT_B);
 
@@ -109,7 +109,6 @@ void ADC14_IRQHandler(void) {
             xSemaphoreGiveFromISR(Sem_ClayLaunched, &xHigherPriorityTaskWoken);
         else if(!AMMO) // The clay is in the air and there is no ammo, so reload
             AMMO = true; // Reload ammo
-            // TODO xQueueSendToBackFromISR(Queue_Ammo, &ammo, 0); // Reload ammo
     }
 
 }

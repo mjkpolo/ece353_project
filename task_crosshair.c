@@ -9,12 +9,12 @@
 #include "lcd.h"
 #include "ps2.h"
 
-TaskHandle_t TaskH_crosshair;
+TaskHandle_t TaskH_crosshairBottomHalf;
 TaskHandle_t TaskH_drawCrosshair;
 MOVE_t crosshair_move;
 
 // TODO header. Also, Task_crosshairBottomHalf
-void Task_crosshair(void* pvParameters)
+void Task_crosshairBottomHalf(void* pvParameters)
 {
     BaseType_t status;
 
@@ -59,7 +59,7 @@ void Task_drawCrosshair(void* pvParameters) {
         switch(crosshair_move.y) {
             case UP:
                 // Make sure the crosshair doesn't go past the top boundary of the screen
-                if (crosshair_y > (CROSSHAIR_HEIGHT / 2) + STEP_VAL + 2)
+                if (crosshair_y > (CROSSHAIR_HEIGHT / 2) + STEP_VAL + 1)
                     crosshair_y -= STEP_VAL;
                 break;
             case DOWN:

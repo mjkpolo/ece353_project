@@ -10,7 +10,7 @@
 #include "ps2.h"
 
 TaskHandle_t TaskH_endGame;
-TaskHandle_t TaskH_crosshair;
+TaskHandle_t TaskH_crosshairBottomHalf;
 TaskHandle_t TaskH_score;
 TaskHandle_t TaskH_background; // TODO
 SemaphoreHandle_t Sem_Timer;
@@ -35,18 +35,17 @@ void Task_endGame(void* pvParameters) {
         PS2_X_VAL = 2000;
         PS2_Y_VAL = 2000;
 
-        // Notify Task_crosshair to update the x and y movements of the crosshair (so it stops moving)
-        xTaskNotifyGive(TaskH_crosshair);
+        // Notify Task_crosshairBottomHalf to update the x and y movements of the crosshair (so it stops moving)
+        xTaskNotifyGive(TaskH_crosshairBottomHalf);
 
-        // TODO Maybe just delay for a few ms to let the crosshair stop
+        // Delay for a few ms to allow the crosshair to stop
+        vTaskDelay(pdMS_TO_TICKS(5));
 
         // Erase the crosshair
         erase_image(&crosshair);
 
         // Draw end of game splash screen
         draw_end_splash(&end_splash, 66, 66);
-
-        // TODO Use S1 instead
 
         while (buttonState != 0xFF) {
             // Debounce S1 on MKII
@@ -60,12 +59,11 @@ void Task_endGame(void* pvParameters) {
         // Erase the end of game splash screen
         erase_image(&end_splash);
 
-        // Reset score TODO Remove: (by sending a point value of 255)
-        // TODO xQueueSendToBack(Queue_Score, &buttonState, portMAX_DELAY);
+        // Reset score
         SCORE = 0;
         xTaskNotifyGive(TaskH_score);
 
-        // TODO Only do this if I make the crosshair's x and y globals: Redraw the crosshair
+        // Move the crosshair to the center of the screen and redraw it
         crosshair_x = 64;
         crosshair_y = 64;
         draw_crosshair(&crosshair, crosshair_x, crosshair_y);
@@ -73,7 +71,7 @@ void Task_endGame(void* pvParameters) {
         // Reset buttonState
         buttonState = 0;
 
-        // TODO Reset number of clay pigeons hit and number of points per clay pigeon
+        // Reset number of clay pigeons hit
         CLAYS_HIT = 0;
 
         // Give the timer semaphore to enable gameplay/user input again
