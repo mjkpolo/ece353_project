@@ -18,7 +18,7 @@
 
 #define STEP_VAL 1
 #define SKY_BOTTOM_Y 95
-#define CLAYS_PER_LEVEL 1
+#define CLAYS_PER_LEVEL 3
 
 extern SemaphoreHandle_t Sem_LCD; // TODO Is this still needed???
 

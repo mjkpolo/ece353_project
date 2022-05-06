@@ -84,7 +84,7 @@ void Task_clayPigeon(void *pvParameters)
 
             // Wait for a certain amount of time (no less than 10ms) according to the number of clays hit
             // As more clays are hit, the wait time will decrease
-            vTaskDelay(pdMS_TO_TICKS((dt > 15) ? 5 : (20 - dt)));
+            vTaskDelay(pdMS_TO_TICKS((CLAYS_PER_LEVEL*dt > 25) ? 5 : (30 - CLAYS_PER_LEVEL*dt)));
         }
 
         // Give semaphore to indicate that the clay is no longer in the air
