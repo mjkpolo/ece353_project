@@ -304,16 +304,15 @@ void draw(image* image)
       HAL_LCD_writeCommand(CM_RAMWR);
 
       for (i = y0; i <= y1; i++) {
-          for (j = x0; j <= x1; j++) {
-              for (k = 0; k < numImages; k++) {
-                  if (draw_pixel(images[k], i, j))
-                      break;
-              }
-              if (k == numImages) { // just draw black if no pixel found
-                  HAL_LCD_writeData(0x0);
-                  HAL_LCD_writeData(0x0);
-              }
+        for (j = x0; j <= x1; j++) {
+          for (k=0; k<numImages; k++) {
+            if (images[k]->inQueue ? (images[k]==image ? draw_pixel(image,i,j) : false) : draw_pixel(images[k],i,j)) break;
           }
+          if (k==numImages) {
+            HAL_LCD_writeData(0x0);
+            HAL_LCD_writeData(0x0);
+          }
+        }
       }
     }
 }
