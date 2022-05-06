@@ -18,7 +18,7 @@ static const uint8_t _crosshair_bm_0x0[] = {
   0x1, 0x0
 };
 
-static const uint8_t _crosshair_bm_0xc718[] = {
+static const uint8_t _crosshair_bm_0xe71c[] = {
   0x0, 0x0,
   0x1, 0x0,
   0x3f, 0xf8,
@@ -38,7 +38,7 @@ static const uint8_t _crosshair_bm_0xc718[] = {
 
 static layer _layers_crosshair[] = {
   {58,72,52,66,0x0,_crosshair_bm_0x0},
-  {58,72,52,66,0xc718,_crosshair_bm_0xc718}
+  {58,72,52,66,0xe71c,_crosshair_bm_0xe71c}
 };
 
 void draw_crosshair(image* image, short x, short y) {
