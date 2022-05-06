@@ -22,7 +22,9 @@
 
 extern SemaphoreHandle_t Sem_LCD; // TODO Is this still needed???
 
-// TODO Remove: extern TaskHandle_t TaskH_updateBackground;
+extern volatile uint8_t CLAYS_HIT;
+extern volatile bool AMMO;
+extern volatile uint16_t SCORE;
 
 
 #endif /* MAIN_H_ */

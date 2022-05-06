@@ -13,18 +13,13 @@
 
 
 // TODO Play a note for the given duration
+// TODO Remove???
 void play_note(uint32_t period, uint16_t ms_time);
 
-/******************************************************************************
-* TODO Prints a message to the Console
-******************************************************************************/
+// TODO Header
 void TaskBlast(void *pvParameters);
 
 extern TaskHandle_t TaskH_TaskBlast;
-
-extern QueueHandle_t Queue_Score;
-extern QueueHandle_t Queue_Hit;
-extern QueueHandle_t Queue_Ammo;
 
 
 #endif /* TASK_BLAST_H_ */

@@ -63,16 +63,5 @@ void MKII_Buzzer_On(void);
  *******************************************************/
 void MKII_Buzzer_Off(void);
 
-// TODO ??? \/\/\/ Remove \/\/\/ ???
-/********************************************************
- * Check Buzzer Run Status
- *
- * Parameters
- *      None
- * Returns
- *      true  if TimerA0 is on
- *      false if TimerA0 is off
- *******************************************************/
-bool MKII_Buzzer_Run_Status(void);
 
 #endif /* BUZZER_H_ */

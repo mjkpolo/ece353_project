@@ -1,10 +1,6 @@
 #include "main.h"
 #include "msp.h"
 #include "msp432p401r.h"
-// TODO Remove: #include "msp.h"
-// TODO Remove: #include "msp432p401r.h"
-
-
 // Tasks
 #include "task_blast.h"
 #include "task_clayPigeon.h"
@@ -12,37 +8,29 @@
 #include "task_background.h"
 #include "task_drawScreen.h"
 #include "task_timer.h" // TODO
-#include "task_endGame.h" // TODO
+#include "task_endGame.h"
+#include "task_score.h"
 // Non-FreeRTOS
 #include "images.h"
-#include "lcd.h" // TODO Move hardware-related/non-FreeRTOS headers into main.h
+#include "lcd.h"
 #include "opt3001.h"
 #include "ps2.h"
-//#include "serial_debug.h"
 // TODO Remove #include "timer32.h"
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdio.h>
 
-
 // TODO SemaphoreHandle_t Sem_LCD = NULL;
 
-//TODO TaskHandle_t TaskH_clayPigeon;
-//TODO TaskHandle_t TaskH_crosshair;
+extern SemaphoreHandle_t Sem_Erase; // TODO
 
-// TODO Remove QueueHandle_t Queue_PS2; // TODO Move to joystick task file
+volatile uint8_t CLAYS_HIT = 0; // Number of clays hit
+volatile bool AMMO = false; // true if there is ammo; false otherwise
+volatile uint16_t SCORE = 0; // Score
 
-/* TODO
-extern image background;
-extern image crosshair;
-extern image score;
-extern image pidgeon;*/
-
-extern SemaphoreHandle_t Sem_Erase;
-
+// TODO Header
 inline void init(void)
 {
-    // TODO P3->DIR &= ~BIT5;
     P5->DIR &= ~BIT1;
     P5->DIR &= ~BIT5;
 
@@ -52,7 +40,6 @@ inline void init(void)
     adc14_init();
     i2c_init();
     opt3001_init();
-    //serial_debug_init();
 }
 
 // TODO Header ig
@@ -79,32 +66,18 @@ int main(void)
     numImages = add_image(&background);
 
     Draw_Queue = xQueueCreate(numImages,sizeof(image*));
-    // TODO Queue_Accelerometer = xQueueCreate(1, sizeof(MOVE_DIR)); // TODO sizeof(LEFT) or sizeof(uint8_t) or 1???
-    Queue_PS2 = xQueueCreate(1, sizeof(MOVE_t)); // TODO size ???
-    Queue_Score = xQueueCreate(1, sizeof(uint8_t));
-    Queue_Hit = xQueueCreate(1, sizeof(uint8_t));
-    Queue_Ammo = xQueueCreate(1, sizeof(uint8_t));
 
-    // TODO Remove: Draw_Queue = xQueueCreate(8,sizeof(image*));
-
-    /* TODO Remove
-    add_image(&crosshair);
-    add_image(&pidgeon);
-    add_image(&score);
-    numImages = add_image(&background);
-    Draw_Queue = xQueueCreate(numImages,sizeof(image*));
-
-    xSemaphoreGive(Sem_LCD);*/
+    // TODO Remove: xSemaphoreGive(Sem_LCD);
     xTaskCreate(Task_clayPigeon, "drawClay", configMINIMAL_STACK_SIZE, NULL, 2, &TaskH_clayPigeon);
     xTaskCreate(Task_accelerometerXBottomHalf, "updateClayX", configMINIMAL_STACK_SIZE, NULL, 4, &TaskH_accelerometerXBottomHalf);
     xTaskCreate(Task_background, "background", configMINIMAL_STACK_SIZE, NULL, 2, &TaskH_background);
+    xTaskCreate(Task_score, "score", configMINIMAL_STACK_SIZE, NULL, 2, &TaskH_score);
     xTaskCreate(Task_crosshair, "crosshair", configMINIMAL_STACK_SIZE, NULL, 4, &TaskH_crosshair);
     xTaskCreate(Task_drawCrosshair, "drawCrosshair", configMINIMAL_STACK_SIZE, NULL, 2, &TaskH_drawCrosshair);
     xTaskCreate(Task_drawScreen, "drawScreen", configMINIMAL_STACK_SIZE, NULL, 2, &TaskH_drawScreen);
     xTaskCreate(TaskBlast, "blast", configMINIMAL_STACK_SIZE, NULL, 4, &TaskH_TaskBlast);
     xTaskCreate(Task_timer, "buttonADCTimer", configMINIMAL_STACK_SIZE, NULL, 3, &TaskH_timer); // TODO
-    xTaskCreate(Task_endGame, "endGame", configMINIMAL_STACK_SIZE, NULL, 5, &TaskH_endGame); // TODO
-    // TODO xTaskCreate(Task_s2, "s2", configMINIMAL_STACK_SIZE, NULL, 4, &TaskH_s2);
+    xTaskCreate(Task_endGame, "endGame", configMINIMAL_STACK_SIZE, NULL, 4, &TaskH_endGame);
 
     vTaskStartScheduler();
     while (true);

@@ -8,7 +8,7 @@
 #include "task_timer.h"
 
 TaskHandle_t TaskH_timer;
-TaskHandle_t TaskH_TaskBlast; // TODO include task_blast???
+TaskHandle_t TaskH_TaskBlast;
 
 SemaphoreHandle_t Sem_Timer;
 

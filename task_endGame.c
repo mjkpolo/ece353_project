@@ -6,15 +6,13 @@
  */
 
 #include "task_endGame.h"
-#include "lcd.h" // TODO
-#include "ps2.h" // TODO
+#include "lcd.h"
+#include "ps2.h"
 
 TaskHandle_t TaskH_endGame;
 TaskHandle_t TaskH_crosshair;
-TaskHandle_t TaskH_clayPigeon; // TODO
+TaskHandle_t TaskH_score;
 SemaphoreHandle_t Sem_Timer;
-QueueHandle_t Queue_Hit; // TODO
-QueueHandle_t Queue_Score;
 
 // TODO Header
 bool MKII_S1(void) {
@@ -39,6 +37,8 @@ void Task_endGame(void* pvParameters) {
         // Notify Task_crosshair to update the x and y movements of the crosshair (so it stops moving)
         xTaskNotifyGive(TaskH_crosshair);
 
+        // TODO Maybe just delay for a few ms to let the crosshair stop
+
         // Erase the crosshair
         erase_image(&crosshair);
 
@@ -57,16 +57,19 @@ void Task_endGame(void* pvParameters) {
         // Erase the end of game splash screen
         erase_image(&end_splash);
 
-        // Reset score and all context for the game
-        xQueueSendToBack(Queue_Score, &buttonState, portMAX_DELAY);
+        // Reset score TODO Remove: (by sending a point value of 255)
+        // TODO xQueueSendToBack(Queue_Score, &buttonState, portMAX_DELAY);
+        SCORE = 0;
+        xTaskNotifyGive(TaskH_score);
+
+        // TODO Only do this if I make the crosshair's x and y globals: Redraw the crosshair
+        // TODO draw_crosshair(&crosshair, );
 
         // Reset buttonState
         buttonState = 0;
 
         // TODO Reset number of clay pigeons hit and number of points per clay pigeon
-
-        //xQueueSendToBack(Queue_Hit, &buttonState, portMAX_DELAY);
-        //xTaskNotifyGive(TaskH_clayPigeon);
+        CLAYS_HIT = 0;
 
         // Give the timer semaphore to enable gameplay/user input again
         xSemaphoreGive(Sem_Timer);

@@ -11,7 +11,6 @@
 
 TaskHandle_t TaskH_crosshair;
 TaskHandle_t TaskH_drawCrosshair;
-// TODO Remove QueueHandle_t Queue_PS2;
 MOVE_t crosshair_move;
 
 // TODO header. Also, Task_crosshairBottomHalf
@@ -87,6 +86,6 @@ void Task_drawCrosshair(void* pvParameters) {
             draw_crosshair(&crosshair, x, y);
         }
 
-        vTaskDelay(pdMS_TO_TICKS(10)); // TODO Adjust the wait time to adjust the speed of the crosshair
+        vTaskDelay(pdMS_TO_TICKS(20)); // TODO Adjust the wait time to adjust the speed of the crosshair
     }
 }
