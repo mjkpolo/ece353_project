@@ -70,20 +70,20 @@ int main(void)
 
     Draw_Queue = xQueueCreate(numImages,sizeof(image*));
 
-    xTaskCreate(Task_clayPigeon, "drawClay", configMINIMAL_STACK_SIZE, NULL, 4, &TaskH_clayPigeon);
-    xTaskCreate(Task_accelerometerXBottomHalf, "updateClayX", configMINIMAL_STACK_SIZE, NULL, 3, &TaskH_accelerometerXBottomHalf);
-    xTaskCreate(Task_background, "background", configMINIMAL_STACK_SIZE, NULL, 4, &TaskH_background);
-    xTaskCreate(Task_score, "score", configMINIMAL_STACK_SIZE, NULL, 4, &TaskH_score);
-    xTaskCreate(Task_crosshair, "crosshair", configMINIMAL_STACK_SIZE, NULL, 3, &TaskH_crosshair);
-    xTaskCreate(Task_drawCrosshair, "drawCrosshair", configMINIMAL_STACK_SIZE, NULL, 4, &TaskH_drawCrosshair);
-    
-    //xTaskCreate(Task_clayPigeon, "drawClay", configMINIMAL_STACK_SIZE, NULL, 2, &TaskH_clayPigeon);
-    //xTaskCreate(Task_accelerometerXBottomHalf, "updateClayX", configMINIMAL_STACK_SIZE, NULL, 4, &TaskH_accelerometerXBottomHalf);
-    //xTaskCreate(Task_background, "background", configMINIMAL_STACK_SIZE, NULL, 2, &TaskH_background);
-    //xTaskCreate(Task_score, "score", configMINIMAL_STACK_SIZE, NULL, 2, &TaskH_score);
-    //xTaskCreate(Task_crosshair, "crosshair", configMINIMAL_STACK_SIZE, NULL, 4, &TaskH_crosshair);
-    //xTaskCreate(Task_drawCrosshair, "drawCrosshair", configMINIMAL_STACK_SIZE, NULL, 2, &TaskH_drawCrosshair);
+    xTaskCreate(Task_clayPigeon, "drawClay", configMINIMAL_STACK_SIZE, NULL, 2, &TaskH_clayPigeon);
+    xTaskCreate(Task_accelerometerXBottomHalf, "updateClayX", configMINIMAL_STACK_SIZE, NULL, 4, &TaskH_accelerometerXBottomHalf);
+    xTaskCreate(Task_background, "background", configMINIMAL_STACK_SIZE, NULL, 2, &TaskH_background);
+    xTaskCreate(Task_score, "score", configMINIMAL_STACK_SIZE, NULL, 2, &TaskH_score);
+    xTaskCreate(Task_crosshair, "crosshair", configMINIMAL_STACK_SIZE, NULL, 4, &TaskH_crosshair);
+    xTaskCreate(Task_drawCrosshair, "drawCrosshair", configMINIMAL_STACK_SIZE, NULL, 2, &TaskH_drawCrosshair);
 
+    //xTaskCreate(Task_clayPigeon, "drawClay", configMINIMAL_STACK_SIZE, NULL, 4, &TaskH_clayPigeon);
+    //xTaskCreate(Task_accelerometerXBottomHalf, "updateClayX", configMINIMAL_STACK_SIZE, NULL, 3, &TaskH_accelerometerXBottomHalf);
+    //xTaskCreate(Task_background, "background", configMINIMAL_STACK_SIZE, NULL, 4, &TaskH_background);
+    //xTaskCreate(Task_score, "score", configMINIMAL_STACK_SIZE, NULL, 4, &TaskH_score);
+    //xTaskCreate(Task_crosshair, "crosshair", configMINIMAL_STACK_SIZE, NULL, 3, &TaskH_crosshair);
+    //xTaskCreate(Task_drawCrosshair, "drawCrosshair", configMINIMAL_STACK_SIZE, NULL, 4, &TaskH_drawCrosshair);
+    
 
     xTaskCreate(Task_drawScreen, "drawScreen", configMINIMAL_STACK_SIZE, NULL, 2, &TaskH_drawScreen);
     xTaskCreate(TaskBlast, "blast", configMINIMAL_STACK_SIZE, NULL, 4, &TaskH_TaskBlast);
