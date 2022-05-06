@@ -306,7 +306,7 @@ void draw(image* image)
       for (i = y0; i <= y1; i++) {
         for (j = x0; j <= x1; j++) {
           for (k=0; k<numImages; k++) {
-            if (images[k]->inQueue ? (images[k]==image ? draw_pixel(image,i,j) : false) : draw_pixel(images[k],i,j)) break;
+            if (draw_pixel(images[k],i,j)) break;
           }
           if (k==numImages) {
             HAL_LCD_writeData(0x0);
