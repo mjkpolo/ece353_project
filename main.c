@@ -91,12 +91,12 @@ int main(void)
 
     xSemaphoreGive(Sem_LCD);*/
     xTaskCreate(Task_clayPigeon, "drawClay", configMINIMAL_STACK_SIZE, NULL, 5, &TaskH_clayPigeon);
-    xTaskCreate(Task_accelerometerXBottomHalf, "updateClayX", configMINIMAL_STACK_SIZE, NULL, 4, &TaskH_accelerometerXBottomHalf);
+    xTaskCreate(Task_accelerometerXBottomHalf, "updateClayX", configMINIMAL_STACK_SIZE, NULL, 3, &TaskH_accelerometerXBottomHalf);
     xTaskCreate(Task_background, "background", configMINIMAL_STACK_SIZE, NULL, 5, &TaskH_background);
     xTaskCreate(Task_crosshair, "crosshair", configMINIMAL_STACK_SIZE, NULL, 5, &TaskH_crosshair);
     xTaskCreate(Task_drawCrosshair, "drawCrosshair", configMINIMAL_STACK_SIZE, NULL, 3, &TaskH_drawCrosshair);
     xTaskCreate(Task_drawScreen, "drawScreen", configMINIMAL_STACK_SIZE, NULL, 2, &TaskH_drawScreen);
-    xTaskCreate(TaskBlast, "blast", configMINIMAL_STACK_SIZE, NULL, 4, &TaskH_TaskBlast);
+    xTaskCreate(TaskBlast, "blast", configMINIMAL_STACK_SIZE, NULL, 3, &TaskH_TaskBlast);
     // TODO xTaskCreate(Task_s2, "s2", configMINIMAL_STACK_SIZE, NULL, 4, &TaskH_s2);
 
     vTaskStartScheduler();
