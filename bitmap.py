@@ -1,6 +1,9 @@
 #!/usr/bin/env python
 import sys
 
+'''
+Paste bitmaps from header file into stdout and pipe into this screen to see what it'd look like
+'''
 
 def main(hexes):
     hex2bin = lambda h : (' '*8+bin(int(h,base=16))[2:].replace('0',' ').replace('1','#'))[-8:]
