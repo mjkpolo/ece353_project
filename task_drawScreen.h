@@ -10,7 +10,7 @@
 
 #include "main.h"
 
-// TODO header
+/* responsible for managing the image queue and sending them to the LCD */
 void Task_drawScreen(void* pvParameters);
 
 extern TaskHandle_t TaskH_drawScreen;
