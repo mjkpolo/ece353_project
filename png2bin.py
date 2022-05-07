@@ -101,7 +101,7 @@ def main(names, move):
         img = cv2.cvtColor(cv2.imread(name, cv2.IMREAD_UNCHANGED), cv2.COLOR_BGRA2RGBA).astype(np.uint16)
         
         '''
-        CONVERT TO 16 BIT
+        CONVERT TO 16 BIT : 5R 6G 5B
         '''
         R = (img[:,:,0] >> 3 & 0x18)
         G = (img[:,:,1] >> 2 & 0x38)
@@ -109,7 +109,7 @@ def main(names, move):
         A = (img[:,:,3] > (1 << 7)).astype(bool) # consider alpha < 128 (max val 255) clear
 
         np.place(layer, A ,((R << 11) | (G << 5) | B)[A])
-        layer.mask &= ~A
+        layer.mask &= ~A # remove alpha where layer isn't clear
     
     with open(f'{os.path.splitext(name)[0]}.h', mode='w') as file:
         file.write(reduce(lambda a,b:a+b, getBitmaps(layer, os.path.splitext(name)[0], move)))

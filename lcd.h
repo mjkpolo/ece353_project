@@ -85,7 +85,7 @@ typedef struct {
     short y1;
     const uint16_t color;
     const uint8_t* bitmap;
-} layer;
+} layer; // stores our bitmaps
 
 typedef struct {
     short x0;
@@ -100,9 +100,9 @@ typedef struct {
     size_t numLayers;
     bool inQueue;
     bool moving;
-} image;
+} image; // stores our layers
 
-extern image pidgeon, score, crosshair, background, end_splash; // TODO
+extern image pidgeon, score, crosshair, background, end_splash;
 
 
 void draw(image* image);
