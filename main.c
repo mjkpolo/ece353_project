@@ -23,7 +23,7 @@ extern SemaphoreHandle_t Sem_Erase;
 
 uint8_t CLAYS_HIT = 0; // Number of clays hit
 uint16_t SCORE = 0; // Score
-short crosshair_x = 64, crosshair_y = 64;
+short crosshair_x = 64, crosshair_y = 64; // Crosshair x and y positions
 volatile bool AMMO = false; // true if there is ammo; false otherwise
 
 /******************************************************************************
@@ -36,11 +36,9 @@ inline void init(void)
 
     Crystalfontz128x128_Init();
 
-    // TODO Remove t32_init();
     adc14_init();
     i2c_init();
     opt3001_init();
-    //serial_debug_init();
 }
 
 /******************************************************************************
@@ -51,17 +49,23 @@ inline void init(void)
 int main(void)
 {
     WDT_A->CTL = WDT_A_CTL_PW | WDT_A_CTL_HOLD; // stop watchdog timer
-    init();
-    size_t numImages;
 
+    size_t numImages; // Number of images
+
+    // Initialize hardware/peripheral devices
+    init();
+
+    // Create semaphores
     Sem_ClayLaunched = xSemaphoreCreateBinary();
     Sem_Erase = xSemaphoreCreateBinary();
     Sem_Timer = xSemaphoreCreateBinary();
 
+    // Give semaphores
     xSemaphoreGive(Sem_ClayLaunched);
     xSemaphoreGive(Sem_Erase);
     xSemaphoreGive(Sem_Timer);
 
+    // Add images to list of image pointers
     add_image(&crosshair);
     add_image(&pidgeon);
     add_image(&score);
@@ -69,8 +73,10 @@ int main(void)
     add_image(&warn_ammo);
     numImages = add_image(&background);
 
+    // Create draw queue
     Draw_Queue = xQueueCreate(numImages,sizeof(image*));
 
+    // Create tasks
     xTaskCreate(Task_clayPigeon, "drawClay", configMINIMAL_STACK_SIZE, NULL, 4, &TaskH_clayPigeon);
     xTaskCreate(Task_accelerometerXBottomHalf, "updateClayX", configMINIMAL_STACK_SIZE, NULL, 3, &TaskH_accelerometerXBottomHalf);
     xTaskCreate(Task_background, "background", configMINIMAL_STACK_SIZE, NULL, 4, &TaskH_background);

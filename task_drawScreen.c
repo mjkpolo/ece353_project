@@ -11,16 +11,17 @@
 TaskHandle_t TaskH_drawScreen;
 QueueHandle_t Draw_Queue;
 
-// TODO header
+
+/******************************************************************************
+* Receives images that were either filled, or recently erased, and sends them
+* to the LCD
+******************************************************************************/
 void Task_drawScreen(void* pvParameters)
 {
     while(true) {
-
-      // TODO Draw crosshair and clay pigeon here
-
       image* image = NULL;
       xQueueReceive(Draw_Queue, &image, portMAX_DELAY);
-      if (image) draw(image);
+      if (image) draw(image); // draw the image if it didn't stay null
       vTaskDelay(pdMS_TO_TICKS(30));
     }
 }

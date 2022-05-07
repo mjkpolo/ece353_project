@@ -43,7 +43,9 @@ void TaskBlast(void *pvParameters)
         {NOTE_DS, 2, 20},
     };
 
+    // Size of sound array
     const int HIT_SOUND_SIZE = sizeof hit_sound / sizeof hit_sound[0];
+    // Max frequency of miss sound
     const int MISS_SOUND_MAX = (int)(NOTE_C * pow(2, 3.25));
     int i = 0;
 

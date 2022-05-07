@@ -18,13 +18,10 @@ typedef struct {
     MOVE_DIR y;
 } MOVE_t;
 
-
-// TODO remove any unnecessary values
-extern volatile uint32_t ACCEL_X;
-extern volatile uint32_t ACCEL_Y;
-
 extern volatile uint32_t PS2_X_VAL;
 extern volatile uint32_t PS2_Y_VAL;
+extern volatile uint32_t ACCEL_X;
+extern volatile uint32_t ACCEL_Y;
 
 /******************************************************************************
 * Initialize ADC14

@@ -7,7 +7,6 @@
 
 #include "adc14.h"
 
-// TODO Remove any unnecessary values
 volatile uint32_t PS2_X_VAL = 0;
 volatile uint32_t PS2_Y_VAL = 0;
 volatile uint32_t ACCEL_X = 0;
@@ -58,7 +57,7 @@ void adc14_init(void) {
     // Enable ADC Interrupt in the NVIC
     NVIC_EnableIRQ(ADC14_IRQn);
     // Set ADC Interrupt priority. Priority is greater than 2 to ensure it doesn't interrupt the FreeRTOS scheduler
-    NVIC_SetPriority(ADC14_IRQn, 3); // TODO Change to 3 since t32 is removed
+    NVIC_SetPriority(ADC14_IRQn, 3);
     // Turn ADC ON
     ADC14->CTL0 |= ADC14_CTL0_ON;
 }
@@ -88,7 +87,6 @@ void ADC14_IRQHandler(void) {
     // Get accelerator x value
     ACCEL_X = ADC14->MEM[2];
 
-    // TODO move this to the bottom of the ISR and rework the logic so that the tasks are only notified at appropriate times (when the clay is either in the air or not yet launched)
     // Notify bottom half task to update the clay pigeon's x movement direction
     vTaskNotifyGiveFromISR(TaskH_accelerometerXBottomHalf, &xHigherPriorityTaskWoken);
 
@@ -111,7 +109,7 @@ void ADC14_IRQHandler(void) {
     // Reload once when the user tilts the board backward
     else if(y_tilt_b_state == 0x7F) {
         // Try to take Sem_ClayLaunched to check if the clay is currently in the air
-        status = xSemaphoreTakeFromISR(Sem_ClayLaunched, &xHigherPriorityTaskWoken); // TODO Change to reloading semaphore
+        status = xSemaphoreTakeFromISR(Sem_ClayLaunched, &xHigherPriorityTaskWoken);
 
         if(status == pdPASS) // The clay is not in the air (status == pdPASS), so just give the semaphore back and don't reload
             xSemaphoreGiveFromISR(Sem_ClayLaunched, &xHigherPriorityTaskWoken);

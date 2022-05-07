@@ -16,7 +16,6 @@
 void opt3001_init(void)
 {
     // Initialize OPT3001
-    // i2c_write_16(OPT3001_SLAVE_ADDRESS, 0, 0x06);
     i2c_write_16(OPT3001_SLAVE_ADDRESS, CONFIG_REG, 0xC410);
 }
 

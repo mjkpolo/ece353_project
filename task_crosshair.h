@@ -10,9 +10,16 @@
 
 #include "main.h"
 
-// TODO Header
+/******************************************************************************
+* Bottom Half Task. Examines the ADC data from the joystick on the MKII and
+* sets the crosshair's movement directions accordingly
+******************************************************************************/
 void Task_crosshairBottomHalf(void* pvParameters);
-// TODO Header
+
+/******************************************************************************
+* Updates the x and y positions of the crosshair and draws the crosshair at
+* those x and y positions
+******************************************************************************/
 void Task_drawCrosshair(void* pvParameters);
 
 extern TaskHandle_t TaskH_crosshairBottomHalf;

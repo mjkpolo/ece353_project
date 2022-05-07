@@ -20,8 +20,6 @@ extern QueueHandle_t Draw_Queue;
  ******************************************************************************/
 void HAL_LCD_PortInit(void)
 {
-    // ADD CODE
-
     // LCD_SCK
     LCD_SCK_PORT->SEL0 |= LCD_SCK_PIN;
     LCD_SCK_PORT->SEL1 &= ~LCD_SCK_PIN;
@@ -48,7 +46,6 @@ void HAL_LCD_SpiInit(void)
 {
     EUSCI_B0->CTLW0 = EUSCI_B_CTLW0_SWRST; // Put eUSCI state machine in reset
 
-    // ADD CODE to define the behavior of the eUSCI_B0 as a SPI interface
     EUSCI_B0->CTLW0 = EUSCI_B_CTLW0_CKPH | // Phase 1
         EUSCI_B_CTLW0_MSB | // Msb first
         EUSCI_B_CTLW0_MST | // Set as SPI master
@@ -58,7 +55,7 @@ void HAL_LCD_SpiInit(void)
         // EUSCI_B_CTLW0_STEM | //UCxSTE digital output
         EUSCI_B_CTLW0_SWRST; // remain in eusci mode
 
-    // ADD CODE to set the SPI Clock to 12MHz.
+    // Set the SPI Clock to 12MHz.
     //
     // Divide clock speed by 2 (24MHz/2) = 12 MHz
     // fBitClock = fBRCLK/(UCBRx+1).
@@ -83,8 +80,6 @@ void HAL_LCD_SpiInit(void)
 //*****************************************************************************
 void HAL_LCD_writeCommand(uint8_t command)
 {
-    // ADD CODE
-
     // Set to command mode -- DC PIN Set to 0
     LCD_DC_PORT->OUT &= ~LCD_DC_PIN;
 
@@ -123,8 +118,6 @@ void HAL_LCD_writeData(uint8_t data)
 //*****************************************************************************
 void Crystalfontz128x128_SetDrawFrame(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1)
 {
-
-    // ADD CODE
     // Write the CM_CASET command followed by the 4 bytes of data
     // used to set the Column start and end rows.
     HAL_LCD_writeCommand(CM_CASET);
@@ -133,7 +126,6 @@ void Crystalfontz128x128_SetDrawFrame(uint16_t x0, uint16_t y0, uint16_t x1, uin
     HAL_LCD_writeData(x1 >> 8);
     HAL_LCD_writeData(x1);
 
-    // ADD CODE
     // Write the CM_RASET command followed by the 4 bytes of data
     // used to set the Row start and end rows.
     HAL_LCD_writeCommand(CM_RASET);
@@ -212,24 +204,24 @@ void Crystalfontz128x128_Init(void)
     HAL_LCD_writeData(CM_MADCTL_MX | CM_MADCTL_MY | CM_MADCTL_BGR);
 }
 
-image pidgeon, score, crosshair, background, end_splash, warn_ammo;
-static image** images = NULL;
+image pidgeon, score, crosshair, background, end_splash, warn_ammo; // all the layers we draw on
+static image** images = NULL; // all our images to iterate through
 static size_t numImages = 0;
 
 size_t add_image(image* i)
 {
     i->inQueue = false;
-    images = realloc(images, (numImages + 1) * sizeof(image*));
-    images[numImages++] = i;
+    images = realloc(images, (numImages + 1) * sizeof(image*)); // make room for another pointer
+    images[numImages++] = i; // place pointer in space
     i->layers = NULL;
-    return numImages;
+    return numImages; // used to create the size of draw queue
 }
 
 void erase_image(image* image)
 {
-    xSemaphoreTake(Sem_Erase, portMAX_DELAY);
+    xSemaphoreTake(Sem_Erase, portMAX_DELAY); // stop drawing to erase image
     image->numLayers = 0;
-    if (image->layers) free(image->layers);
+    if (image->layers) free(image->layers); // if pointer is not null, free it
     image->layers = NULL;
     image->x0 = 132;
     image->y0 = 132;
@@ -237,7 +229,7 @@ void erase_image(image* image)
     image->y1 = 0;
     xSemaphoreGive(Sem_Erase);
 
-    if (!image->inQueue) {
+    if (!image->inQueue) { // queue the empty area to be redrawn to clear the image
         xQueueSendToBack(Draw_Queue,&image,portMAX_DELAY);
         image->inQueue = true;
     }
@@ -245,18 +237,19 @@ void erase_image(image* image)
 
 void fill_image(image* image, layer* layers, size_t numLayers, bool moving)
 {
-    image->layers = (layer*)realloc(image->layers, (image->numLayers + numLayers) * sizeof(layer));
-    memcpy(&image->layers[image->numLayers], layers, sizeof(layer) * numLayers);
+    image->layers = (layer*)realloc(image->layers, (image->numLayers + numLayers) * sizeof(layer)); // make room for another layer
+    memcpy(&image->layers[image->numLayers], layers, sizeof(layer) * numLayers); // copy layer into space made
     image->numLayers += numLayers;
-    image->moving = moving;
+    image->moving = moving; // used to not iterate through moving images in draw queue later when drawing
     int i;
+    // expand max bounds of the image, which functions as a hitbox
     for (i = 0; i < numLayers; i++) {
         image->x0 = image->x0 < layers[i].x0 ? image->x0 : layers[i].x0;
         image->y0 = image->y0 < layers[i].y0 ? image->y0 : layers[i].y0;
         image->x1 = image->x1 > layers[i].x1 ? image->x1 : layers[i].x1;
         image->y1 = image->y1 > layers[i].y1 ? image->y1 : layers[i].y1;
     }
-    if (!image->inQueue) {
+    if (!image->inQueue) { // queue the image to be drawn
         xQueueSendToBack(Draw_Queue,&image,portMAX_DELAY);
         image->inQueue = true;
     }
@@ -265,14 +258,17 @@ void fill_image(image* image, layer* layers, size_t numLayers, bool moving)
 bool draw_pixel(image* image, short i, short j)
 {
     int k;
+    // search all layers of each image
     for (k = 0; k < image->numLayers; k++) {
         short image_width = image->layers[k].x1 - image->layers[k].x0 + 1;
         short image_height = image->layers[k].y1 - image->layers[k].y0 + 1;
         short bytes_per_row = image_width / 8;
         bytes_per_row += image_width % 8 ? 1 : 0;
+        // find relative indices
         short relx = j - image->layers[k].x0;
         short rely = i - image->layers[k].y0;
         short byte_index = (rely * bytes_per_row) + relx / 8;
+        // check if layer contains this i,j coordinate
         bool inbounds = relx >= 0 ? (relx < image_width ? (rely >= 0 ? rely < image_height : false) : false) : false;
         if (inbounds ? image->layers[k].bitmap[byte_index] & (1 << (7 - (relx % 8))) : false) {
             HAL_LCD_writeData(image->layers[k].color >> 8);
@@ -285,40 +281,45 @@ bool draw_pixel(image* image, short i, short j)
 
 void draw(image* image)
 {
-  image->inQueue = false;
+  image->inQueue = false; // image clearly left the queue to be drawn
   short i, j, k;
 
+  // find max bounds with previous location to erase trails
   short y0 = image->y0 < image->py0 ? image->y0 : image->py0;
   short x0 = image->x0 < image->px0 ? image->x0 : image->px0;
   short y1 = image->y1 > image->py1 ? image->y1 : image->py1;
   short x1 = image->x1 > image->px1 ? image->x1 : image->px1;
 
+  // saturate between 0 and 131
   x0 = (x0 > 131 ? 131 : (x0 < 0 ? 0 : x0));
   y0 = (y0 > 131 ? 131 : (y0 < 0 ? 0 : y0));
   x1 = (x1 > 131 ? 131 : (x1 < 0 ? 0 : x1));
   y1 = (y1 > 131 ? 131 : (y1 < 0 ? 0 : y1));
 
+  // store current bounds to previous
   image->px0 = image->x0;
   image->py0 = image->y0;
   image->px1 = image->x1;
   image->py1 = image->y1;
 
+  // sanity check on the bounds
   if (x0<=x1 ? (y0<=y1 ? true : false) : false) {
-    xSemaphoreTake(Sem_Erase, portMAX_DELAY);
+    xSemaphoreTake(Sem_Erase, portMAX_DELAY); // wait for images to finish erasing
     Crystalfontz128x128_SetDrawFrame(x0, y0, x1, y1);
     HAL_LCD_writeCommand(CM_RAMWR);
 
     for (i = y0; i <= y1; i++) {
       for (j = x0; j <= x1; j++) {
         for (k=0; k<numImages; k++) {
+          // if the current image is moving and in the draw queue, only draw it if the PASSED image param is moving
           if (((images[k]->inQueue & images[k]->moving) & !image->moving) ? false : draw_pixel(images[k],i,j)) break;
         }
-        if (k==numImages) {
+        if (k==numImages) { // draw black if no pixels found
           HAL_LCD_writeData(0x0);
           HAL_LCD_writeData(0x0);
         }
       }
     }
-    xSemaphoreGive(Sem_Erase);
+    xSemaphoreGive(Sem_Erase); // allow images to erase now
   }
 }

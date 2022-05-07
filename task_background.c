@@ -29,8 +29,10 @@ void Task_background(void* pvParameters)
         // Wait for task to be notified
         ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
 
+        // Get light sensor reading in lux
         float lux = opt3001_read_lux();
 
+        // Set light level according to lux reading
         if (lux < 20)
             l = DARK;
         else if (lux < 75)
@@ -38,6 +40,7 @@ void Task_background(void* pvParameters)
         else
             l = BRIGHT;
 
+        // If current light level doesn't equal the previous light level, redraw the background according to the light level
         if (pl != l) {
             erase_image(&background);
             switch (l) {
@@ -53,6 +56,7 @@ void Task_background(void* pvParameters)
             }
         }
 
+        // Update previous light level
         pl=l;
 
         vTaskDelay(pdMS_TO_TICKS(50));

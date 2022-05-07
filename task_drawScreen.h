@@ -10,7 +10,10 @@
 
 #include "main.h"
 
-// TODO header
+/******************************************************************************
+* Receives images that were either filled, or recently erased, and sends them
+* to the LCD
+******************************************************************************/
 void Task_drawScreen(void* pvParameters);
 
 extern TaskHandle_t TaskH_drawScreen;

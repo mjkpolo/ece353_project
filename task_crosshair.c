@@ -13,7 +13,10 @@ TaskHandle_t TaskH_crosshairBottomHalf;
 TaskHandle_t TaskH_drawCrosshair;
 MOVE_t crosshair_move;
 
-// TODO header. Also, Task_crosshairBottomHalf
+/******************************************************************************
+* Bottom Half Task. Examines the ADC data from the joystick on the MKII and
+* sets the crosshair's movement directions accordingly
+******************************************************************************/
 void Task_crosshairBottomHalf(void* pvParameters)
 {
     BaseType_t status;
@@ -39,7 +42,10 @@ void Task_crosshairBottomHalf(void* pvParameters)
     }
 }
 
-// TODO header
+/******************************************************************************
+* Updates the x and y positions of the crosshair and draws the crosshair at
+* those x and y positions
+******************************************************************************/
 void Task_drawCrosshair(void* pvParameters) {
     const short CROSSHAIR_HEIGHT = crosshair.y1 - crosshair.y0 + 1; // Height of the crosshair image
     const short CROSSHAIR_WIDTH = crosshair.x1 - crosshair.x0 + 1; // Width of the crosshair image
@@ -55,7 +61,7 @@ void Task_drawCrosshair(void* pvParameters) {
         px = crosshair_x;
         py = crosshair_y;
 
-        // TODO Just use if statements
+        // Update the x and y positions according to the x and y movement directions (crosshair_move.x/y)
         switch(crosshair_move.y) {
             case UP:
                 // Make sure the crosshair doesn't go past the top boundary of the screen

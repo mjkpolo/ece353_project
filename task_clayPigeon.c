@@ -19,7 +19,12 @@ SemaphoreHandle_t Sem_ClayLaunched;
 MOVE_DIR clay_x_move;
 
 
-// TODO Header
+/******************************************************************************
+* Draws the clay pigeon to move from one side of the screen to the other. It
+* also takes care of filling ammo initially and notifying the task to update
+* the background after the clay pigeon is hit, leaves the screen, or hits the
+* ground.
+******************************************************************************/
 void Task_clayPigeon(void *pvParameters)
 {
     bool move_up; // Boolean used to track whether the clay pigeon should move up or down (ascending or descending)
@@ -69,7 +74,7 @@ void Task_clayPigeon(void *pvParameters)
             }
 
             // Check if the clay has hit the top of the screen. If so, it should descend
-            if(y <= (CLAY_HEIGHT / 2)) move_up = false; // TODO I don't think CLAY_HEIGHT is properly calculating the height, as removing/adding it has no effect here
+            if(y <= (CLAY_HEIGHT / 2)) move_up = false;
 
             // Adjust the clay's x movement if the user is tilting the board to the left or right
             switch(clay_x_move) {
@@ -111,9 +116,6 @@ void Task_clayPigeon(void *pvParameters)
         // Change the background for the next clay pigeon if the lighting has changed
         xTaskNotifyGive(TaskH_background);
 
-
-        // TODO \/\/ Remove if the logic in ps2.c is reworked \/\/
-
         // Clear task notification's value so that the task cannot be notified while it is running (e.g. if the inner while loop is running and the
         // user tilts forward/notifies the task again, this will make sure any such notification attempts are not seen/processed at the next iteration
         // of the outer while loop/when the task runs again)
@@ -121,7 +123,11 @@ void Task_clayPigeon(void *pvParameters)
     }
 }
 
-// TODO header
+/******************************************************************************
+* Bottom Half Task. Examines the accelerometer x value and sets the clay's x
+* direction movement (more specifically, which way to adjust its x movement
+* towards) accordingly
+******************************************************************************/
 void Task_accelerometerXBottomHalf(void* pvParameters)
 {
     uint8_t x_tilt_l_state = 0;
