@@ -29,7 +29,9 @@ uint16_t SCORE = 0; // Score
 short crosshair_x = 64, crosshair_y = 64;
 volatile bool AMMO = false; // true if there is ammo; false otherwise
 
-// TODO Header
+/******************************************************************************
+* Initializes peripheral devices/hardware resources
+******************************************************************************/
 inline void init(void)
 {
     P5->DIR &= ~BIT1;
@@ -44,7 +46,11 @@ inline void init(void)
     //serial_debug_init();
 }
 
-// TODO Header ig
+/******************************************************************************
+* Main method that initializes FreeRTOS semaphores, queues, and tasks, adds
+* images to TODO ???? TODO, calls the method to initialize hardware, and starts
+* the FreeRTOS scheduler
+******************************************************************************/
 int main(void)
 {
     WDT_A->CTL = WDT_A_CTL_PW | WDT_A_CTL_HOLD; // stop watchdog timer

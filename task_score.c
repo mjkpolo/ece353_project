@@ -11,7 +11,12 @@
 TaskHandle_t TaskH_score;
 TaskHandle_t TaskH_endGame;
 
-// TODO Header
+/******************************************************************************
+* When notified, this task draws the score/scoreboard according to the value
+* of the global variable SCORE. This task also checks the number of clay
+* pigeons that have been hit and notifies Task_endGame if that number is high
+* enough to end the game.
+******************************************************************************/
 void Task_score(void* pvParameters) {
     // Draw the score board initially
     draw_xx0(&score);
