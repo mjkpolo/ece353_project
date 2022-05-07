@@ -20,8 +20,8 @@ def getBitmaps(img, name, move):
         structs = []
 
         yield '#include "lcd.h"\n\n'
-        tmp = np.zeros((132,132,4)).astype(np.uint8)
-        tmp[:,:,:] = 255
+        #tmp = np.zeros((132,132,4)).astype(np.uint8)
+        #tmp[:,:,:] = 255
 
         for key,pixels in sections:
 
@@ -45,10 +45,10 @@ def getBitmaps(img, name, move):
             if (width%8): width += 8-width%8
 
             pixels = pixels[first_row:last_row+1,first_col:last_col+1]
-            tmp[first_row:last_row+1,first_col:last_col+1,0][pixels] = hex2b(key)
-            tmp[first_row:last_row+1,first_col:last_col+1,1][pixels] = hex2g(key)
-            tmp[first_row:last_row+1,first_col:last_col+1,2][pixels] = hex2r(key)
-            tmp[first_row:last_row+1,first_col:last_col+1,3][pixels] = 255
+            #tmp[first_row:last_row+1,first_col:last_col+1,0][pixels] = hex2b(key)
+            #tmp[first_row:last_row+1,first_col:last_col+1,1][pixels] = hex2g(key)
+            #tmp[first_row:last_row+1,first_col:last_col+1,2][pixels] = hex2r(key)
+            #tmp[first_row:last_row+1,first_col:last_col+1,3][pixels] = 255
 
 
             
