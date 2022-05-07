@@ -61,7 +61,7 @@ void Task_clayPigeon(void *pvParameters)
         // Set the speed of the clay pigeon according to the current level/number of clays that have been hit
         dt = CLAYS_HIT / CLAYS_PER_LEVEL;
 
-        while((y<=SKY_BOTTOM_Y)&(x>0 && x<=131)) {
+        while((y<=SKY_BOTTOM_Y)&(x>=0 && x<=131)) {
             // Check if the clay has been hit. If so, break from the loop
             if(CLAYS_HIT != prev_clays_hit) break;
 
