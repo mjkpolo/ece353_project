@@ -42,45 +42,46 @@ void Task_clayPigeon(void *pvParameters)
         // The clay pigeon should initially be moving up
         move_up = true;
         // Start the clay pigeon immediately above the grass at the left or right boundary of the LCD
-        x = (ACCEL_X % 2 == 0) ? (CLAY_WIDTH / 2) : (LCD_HORIZONTAL_MAX - CLAY_WIDTH / 2);
-        y = SKY_BOTTOM_Y - (CLAY_HEIGHT / 2) - 1;
+        bool left = ACCEL_X%2;
+        x = (left) ? 0 : 131;
+        y = SKY_BOTTOM_Y;
         // Determine the starting x position (left or right border or the LCD) and the x step needed to get from there
         // to the horizontal center of the screen +/- a random number between 0 and 30 when the clay pigeon lands
-        xf = (LCD_HORIZONTAL_MAX / 2) + ((rand() % 2 == 0) ? -(ACCEL_Y % 61) : (ACCEL_Y % 61));
-        dx = (float) (xf - ((x == CLAY_WIDTH / 2) ? 0 : LCD_HORIZONTAL_MAX)) / (2.0 * (float) (SKY_BOTTOM_Y - CLAY_HEIGHT / 2)); // TODO Check which cast(s) (if either) is/are needed
+        dx = (10+ACCEL_Y%20)/(float)20;
 
         // Update the previous number of clays hit
         prev_clays_hit = CLAYS_HIT;
         // Set the speed of the clay pigeon according to the current level/number of clays that have been hit
         dt = CLAYS_HIT / CLAYS_PER_LEVEL;
 
-        while(y < SKY_BOTTOM_Y - (CLAY_HEIGHT / 2)) {
+        while((y<=SKY_BOTTOM_Y)&(x<0 ? false : x<=131)) {
             // Check if the clay has been hit. If so, break from the loop
             if(CLAYS_HIT != prev_clays_hit) break;
 
             // Check if the clay has hit the top of the screen. If so, it should descend
             if(y <= (CLAY_HEIGHT / 2)) move_up = false; // TODO I don't think CLAY_HEIGHT is properly calculating the height, as removing/adding it has no effect here
 
-            if(move_up) y--;
-            else y++;
-
-            // Move the clay pigeon closer to the center of the screen
-            x += dx;
-
             // Adjust the clay's x movement if the user is tilting the board to the left or right
             switch(clay_x_move) {
                 case LEFT: // Tilting left
                     // Increase the clay's movement to the left (or decrease its movement to the right)
-                    x -= dx / (dx < 0 ? -3 : 3);
+                    x -= dx / 2;
                     break;
                 case RIGHT: // Tilting right
                     // Increase the clay's movement to the right (or decrease its movement to the left)
-                    x += dx / (dx < 0 ? -3 : 3);
+                    x += dx / 2;
                     break;
             }
 
             // Redraw clay pigeon now that it has moved
             draw_clay(&pidgeon, (uint8_t) x, y);
+
+            if(move_up) y--;
+            else y++;
+
+            // Move the clay pigeon closer to the center of the screen
+            x = left ? x+dx : x-dx;
+
 
             // Wait for a certain amount of time (no less than 10ms) according to the number of clays hit
             // As more clays are hit, the wait time will decrease
