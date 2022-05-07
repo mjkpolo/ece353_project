@@ -12,15 +12,24 @@
 TaskHandle_t TaskH_endGame;
 TaskHandle_t TaskH_crosshairBottomHalf;
 TaskHandle_t TaskH_score;
-TaskHandle_t TaskH_background; // TODO
+TaskHandle_t TaskH_background;
 SemaphoreHandle_t Sem_Timer;
 
-// TODO Header
+/******************************************************************************
+* Returns the state of S1 on MKII.
+* Returns true if S1 is pressed, false if S1 is not pressed.
+******************************************************************************/
 bool MKII_S1(void) {
     return (P5->IN & BIT1) == 0;
 }
 
-// TODO Header
+/******************************************************************************
+* End of game task/sequence. Draws the end of game splash screen and pauses
+* user input from S2 on MKII and ADC14. This task runs until the user presses
+* S1 on MKII to reset the game. This task repeatedly notifies Task_background
+* so that the background can update whenever the level of light detected by
+* the opt3001 light sensor changes.
+******************************************************************************/
 void Task_endGame(void* pvParameters) {
     uint8_t buttonState = 0;
 
@@ -51,7 +60,7 @@ void Task_endGame(void* pvParameters) {
             // Debounce S1 on MKII
             buttonState = buttonState << 1 | MKII_S1();
 
-            xTaskNotifyGive(TaskH_background); // TODO
+            xTaskNotifyGive(TaskH_background);
 
             vTaskDelay(pdMS_TO_TICKS(10));
         }

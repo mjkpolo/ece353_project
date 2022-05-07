@@ -11,7 +11,11 @@
 
 TaskHandle_t TaskH_background;
 
-// TODO Header
+/******************************************************************************
+* Draws the background. The background will be drawn as one of three images
+* (light_background, medium_background, or dark_background) depending on the
+* level of light sensed by the opt3001 light sensor.
+******************************************************************************/
 void Task_background(void* pvParameters)
 {
     while (true) {

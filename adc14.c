@@ -19,6 +19,9 @@ TaskHandle_t TaskH_accelerometerXBottomHalf;
 
 SemaphoreHandle_t Sem_ClayLaunched;
 
+/******************************************************************************
+* Initialize ADC14
+******************************************************************************/
 void adc14_init(void) {
     // Configure the X direction of the joystick as an analog input pin.
     P6->SEL0 |= BIT0;
@@ -60,6 +63,11 @@ void adc14_init(void) {
     ADC14->CTL0 |= ADC14_CTL0_ON;
 }
 
+/******************************************************************************
+* Top Half of ADC14 Handler. Gets the PS2 and accelerometer values and
+* notifies the crosshairBottomHalf, accelerometerXBottomHalf, and clayPigeon
+* tasks.
+******************************************************************************/
 void ADC14_IRQHandler(void) {
     BaseType_t xHigherPriorityTaskWoken;
     BaseType_t status;

@@ -212,7 +212,7 @@ void Crystalfontz128x128_Init(void)
     HAL_LCD_writeData(CM_MADCTL_MX | CM_MADCTL_MY | CM_MADCTL_BGR);
 }
 
-image pidgeon, score, crosshair, background, end_splash;
+image pidgeon, score, crosshair, background, end_splash, warn_ammo;
 static image** images = NULL;
 static size_t numImages = 0;
 
@@ -237,7 +237,7 @@ void erase_image(image* image)
     image->y1 = 0;
     xSemaphoreGive(Sem_Erase);
 
-    if (image->inQueue ? false : image->moving) {
+    if (!image->inQueue) {
         xQueueSendToBack(Draw_Queue,&image,portMAX_DELAY);
         image->inQueue = true;
     }

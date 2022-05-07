@@ -10,7 +10,11 @@
 
 #include "main.h"
 
-// TODO Header
+/******************************************************************************
+* Draws the background. The background will be drawn as one of three images
+* (light_background, medium_background, or dark_background) depending on the
+* level of light sensed by the opt3001 light sensor.
+******************************************************************************/
 void Task_background(void* pvParameters);
 
 extern TaskHandle_t TaskH_background;

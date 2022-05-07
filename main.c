@@ -15,21 +15,20 @@
 #include "lcd.h"
 #include "opt3001.h"
 #include "adc14.h"
-// TODO Remove #include "timer32.h"
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdio.h>
 
-// TODO SemaphoreHandle_t Sem_LCD = NULL;
-
-extern SemaphoreHandle_t Sem_Erase; // TODO
+extern SemaphoreHandle_t Sem_Erase;
 
 uint8_t CLAYS_HIT = 0; // Number of clays hit
 uint16_t SCORE = 0; // Score
 short crosshair_x = 64, crosshair_y = 64;
 volatile bool AMMO = false; // true if there is ammo; false otherwise
 
-// TODO Header
+/******************************************************************************
+* Initializes peripheral devices/hardware resources
+******************************************************************************/
 inline void init(void)
 {
     P5->DIR &= ~BIT1;
@@ -44,7 +43,11 @@ inline void init(void)
     //serial_debug_init();
 }
 
-// TODO Header ig
+/******************************************************************************
+* Main method that initializes FreeRTOS semaphores, queues, and tasks, adds
+* images to list of image pointers, calls the method to initialize hardware,
+* and starts the FreeRTOS scheduler
+******************************************************************************/
 int main(void)
 {
     WDT_A->CTL = WDT_A_CTL_PW | WDT_A_CTL_HOLD; // stop watchdog timer
@@ -63,6 +66,7 @@ int main(void)
     add_image(&pidgeon);
     add_image(&score);
     add_image(&end_splash);
+    add_image(&warn_ammo);
     numImages = add_image(&background);
 
     Draw_Queue = xQueueCreate(numImages,sizeof(image*));
@@ -73,21 +77,13 @@ int main(void)
     xTaskCreate(Task_score, "score", configMINIMAL_STACK_SIZE, NULL, 4, &TaskH_score);
     xTaskCreate(Task_crosshairBottomHalf, "updateCrosshairMovement", configMINIMAL_STACK_SIZE, NULL, 3, &TaskH_crosshairBottomHalf);
     xTaskCreate(Task_drawCrosshair, "drawCrosshair", configMINIMAL_STACK_SIZE, NULL, 4, &TaskH_drawCrosshair);
-
-    //xTaskCreate(Task_clayPigeon, "drawClay", configMINIMAL_STACK_SIZE, NULL, 4, &TaskH_clayPigeon);
-    //xTaskCreate(Task_accelerometerXBottomHalf, "updateClayX", configMINIMAL_STACK_SIZE, NULL, 4, &TaskH_accelerometerXBottomHalf);
-    //xTaskCreate(Task_background, "background", configMINIMAL_STACK_SIZE, NULL, 4, &TaskH_background);
-    //xTaskCreate(Task_score, "score", configMINIMAL_STACK_SIZE, NULL, 4, &TaskH_score);
-    //xTaskCreate(Task_crosshairBottomHalf, "crosshair", configMINIMAL_STACK_SIZE, NULL, 4, &TaskH_crosshairBottomHalf);
-    //xTaskCreate(Task_drawCrosshair, "drawCrosshair", configMINIMAL_STACK_SIZE, NULL, 4, &TaskH_drawCrosshair);
-    
-
     xTaskCreate(Task_drawScreen, "drawScreen", configMINIMAL_STACK_SIZE, NULL, 2, &TaskH_drawScreen);
     xTaskCreate(TaskBlast, "blast", configMINIMAL_STACK_SIZE, NULL, 4, &TaskH_TaskBlast);
     xTaskCreate(Task_timer, "buttonADCTimer", configMINIMAL_STACK_SIZE, NULL, 3, &TaskH_timer);
     xTaskCreate(Task_endGame, "endGame", configMINIMAL_STACK_SIZE, NULL, 4, &TaskH_endGame);
 
-    xTaskNotifyGive(TaskH_background); //TODO
+    // Draw background right away
+    xTaskNotifyGive(TaskH_background);
 
     vTaskStartScheduler();
     while (true);

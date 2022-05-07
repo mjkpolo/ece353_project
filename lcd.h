@@ -102,7 +102,7 @@ typedef struct {
     bool moving;
 } image;
 
-extern image pidgeon, score, crosshair, background, end_splash; // TODO
+extern image pidgeon, score, crosshair, background, end_splash, warn_ammo;
 
 
 void draw(image* image);

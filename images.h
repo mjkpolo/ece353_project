@@ -8,6 +8,7 @@
 #include "medium_background.h"
 #include "light_background.h"
 #include "end_splash.h"
+#include "warn_ammo.h"
 #include "xx0.h"
 #include "xx1.h"
 #include "xx2.h"

@@ -12,12 +12,20 @@ TaskHandle_t TaskH_TaskBlast;
 
 SemaphoreHandle_t Sem_Timer;
 
-// TODO Header
+/******************************************************************************
+* Returns the state of S2 on MKII.
+* Returns true if S2 is pressed, false if S2 is not pressed.
+******************************************************************************/
 bool MKII_S2(void) {
     return (P3->IN & BIT5) == 0;
 }
 
-// TODO Header
+/******************************************************************************
+* Used to start ADC14 conversions and to read/debounce S2 on MKII. When S2 is
+* pressed, Task_blast is notified. This task takes and gives the Sem_Timer
+* semaphore at the beginning and end of each iteration, respectively, so this
+* task can be blocked by another task taking Sem_Timer.
+******************************************************************************/
 void Task_timer(void* pvParameters) {
 
     BaseType_t xHigherPriorityTaskWoken;

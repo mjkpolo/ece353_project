@@ -59,25 +59,25 @@ void Task_drawCrosshair(void* pvParameters) {
         switch(crosshair_move.y) {
             case UP:
                 // Make sure the crosshair doesn't go past the top boundary of the screen
-                if (crosshair_y > (CROSSHAIR_HEIGHT / 2) + STEP_VAL + 1)
-                    crosshair_y -= STEP_VAL;
+                if (crosshair_y > (CROSSHAIR_HEIGHT / 2) + 1)
+                    crosshair_y --;
                 break;
             case DOWN:
                 // Make sure the crosshair doesn't go past the bottom boundary of the screen
-                if(crosshair_y < (LCD_VERTICAL_MAX - (CROSSHAIR_HEIGHT / 2) - STEP_VAL - 1))
-                    crosshair_y += STEP_VAL;
+                if(crosshair_y < (LCD_VERTICAL_MAX - (CROSSHAIR_HEIGHT / 2) - 1))
+                    crosshair_y ++;
                 break;
         }
         switch(crosshair_move.x) {
             case LEFT:
                 // Make sure the crosshair doesn't go past the left boundary of the screen
-                if(crosshair_x > (CROSSHAIR_WIDTH / 2) + STEP_VAL + 1)
-                    crosshair_x -= STEP_VAL;
+                if(crosshair_x > (CROSSHAIR_WIDTH / 2) + 1)
+                    crosshair_x --;
                 break;
             case RIGHT:
                 // Make sure the crosshair doesn't go past the right boundary of the screen
-                if(crosshair_x < (LCD_HORIZONTAL_MAX - (CROSSHAIR_WIDTH / 2) - STEP_VAL - 1))
-                    crosshair_x += STEP_VAL;
+                if(crosshair_x < (LCD_HORIZONTAL_MAX - (CROSSHAIR_WIDTH / 2) - 1))
+                    crosshair_x ++;
                 break;
         }
 
@@ -86,6 +86,6 @@ void Task_drawCrosshair(void* pvParameters) {
             draw_crosshair(&crosshair, crosshair_x, crosshair_y);
         }
 
-        vTaskDelay(pdMS_TO_TICKS(10)); // TODO Adjust the wait time to adjust the speed of the crosshair
+        vTaskDelay(pdMS_TO_TICKS(10));
     }
 }
